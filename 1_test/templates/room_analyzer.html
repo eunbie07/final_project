@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방 사진 분석 시스템</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .upload-area { border: 2px dashed #ccc; padding: 40px; text-align: center; margin-bottom: 20px; background: white; }
+        .controls { background: white; padding: 20px; margin-bottom: 20px; }
+        .results { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .result-box { background: white; padding: 20px; }
+        img { max-width: 100%; height: auto; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        input, select { padding: 8px; margin: 5px; width: 100px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>방 사진 분석 시스템</h1>
+            <p>방 사진을 업로드하여 크기를 측정하세요</p>
+        </div>
+        
+        <div class="upload-area" id="uploadArea">
+            <p>이미지를 드래그하거나 클릭하여 업로드</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <div class="controls">
+            <label>기준 크기: <input type="number" id="referenceSize" value="200" min="50" max="500"> cm</label>
+            <button id="analyzeBtn" disabled>분석 시작</button>
+            <button id="resetBtn">리셋</button>
+        </div>
+        
+        <div class="results hidden" id="results">
+            <div class="result-box">
+                <h3>원본 이미지</h3>
+                <img id="originalImage" alt="원본 이미지">
+            </div>
+            <div class="result-box">
+                <h3>분석 결과</h3>
+                <img id="resultImage" alt="분석 결과">
+                <div id="measurements"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const originalImage = document.getElementById('originalImage');
+        const resultImage = document.getElementById('resultImage');
+        const results = document.getElementById('results');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const measurements = document.getElementById('measurements');
+        
+        let imageData = null;
+        
+        uploadArea.onclick = () => fileInput.click();
+        
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imageData = e.target.result;
+                    originalImage.src = imageData;
+                    results.classList.remove('hidden');
+                    analyzeBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        
+        analyzeBtn.onclick = async () => {
+            analyzeBtn.textContent = '분석 중...';
+            analyzeBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: imageData,
+                        reference_size: parseInt(document.getElementById('referenceSize').value),
+                        options: {}
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultImage.src = result.result_image;
+                    const dims = result.dimensions;
+                    measurements.innerHTML = `
+                        <p>가로: ${dims.width}cm</p>
+                        <p>세로: ${dims.height}cm</p>
+                        <p>면적: ${dims.area}m²</p>
+                        <p>둘레: ${dims.perimeter}m</p>
+                    `;
+                } else {
+                    alert('분석 실패: ' + result.error);
+                }
+            } catch (error) {
+                alert('오류: ' + error.message);
+            }
+            
+            analyzeBtn.textContent = '분석 시작';
+            analyzeBtn.disabled = false;
+        };
+        
+        resetBtn.onclick = () => {
+            imageData = null;
+            results.classList.add('hidden');
+            analyzeBtn.disabled = true;
+            fileInput.value = '';
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# Python 3.12 호환 패키지 목록
+flask>=2.3.0
+flask-cors>=4.0.0
+opencv-python>=4.9.0
+numpy>=1.26.0
+Pillow>=10.0.0
+setuptools>=68.0.0
