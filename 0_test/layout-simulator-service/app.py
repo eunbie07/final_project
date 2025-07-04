@@ -1,9 +1,7 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File
-from yolo_detector import detect_objects
-from layout_generator import normalize_boxes
-from parent_filter import check_parent_friendly
 from PIL import Image
+from ultralytics import YOLO
 
 app = FastAPI()
 
@@ -16,6 +14,42 @@ app.add_middleware(
 )
 
 REAL_BED_WIDTH_CM = 200  # 실제 침대 너비 기준
+
+# YOLO 모델 로드
+model = YOLO('yolov8n.pt')
+
+def detect_objects(image_path):
+    results = model(image_path)
+    detections = []
+    for r in results:
+        for box in r.boxes:
+            label = model.names[int(box.cls)]
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            detections.append({
+                'label': label,
+                'bbox': [x1, y1, x2, y2]
+            })
+    return detections
+
+def normalize_boxes(detections, image_width, image_height):
+    normalized = []
+    for d in detections:
+        x1, y1, x2, y2 = d['bbox']
+        normalized.append({
+            'label': d['label'],
+            'x': x1 / image_width,
+            'y': y1 / image_height,
+            'w': (x2 - x1) / image_width,
+            'h': (y2 - y1) / image_height
+        })
+    return normalized
+
+def check_parent_friendly(normalized_boxes):
+    warnings = []
+    for item in normalized_boxes:
+        if item['w'] < 0.2 and item['label'] in ['table', 'sofa']:
+            warnings.append(f"{item['label']} 주변 간격이 좁아 이동이 불편할 수 있어요.")
+    return warnings
 
 @app.post("/layout")
 async def analyze_layout(file: UploadFile = File(...)):
