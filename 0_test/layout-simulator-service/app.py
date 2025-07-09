@@ -16,7 +16,7 @@ app.add_middleware(
 REAL_BED_WIDTH_CM = 200  # 실제 침대 너비 기준
 
 # YOLO 모델 로드
-model = YOLO('yolov8n.pt')
+model = YOLO('yolo11n')
 
 def detect_objects(image_path):
     results = model(image_path)
