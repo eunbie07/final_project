@@ -19,7 +19,6 @@ def load_midas_model():
     model.to(device).eval()
     return model, transform, device, expects_pil
 
-
 def predict_depth(model, transform, device, img_path, expects_pil=False):
     img = cv2.imread(img_path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -27,14 +26,15 @@ def predict_depth(model, transform, device, img_path, expects_pil=False):
     if expects_pil:
         img_input = Image.fromarray(img)
     else:
-        img_input = img
+        img_input = img  # numpy 형태 그대로 사용
 
-    # MiDaS에서 기대하는 transform은 numpy RGB 배열이어야 함
-    sample = transform({"image": img_input})
-    image = sample["image"].to(device).unsqueeze(0)
+    # 수정된 transform 적용
+    input_tensor = transform(img_input).to(device)
+    if input_tensor.ndim == 3:
+        input_tensor = input_tensor.unsqueeze(0)  # ← ✅ 들여쓰기 되어야 함
 
     with torch.no_grad():
-        prediction = model.forward(image)
+        prediction = model(input_tensor)
         prediction = torch.nn.functional.interpolate(
             prediction.unsqueeze(1),
             size=img.shape[:2],

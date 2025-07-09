@@ -43,7 +43,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 3000              # FastAPI 실�
 ### 2. 프론트엔드 (React)
 
 ```bash
-cd frontend
+cd /home/node1/final_project/room-analyzer/frontend
 npm install
 npm run dev
 ```
