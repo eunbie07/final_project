@@ -30,11 +30,12 @@
 ### 1. 백엔드 (FastAPI)
 
 ```bash
-cd backend
-python3 -m venv .venv
+cd /home/node1/final_project/room-analyzer/backend
+python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload
+pip install uv               # 최초 1회만
+uv                           # pyproject.toml 기반 의존성 설치
+uvicorn main:app --reload --host 0.0.0.0 --port 3000              # FastAPI 실행
 ```
 
 > YOLOv11 모델(`yolo11n`)은 처음 실행 시 자동 다운로드됩니다.

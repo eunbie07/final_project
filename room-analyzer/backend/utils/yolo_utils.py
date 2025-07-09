@@ -1,4 +1,4 @@
-
+# utils/yolo_utils.py
 from ultralytics import YOLO
 
 REAL_BED_WIDTH_CM = 200
