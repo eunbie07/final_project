@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방 크기 측정기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .upload-container {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 40px 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background-color: #f0f8ff;
+            border-color: #2980b9;
+        }
+
+        .upload-area.dragover {
+            background-color: #e6f3ff;
+            border-color: #1abc9c;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 15px;
+        }
+
+        .upload-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .result-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            display: none; /* 초기에는 숨김 */
+        }
+
+        .image-preview {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        #previewImage {
+            max-width: 100%;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .measurements {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+        }
+
+        .measurement-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .measurement-item h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .measurement-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .unit {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-left: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3498db;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            padding: 15px;
+            background-color: #fdecea;
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .result-container {
+                flex-direction: column;
+            }
+            
+            .image-preview, .measurements {
+                width: 100%;
+            }
+        }
+
+        .instructions {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>방 크기 측정기</h1>
+        
+        <div class="upload-container">
+            <div class="instructions">
+                <h3>사용 방법</h3>
+                <ol>
+                    <li>방 사진을 업로드하세요. (JPG, PNG 형식)</li>
+                    <li>천장과 바닥이 잘 보이는 사진을 사용하세요.</li>
+                    <li>사진은 정면에서 촬영된 것이 가장 좋습니다.</li>
+                </ol>
+            </div>
+            
+            <input type="file" id="fileInput" accept="image/*">
+            <div class="upload-area" id="uploadArea">
+                <div style="font-size: 24px; margin-bottom: 10px;">📷</div>
+                <div style="margin-bottom: 10px;">이미지를 드래그 앤 드롭하거나 클릭하여 업로드하세요</div>
+                <div style="font-size: 12px; color: #7f8c8d;">JPG, PNG 파일 (최대 10MB)</div>
+            </div>
+            <button class="upload-btn" id="uploadBtn">측정 시작</button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>이미지 분석 중입니다. 잠시만 기다려주세요...</div>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="image-preview">
+                <img id="previewImage" src="#" alt="미리보기">
+            </div>
+            <div class="measurements" id="measurements">
+                <h2>측정 결과</h2>
+                <div class="measurement-item">
+                    <h3>가로 길이</h3>
+                    <div><span id="widthValue">-</span> <span class="unit">미터</span></div>
+                </div>
+                <div class="measurement-item">
+                    <h3>세로 길이</h3>
+                    <div><span id="lengthValue">-</span> <span class="unit">미터</span></div>
+                </div>
+                <div class="measurement-item">
+                    <h3>면적</h3>
+                    <div><span id="areaValue">-</span> <span class="unit">제곱미터 (㎡)</span></div>
+                </div>
+                <div style="margin-top: 30px; font-size: 12px; color: #7f8c8d;">
+                    <p>※ 측정 결과는 참고용이며, 실제와 다를 수 있습니다. 정확한 측정을 위해서는 전문가의 도움을 받으시기 바랍니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const previewImage = document.getElementById('previewImage');
+            const resultContainer = document.getElementById('resultContainer');
+            const loadingElement = document.getElementById('loading');
+            const errorMessageElement = document.getElementById('errorMessage');
+            
+            // 드래그 앤 드롭 이벤트
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                uploadArea.classList.add('dragover');
+            }
+
+            function unhighlight() {
+                uploadArea.classList.remove('dragover');
+            }
+
+            // 파일 드롭 처리
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+
+            // 파일 선택 처리
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    handleFiles(this.files);
+                }
+            });
+
+            // 업로드 버튼 클릭
+            uploadBtn.addEventListener('click', function() {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    showError('이미지를 선택해주세요.');
+                    return;
+                }
+                
+                uploadFile(fileInput.files[0]);
+            });
+
+            // 파일 처리
+            function handleFiles(files) {
+                const file = files[0];
+                
+                // 파일 유효성 검사
+                if (!file.type.match('image.*')) {
+                    showError('이미지 파일만 업로드 가능합니다.');
+                    return;
+                }
+                
+                if (file.size > 10 * 1024 * 1024) { // 10MB
+                    showError('파일 크기는 10MB를 초과할 수 없습니다.');
+                    return;
+                }
+                
+                // 미리보기
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    resultContainer.style.display = 'flex';
+                    
+                    // 결과 초기화
+                    document.getElementById('widthValue').textContent = '-';
+                    document.getElementById('lengthValue').textContent = '-';
+                    document.getElementById('areaValue').textContent = '-';
+                    
+                    // 에러 메시지 숨기기
+                    hideError();
+                };
+                reader.readAsDataURL(file);
+                
+                // 파일 인풋 업데이트
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+            }
+            
+            // 파일 업로드
+            function uploadFile(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // 로딩 표시
+                loadingElement.style.display = 'block';
+                hideError();
+                
+                // 서버로 전송
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 측정 결과 표시
+                        document.getElementById('widthValue').textContent = data.width;
+                        document.getElementById('lengthValue').textContent = data.length;
+                        document.getElementById('areaValue').textContent = data.area;
+                        
+                        // 이미지 업데이트 (서버에서 처리된 이미지가 있다면)
+                        if (data.image_url) {
+                            previewImage.src = data.image_url;
+                        }
+                        
+                        // 결과 표시
+                        resultContainer.style.display = 'flex';
+                    } else {
+                        showError(data.error || '처리 중 오류가 발생했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('서버와의 통신 중 오류가 발생했습니다.');
+                })
+                .finally(() => {
+                    // 로딩 숨기기
+                    loadingElement.style.display = 'none';
+                });
+            }
+            
+            // 에러 메시지 표시
+            function showError(message) {
+                errorMessageElement.textContent = message;
+                errorMessageElement.style.display = 'block';
+            }
+            
+            // 에러 메시지 숨기기
+            function hideError() {
+                errorMessageElement.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

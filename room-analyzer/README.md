@@ -1,22 +1,22 @@
 
-# 🏠 Room Analyzer Project
+#  Room Analyzer Project
 
 사진 한 장으로 방 크기를 추정하고, 감지된 가구를 포함한 **2D 평면도 도면을 생성**하는 React + FastAPI 기반 AI 웹앱입니다.
 
 ---
 
-## 📦 기능 요약
+##  기능 요약
 
 | 기능 | 설명 |
 |------|------|
-| ✅ 방 사진 업로드 | React에서 사진 업로드 및 층고 입력 |
-| ✅ AI 기반 분석 | FastAPI + YOLOv11 + MiDaS로 방 구조, 가구 감지 |
-| ✅ 평면도 생성 | SVG 기반 도면 + PNG 다운로드 기능 |
-| ✅ Fallback 처리 | 침대 감지 실패 시 MiDaS + 층고 기준 분석으로 대체 |
+|  방 사진 업로드 | React에서 사진 업로드 및 층고 입력 |
+|  AI 기반 분석 | FastAPI + YOLOv11 + MiDaS로 방 구조, 가구 감지 |
+|  평면도 생성 | SVG 기반 도면 + PNG 다운로드 기능 |
+|  Fallback 처리 | 침대 감지 실패 시 MiDaS + 층고 기준 분석으로 대체 |
 
 ---
 
-## 🧠 기술 스택
+##  기술 스택
 
 - **Frontend**: React + Vite
 - **Backend**: FastAPI
@@ -25,7 +25,7 @@
 
 ---
 
-## 🚀 실행 방법
+##  실행 방법
 
 ### 1. 백엔드 (FastAPI)
 
@@ -50,7 +50,7 @@ npm run dev
 
 ---
 
-## 🖼 사용 예시
+##  사용 예시
 
 1. 사진 업로드 + 층고 입력  
 2. `/analyze-room` API 호출  
@@ -59,7 +59,7 @@ npm run dev
 
 ---
 
-## 📁 주요 폴더 구조
+##  주요 폴더 구조
 
 ```
 room-analyzer-project/
@@ -76,14 +76,14 @@ room-analyzer-project/
 
 ---
 
-## 🧰 사용 모델 출처
+##  사용 모델 출처
 
 - [MiDaS (Intel-ISL)](https://github.com/isl-org/MiDaS)
 - [YOLOv11 (Ultralytics)](https://github.com/ultralytics/ultralytics)
 
 ---
 
-## ✨ 향후 확장 가능 기능
+##  향후 확장 가능 기능
 
 - 드래그 가능한 가구 배치
 - 회전 및 정렬 기능
@@ -92,6 +92,6 @@ room-analyzer-project/
 
 ---
 
-## 🧑‍💻 만든이
+##  만든이
 
 이 프로젝트는 2025년 7월 기준 AI 기반 실내 공간 분석 기술을 학습하고 적용하기 위해 제작되었습니다.
