@@ -1,6 +1,7 @@
 // frontend/src/components/RoomResult.jsx
 import React from "react";
 import RoomCanvas from "./RoomCanvas";
+// import Room3DViewer from './Room3DViewer';
 
 const RoomResult = ({ result, depthImageUrl }) => {
   if (!result) return null;

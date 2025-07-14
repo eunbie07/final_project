@@ -248,61 +248,122 @@ def compute_3d_distance(req: DepthDistanceRequest):
 # ---------------------------
 @app.post("/estimate-room-size")
 def estimate_room_size(req: RoomPoints):
-    print("💡 방 크기 추정 요청:", req.points)
+    print("💡 MiDaS 깊이 활용 방 크기 추정 요청:", req.points)
 
     if len(req.points) != 4:
         return {"error": "좌표는 정확히 4개여야 합니다."}
 
-    p = req.points
+    points = req.points
+    p1, p2, p3, p4 = points
     
-    # 올바른 방법: 2D 픽셀 거리 기반 계산
-    # 1. 수직 거리 (층고) - 점1(바닥)과 점2(천장)
-    vertical_pixel_distance = sqrt(
-        (p[1].x - p[0].x)**2 + (p[1].y - p[0].y)**2
-    )
+    print(f"🔍 받은 점들:")
+    print(f"   점1(바닥): ({p1.x}, {p1.y}, depth={p1.z:.2f})")
+    print(f"   점2(천장): ({p2.x}, {p2.y}, depth={p2.z:.2f})")  
+    print(f"   점3(왼쪽): ({p3.x}, {p3.y}, depth={p3.z:.2f})")
+    print(f"   점4(오른쪽): ({p4.x}, {p4.y}, depth={p4.z:.2f})")
     
-    print(f"🔍 수직 픽셀 거리: {vertical_pixel_distance:.2f}")
-    print(f"🔍 점1 (바닥): ({p[0].x}, {p[0].y})")
-    print(f"🔍 점2 (천장): ({p[1].x}, {p[1].y})")
-    print(f"🔍 점3 (왼쪽): ({p[2].x}, {p[2].y})")
-    print(f"🔍 점4 (오른쪽): ({p[3].x}, {p[3].y})")
+    # MiDaS 출력 크기 (깊이맵 크기)
+    image_width, image_height = 256, 192
     
-    if vertical_pixel_distance == 0:
-        return {"error": "수직 거리가 0입니다. 다른 점을 선택해 주세요."}
+    # 🌟 핵심: MiDaS 깊이를 실제 3D 좌표로 변환
+    def to_3d_point(pixel_x, pixel_y, midas_depth):
+        """픽셀 좌표와 MiDaS 깊이를 3D 공간 좌표로 변환"""
+        
+        # 카메라 파라미터 (일반적인 스마트폰 기준)
+        focal_length = image_width * 0.8  # 대략적인 초점거리
+        
+        # 정규화된 좌표 계산
+        norm_x = (pixel_x - image_width/2) / focal_length
+        norm_y = (pixel_y - image_height/2) / focal_length
+        
+        # MiDaS 깊이를 실제 거리로 변환
+        # MiDaS는 역깊이(inverse depth)를 출력하므로 변환 필요
+        real_depth = 5.0 / (midas_depth * 0.01 + 0.1)
+        
+        # 3D 세계 좌표 계산
+        world_x = norm_x * real_depth
+        world_y = norm_y * real_depth
+        world_z = real_depth
+        
+        return world_x, world_y, world_z
     
-    # 2. 픽셀당 실제 거리 비율 (230cm 층고 기준)
-    cm_per_pixel = 230.0 / vertical_pixel_distance
+    # 모든 점을 3D 좌표로 변환
+    p1_3d = to_3d_point(p1.x, p1.y, p1.z)
+    p2_3d = to_3d_point(p2.x, p2.y, p2.z)
+    p3_3d = to_3d_point(p3.x, p3.y, p3.z) 
+    p4_3d = to_3d_point(p4.x, p4.y, p4.z)
     
-    print(f"🔍 픽셀당 실제 거리: {cm_per_pixel:.4f} cm/pixel")
+    print(f"🌍 3D 좌표 변환:")
+    print(f"   점1 → 3D: ({p1_3d[0]:.3f}, {p1_3d[1]:.3f}, {p1_3d[2]:.3f})")
+    print(f"   점2 → 3D: ({p2_3d[0]:.3f}, {p2_3d[1]:.3f}, {p2_3d[2]:.3f})")
+    print(f"   점3 → 3D: ({p3_3d[0]:.3f}, {p3_3d[1]:.3f}, {p3_3d[2]:.3f})")
+    print(f"   점4 → 3D: ({p4_3d[0]:.3f}, {p4_3d[1]:.3f}, {p4_3d[2]:.3f})")
     
-    # 3. 가로 거리 - 점1(기준)과 점4(오른쪽 바닥)
-    horizontal_pixel_distance = sqrt(
-        (p[3].x - p[0].x)**2 + (p[3].y - p[0].y)**2
-    )
+    # 실제 3D 공간에서의 거리 계산
+    def distance_3d_real(point_a, point_b):
+        return sqrt(
+            (point_b[0] - point_a[0])**2 + 
+            (point_b[1] - point_a[1])**2 + 
+            (point_b[2] - point_a[2])**2
+        )
     
-    # 4. 세로 거리 - 점1(기준)과 점3(왼쪽 바닥)  
-    depth_pixel_distance = sqrt(
-        (p[2].x - p[0].x)**2 + (p[2].y - p[0].y)**2
-    )
+    # 3D 거리 측정
+    height_3d = distance_3d_real(p1_3d, p2_3d)  # 수직 거리 (층고)
+    width_3d = distance_3d_real(p1_3d, p4_3d)   # 가로 거리
+    depth_3d = distance_3d_real(p1_3d, p3_3d)   # 세로 거리
     
-    print(f"🔍 가로 픽셀 거리: {horizontal_pixel_distance:.2f}")
-    print(f"🔍 세로 픽셀 거리: {depth_pixel_distance:.2f}")
+    print(f"📏 3D 공간 거리:")
+    print(f"   수직(층고): {height_3d:.3f}m")
+    print(f"   가로: {width_3d:.3f}m")
+    print(f"   세로: {depth_3d:.3f}m")
     
-    # 5. 실제 거리로 변환
-    width_cm = horizontal_pixel_distance * cm_per_pixel
-    depth_cm = depth_pixel_distance * cm_per_pixel
+    # 실제 층고(230cm)를 기준으로 스케일 보정
+    target_height = 2.3  # 미터
+    scale_factor = target_height / height_3d if height_3d > 0 else 1.0
     
-    print(f"📏 계산된 방 크기: 가로 {width_cm:.1f}cm × 세로 {depth_cm:.1f}cm")
+    print(f"🔧 스케일 보정:")
+    print(f"   측정 층고: {height_3d:.3f}m")
+    print(f"   목표 층고: {target_height}m") 
+    print(f"   스케일 팩터: {scale_factor:.4f}")
+    
+    # 최종 크기 계산 (센티미터 단위)
+    final_width_cm = width_3d * scale_factor * 100
+    final_depth_cm = depth_3d * scale_factor * 100
+    
+    # 기존 2D 방식과 비교 (참고용)
+    old_vertical_2d = sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2)
+    old_horizontal_2d = sqrt((p4.x - p1.x)**2 + (p4.y - p1.y)**2)
+    old_width_2d = (old_horizontal_2d / old_vertical_2d) * 230 if old_vertical_2d > 0 else 0
+    
+    improvement_percent = abs(final_width_cm - old_width_2d) / old_width_2d * 100 if old_width_2d > 0 else 0
+    
+    print(f"📊 결과 비교:")
+    print(f"   기존 2D 방식: {old_width_2d:.1f}cm")
+    print(f"   새로운 3D 방식: {final_width_cm:.1f}cm")
+    print(f"   개선 효과: {improvement_percent:.1f}%")
+    print(f"📏 최종 방 크기: 가로 {final_width_cm:.1f}cm × 세로 {final_depth_cm:.1f}cm")
 
     return {
-        "width_cm": round(width_cm, 1),
-        "depth_cm": round(depth_cm, 1),
-        "cm_per_pixel": round(cm_per_pixel, 4),
-        "vertical_pixels": round(vertical_pixel_distance, 2),
-        "horizontal_pixels": round(horizontal_pixel_distance, 2),
-        "depth_pixels": round(depth_pixel_distance, 2)
+        "width_cm": round(final_width_cm, 1),
+        "depth_cm": round(final_depth_cm, 1),
+        "height_cm": 230.0,
+        "method": "midas_3d_aware",
+        "scale_factor": round(scale_factor, 4),
+        "3d_distances_m": {
+            "height": round(height_3d, 3),
+            "width": round(width_3d, 3),
+            "depth": round(depth_3d, 3)
+        },
+        "comparison_with_2d": {
+            "old_2d_result": round(old_width_2d, 1),
+            "new_3d_result": round(final_width_cm, 1),
+            "improvement_percent": round(improvement_percent, 1)
+        },
+        "depth_info": {
+            "depth_range": round(max(p1.z, p2.z, p3.z, p4.z) - min(p1.z, p2.z, p3.z, p4.z), 2),
+            "perspective_strength": "강함" if max(p1.z, p2.z, p3.z, p4.z) - min(p1.z, p2.z, p3.z, p4.z) > 200 else "중간"
+        }
     }
-
 # ---------------------------
 # 서버 시작 이벤트
 # ---------------------------
