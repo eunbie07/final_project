@@ -1,28 +1,56 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
+import axios from "axios";
 
-const ImageClickArea = ({ imageUrl, onComplete }) => {
+const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
   const [points, setPoints] = useState([]);
   const containerRef = useRef(null);
   const imageRef = useRef(null);
 
-  const handleClick = (e) => {
+  const handleClick = async (e) => {
     if (points.length >= 4) return;
+    if (!imageRef.current || depthWidth === 0 || depthHeight === 0) {
+      console.warn("깊이 정보가 아직 준비되지 않았습니다.");
+      return;
+    }
 
     const rect = imageRef.current.getBoundingClientRect();
+    const displayX = e.clientX - rect.left;
+    const displayY = e.clientY - rect.top;
 
-    const scaleX = imageRef.current.naturalWidth / imageRef.current.width;
-    const scaleY = imageRef.current.naturalHeight / imageRef.current.height;
+    const displayWidth = imageRef.current.width;
+    const displayHeight = imageRef.current.height;
 
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
+    const x = Math.round((displayX / displayWidth) * depthWidth);
+    const y = Math.round((displayY / displayHeight) * depthHeight);
 
-    const newPoints = [...points, { x, y }];
-    setPoints(newPoints);
+    if (isNaN(x) || isNaN(y)) {
+      alert("좌표 변환 오류");
+      return;
+    }
 
-    if (newPoints.length === 4) {
-      onComplete(newPoints);
+    try {
+      const res = await axios.get("http://localhost:3000/get-depth-at-point", {
+        params: { x, y },
+      });
+
+      const depth = res.data.depth;
+      if (isNaN(depth) || depth <= 0) {
+        alert("깊이 정보를 불러올 수 없습니다. 다른 위치를 클릭해 주세요.");
+        return;
+      }
+
+      const newPoints = [...points, { x, y, z: depth }];
+      setPoints(newPoints);
+
+      if (newPoints.length === 4) {
+        onComplete(newPoints);
+      }
+    } catch (error) {
+      console.error("깊이 정보 요청 실패:", error);
+      alert("서버 오류로 깊이 정보를 불러오지 못했습니다.");
     }
   };
+
 
   return (
     <div className="mb-4">
@@ -48,21 +76,19 @@ const ImageClickArea = ({ imageUrl, onComplete }) => {
         />
 
         {points.map((pt, index) => {
-          // 마커 위치는 클릭 좌표 (원본 해상도 기준)를 이미지 렌더링 사이즈 기준으로 환산해서 표시
           const img = imageRef.current;
           if (!img) return null;
-          const scaleX = img.width / img.naturalWidth;
-          const scaleY = img.height / img.naturalHeight;
-          const x = pt.x * scaleX;
-          const y = pt.y * scaleY;
+
+          const displayX = (pt.x / depthWidth) * img.width;
+          const displayY = (pt.y / depthHeight) * img.height;
 
           return (
             <div
               key={index}
               style={{
                 position: "absolute",
-                left: `${x}px`,
-                top: `${y}px`,
+                left: `${displayX}px`,
+                top: `${displayY}px`,
                 width: "10px",
                 height: "10px",
                 backgroundColor: "red",
