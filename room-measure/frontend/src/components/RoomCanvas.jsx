@@ -1,6 +1,7 @@
 // frontend/src/components/RoomCanvas.jsx
 import React from "react";
 
+
 const RoomCanvas = ({ x, y }) => {
   // 유효성 검사 및 기본값 설정
   const validX = isNaN(x) || x <= 0 ? 400 : x; // 가로 (width)
