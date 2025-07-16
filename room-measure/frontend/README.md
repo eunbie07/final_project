@@ -2,13 +2,13 @@
 
 이 프로젝트는 부동산 방 사진을 기반으로 사용자가 직접 벽의 기준점을 클릭하여 방의 **가로(x)**, **세로(y)** 길이를 자동으로 추정하는 웹 애플리케이션입니다.광각 렌즈로 촬영된 사진에 대해서도 OpenCV 왜곡 보정을 적용하여 비교적 정확한 거리 추정을 제공합니다.
 
-* * *
+---
 
 ## ✅ 주요 기능
 
 ### 1. 사진 업로드 및 왜곡 보정
 
-* 사용자가 사진을 업로드하면 FastAPI 서버에서 OpenCV `cv2.undistort()` 함수로 광각 왜곡을 1차 보정합니다.
+- 사용자가 사진을 업로드하면 FastAPI 서버에서 OpenCV `cv2.undistort()` 함수로 광각 왜곡을 1차 보정합니다.
 
 ### 2. 4포인트 클릭 방식 (xz / yz 평면 기반)
 
@@ -21,24 +21,24 @@
 
 이 순서를 통해 다음을 계산합니다:
 
-* z축 기준 픽셀 거리 → 230cm로 환산
-* x, y 거리 → 각각 `xz`, `yz` 평면에서 독립적으로 환산
+- z축 기준 픽셀 거리 → 230cm로 환산
+- x, y 거리 → 각각 `xz`, `yz` 평면에서 독립적으로 환산
 
 ### 3. 거리 계산 결과
 
-* 가로 길이 (x): cm 단위
-* 세로 길이 (y): cm 단위
-* 1픽셀당 cm 값
+- 가로 길이 (x): cm 단위
+- 세로 길이 (y): cm 단위
+- 1픽셀당 cm 값
 
-* * *
+---
 
 ## 🧱 기술 스택
 
-* **Frontend**: React + Vite
-* **Backend**: FastAPI + OpenCV
-* **Styling**: Tailwind CSS (선택)
+- **Frontend**: React + Vite
+- **Backend**: FastAPI + OpenCV
+- **Styling**: Tailwind CSS (선택)
 
-* * *
+---
 
 ## 🚀 실행 방법
 
@@ -53,7 +53,7 @@
     npm install
     npm run dev -- --host 0.0.0.0 --port 4000
 
-* * *
+---
 
 ## 📦 주요 디렉토리 구조
 
@@ -70,15 +70,15 @@
     │           ├── ImageUploader.jsx
     │           └── ImageClickArea.jsx
 
-* * *
+---
 
 ## 🎯 향후 확장 가능성
 
-* RoomNet, HorizonNet 등으로 자동 평면 인식 기능 추가
-* 방 구조 2D 시각화 기능
-* 방 크기 결과 다운로드 (PDF, JSON 등)
+- RoomNet, HorizonNet 등으로 자동 평면 인식 기능 추가
+- 방 구조 2D 시각화 기능
+- 방 크기 결과 다운로드 (PDF, JSON 등)
 
-* * *
+---
 
 ## ✨ 만든 이유
 

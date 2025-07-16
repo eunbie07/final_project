@@ -3,105 +3,208 @@ import React from "react";
 
 const RoomCanvas = ({ x, y }) => {
   // 유효성 검사 및 기본값 설정
-  const validX = isNaN(x) || x <= 0 ? 400 : x;
-  const validY = isNaN(y) || y <= 0 ? 300 : y;
-  
-  console.log("🎨 RoomCanvas received:", { x, y, validX, validY });
-  
-  const maxCanvasWidth = 400; // 기준 너비(px)
+  const validX = isNaN(x) || x <= 0 ? 400 : x; // 가로 (width)
+  const validY = isNaN(y) || y <= 0 ? 300 : y; // 세로 (depth)
+
+  console.log("🏠 RoomCanvas 입력값:", { x: validX, y: validY });
+  console.log("🏠 실제 비율:", (validX / validY).toFixed(2));
+
+  // 최대 캔버스 크기 설정
+  const maxCanvasSize = 400;
+
+  // 실제 비율 계산
   const aspectRatio = validX / validY;
 
-  let canvasWidth = maxCanvasWidth;
-  let canvasHeight = maxCanvasWidth / aspectRatio;
+  // 캔버스 크기 계산 (비율 유지)
+  let canvasWidth, canvasHeight;
 
-  // 세로가 더 긴 경우에는 기준을 반대로 설정
-  if (aspectRatio < 1) {
-    canvasHeight = maxCanvasWidth;
-    canvasWidth = maxCanvasWidth * aspectRatio;
+  if (aspectRatio >= 1) {
+    // 가로가 더 긴 경우
+    canvasWidth = maxCanvasSize;
+    canvasHeight = maxCanvasSize / aspectRatio;
+  } else {
+    // 세로가 더 긴 경우
+    canvasHeight = maxCanvasSize;
+    canvasWidth = maxCanvasSize * aspectRatio;
   }
 
   // 최소/최대 크기 제한
-  canvasWidth = Math.max(100, Math.min(canvasWidth, 500));
-  canvasHeight = Math.max(100, Math.min(canvasHeight, 500));
+  canvasWidth = Math.max(200, Math.min(canvasWidth, 500));
+  canvasHeight = Math.max(150, Math.min(canvasHeight, 400));
+
+  console.log("🖼️ 캔버스 크기:", {
+    width: canvasWidth.toFixed(0),
+    height: canvasHeight.toFixed(0),
+    ratio: (canvasWidth / canvasHeight).toFixed(2),
+  });
+
+  // 치수 텍스트 스타일
+  const dimFont = {
+    fontSize: 16,
+    fontWeight: 700,
+    fill: "#1F2937",
+    fontFamily: "inherit",
+  };
 
   return (
-    <div className="mt-6">
-      <h2 className="font-bold mb-2">📐 2D 평면도</h2>
-      
-      {/* 원본 데이터가 유효하지 않을 때 경고 표시 */}
-      {(isNaN(x) || isNaN(y) || x <= 0 || y <= 0) && (
-        <div className="mb-2 p-2 bg-yellow-100 border border-yellow-300 rounded text-sm">
-          ⚠️ 측정 데이터에 문제가 있어 기본값으로 표시됩니다.
-        </div>
-      )}
-      
+    <div className="flex flex-col items-center justify-center bg-white py-8 rounded-lg shadow-sm border border-gray-200">
+      {/* Room layout 제목 */}
+      <div className="mb-4 text-xl font-bold text-gray-800 text-center">
+        📐 Room Layout
+      </div>
+
+      {/* 실제 크기 정보 */}
+      <div className="mb-4 text-sm text-gray-600 text-center">
+        실제 크기: {validX.toFixed(0)} × {validY.toFixed(0)} cm | 비율:{" "}
+        {aspectRatio.toFixed(2)}:1 |{((validX * validY) / 10000).toFixed(1)}㎡
+      </div>
+
       <svg
         width={canvasWidth + 100}
         height={canvasHeight + 80}
-        style={{ border: "1px solid #ccc", backgroundColor: "#f9f9f9" }}
+        style={{ background: "#fff", display: "block" }}
       >
-        {/* 방 평면도 */}
+        {/* 방 평면도 윤곽 */}
         <rect
           x={50}
           y={30}
           width={canvasWidth}
           height={canvasHeight}
-          fill="#d1e8ff"
-          stroke="#2c82c9"
-          strokeWidth="2"
+          fill="#f8fafc"
+          stroke="#1F2937"
+          strokeWidth={3}
         />
-        
-        {/* 가로 길이 표시 */}
+
+        {/* 내부 그리드 (선택사항) */}
+        <defs>
+          <pattern
+            id="roomGrid"
+            width="20"
+            height="20"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 20 0 L 0 0 0 20"
+              fill="none"
+              stroke="#e2e8f0"
+              strokeWidth="0.5"
+            />
+          </pattern>
+        </defs>
+        <rect
+          x={50}
+          y={30}
+          width={canvasWidth}
+          height={canvasHeight}
+          fill="url(#roomGrid)"
+        />
+
+        {/* 가로 치수 (하단) */}
         <text
           x={50 + canvasWidth / 2}
-          y={20}
+          y={canvasHeight + 60}
           textAnchor="middle"
-          fontSize="14"
-          fontWeight="bold"
-          fill="#2c82c9"
+          style={dimFont}
         >
-          가로 {validX.toFixed(1)}cm
+          {validX.toFixed(0)} cm
         </text>
-        
-        {/* 세로 길이 표시 */}
+
+        {/* 세로 치수 (좌측) */}
         <text
-          x={55 + canvasWidth}
+          x={25}
           y={30 + canvasHeight / 2}
-          textAnchor="start"
-          fontSize="14"
-          fontWeight="bold"
-          fill="#2c82c9"
-          transform={`rotate(90, ${55 + canvasWidth}, ${30 + canvasHeight / 2})`}
+          textAnchor="middle"
+          style={dimFont}
+          transform={`rotate(-90, 25, ${30 + canvasHeight / 2})`}
         >
-          세로 {validY.toFixed(1)}cm
+          {validY.toFixed(0)} cm
         </text>
-        
-        {/* 면적 표시 */}
+
+        {/* 가로 치수선 */}
+        <line
+          x1={50}
+          y1={canvasHeight + 45}
+          x2={50 + canvasWidth}
+          y2={canvasHeight + 45}
+          stroke="#374151"
+          strokeWidth={2}
+        />
+        <line
+          x1={50}
+          y1={canvasHeight + 40}
+          x2={50}
+          y2={canvasHeight + 50}
+          stroke="#374151"
+          strokeWidth={2}
+        />
+        <line
+          x1={50 + canvasWidth}
+          y1={canvasHeight + 40}
+          x2={50 + canvasWidth}
+          y2={canvasHeight + 50}
+          stroke="#374151"
+          strokeWidth={2}
+        />
+
+        {/* 세로 치수선 */}
+        <line
+          x1={35}
+          y1={30}
+          x2={35}
+          y2={30 + canvasHeight}
+          stroke="#374151"
+          strokeWidth={2}
+        />
+        <line
+          x1={30}
+          y1={30}
+          x2={40}
+          y2={30}
+          stroke="#374151"
+          strokeWidth={2}
+        />
+        <line
+          x1={30}
+          y1={30 + canvasHeight}
+          x2={40}
+          y2={30 + canvasHeight}
+          stroke="#374151"
+          strokeWidth={2}
+        />
+
+        {/* 방향 표시 */}
         <text
           x={50 + canvasWidth / 2}
           y={30 + canvasHeight / 2}
           textAnchor="middle"
-          fontSize="12"
-          fill="#666"
+          style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
         >
-          {((validX * validY) / 10000).toFixed(1)}㎡
+          Width × Depth
         </text>
-        
-        {/* 평수 표시 */}
         <text
           x={50 + canvasWidth / 2}
-          y={30 + canvasHeight / 2 + 16}
+          y={30 + canvasHeight / 2 + 15}
           textAnchor="middle"
-          fontSize="12"
-          fill="#666"
+          style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
         >
-          ({(((validX * validY) / 10000) / 3.3058).toFixed(1)}평)
+          {validX} × {validY}
         </text>
       </svg>
-      
-      {/* 추가 정보 */}
-      <div className="mt-2 text-xs text-gray-500">
-        비율: {aspectRatio.toFixed(2)}:1 | 캔버스 크기: {canvasWidth.toFixed(0)}×{canvasHeight.toFixed(0)}px
+
+      {/* 비율 정보 */}
+      <div className="mt-4 text-xs text-gray-500 text-center max-w-md">
+        💡 <strong>비율 정보:</strong>
+        {aspectRatio >= 1.5
+          ? " 가로가 매우 긴 방"
+          : aspectRatio >= 1.2
+          ? " 가로가 긴 방"
+          : aspectRatio >= 0.8
+          ? " 정사각형에 가까운 방"
+          : " 세로가 긴 방"}
+        <br />
+        <span className="text-xs">
+          (가로 {validX}cm ÷ 세로 {validY}cm = {aspectRatio.toFixed(2)})
+        </span>
       </div>
     </div>
   );

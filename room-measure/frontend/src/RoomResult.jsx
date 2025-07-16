@@ -1,7 +1,6 @@
 // frontend/src/components/RoomResult.jsx
-import React, { useState } from "react";
+import React from "react";
 import RoomCanvas from "./RoomCanvas";
-import FurniturePlacement from "./FurniturePlacement";
 // import Room3DViewer from './Room3DViewer';
 
 const ConfidenceIndicator = ({ confidence, reliability }) => {
@@ -136,8 +135,6 @@ const MeasurementDetails = ({ result }) => {
 };
 
 const RoomResult = ({ result, depthImageUrl }) => {
-  const [activeTab, setActiveTab] = useState("measurements"); // 'measurements', 'furniture', 'depth'
-
   if (!result) return null;
 
   // 새로운 API 응답 형태에 맞춰 데이터 추출
@@ -176,125 +173,78 @@ const RoomResult = ({ result, depthImageUrl }) => {
         </div>
       )}
 
-      {/* 탭 네비게이션 */}
-      <div className="mb-6">
-        <div className="flex flex-wrap gap-2 border-b border-gray-200">
-          <button
-            onClick={() => setActiveTab("measurements")}
-            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
-              activeTab === "measurements"
-                ? "text-blue-600 border-blue-600"
-                : "text-gray-600 border-transparent hover:text-gray-800"
-            }`}
-          >
-            📏 측정 결과
-          </button>
-          <button
-            onClick={() => setActiveTab("furniture")}
-            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
-              activeTab === "furniture"
-                ? "text-blue-600 border-blue-600"
-                : "text-gray-600 border-transparent hover:text-gray-800"
-            }`}
-          >
-            🛋️ 가구 배치
-          </button>
-          {depthImageUrl && (
-            <button
-              onClick={() => setActiveTab("depth")}
-              className={`px-6 py-3 font-medium transition-colors border-b-2 ${
-                activeTab === "depth"
-                  ? "text-blue-600 border-blue-600"
-                  : "text-gray-600 border-transparent hover:text-gray-800"
-              }`}
-            >
-              🎨 깊이 분석
-            </button>
-          )}
+      {/* 기존 RoomCanvas - x, y 파라미터로 전달 */}
+      <RoomCanvas x={validWidth} y={validDepth} />
+
+      {/* 새로운 측정 결과 표시 */}
+      <div className="mt-6 p-6 border rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-lg">
+        <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+          📏 방 크기 측정 결과
+          <span className="text-sm font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+            개선된 알고리즘
+          </span>
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white p-4 rounded-lg border shadow-sm">
+            <div className="text-sm text-gray-600 mb-1">가로 (Width)</div>
+            <div className="text-2xl font-bold text-blue-600 mb-1">
+              {width?.toFixed(1)} cm
+            </div>
+            <div className="text-sm text-gray-500">
+              {(width / 100)?.toFixed(2)} m
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg border shadow-sm">
+            <div className="text-sm text-gray-600 mb-1">세로 (Depth)</div>
+            <div className="text-2xl font-bold text-green-600 mb-1">
+              {depth?.toFixed(1)} cm
+            </div>
+            <div className="text-sm text-gray-500">
+              {(depth / 100)?.toFixed(2)} m
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* 탭 내용 */}
-      {activeTab === "measurements" && (
-        <div>
-          {/* 기존 RoomCanvas */}
-          <RoomCanvas x={validWidth} y={validDepth} />
-
-          {/* 측정 결과 표시 */}
-          <div className="mt-6 p-6 border rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-lg">
-            <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-              📏 방 크기 측정 결과
-              <span className="text-sm font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                개선된 알고리즘
-              </span>
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <div className="text-sm text-gray-600 mb-1">가로 (Width)</div>
-                <div className="text-2xl font-bold text-blue-600 mb-1">
-                  {width?.toFixed(1)} cm
-                </div>
-                <div className="text-sm text-gray-500">
-                  {(width / 100)?.toFixed(2)} m
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <div className="text-sm text-gray-600 mb-1">세로 (Depth)</div>
-                <div className="text-2xl font-bold text-green-600 mb-1">
-                  {depth?.toFixed(1)} cm
-                </div>
-                <div className="text-sm text-gray-500">
-                  {(depth / 100)?.toFixed(2)} m
-                </div>
+        <div className="bg-white p-4 rounded-lg border shadow-sm mb-6">
+          <h3 className="font-semibold mb-3 text-gray-700">📐 면적 계산</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="text-center p-3 bg-purple-50 rounded-lg">
+              <div className="text-sm text-gray-600 mb-1">제곱미터</div>
+              <div className="text-xl font-bold text-purple-600">
+                {area_m2.toFixed(2)} ㎡
               </div>
             </div>
-
-            <div className="bg-white p-4 rounded-lg border shadow-sm mb-6">
-              <h3 className="font-semibold mb-3 text-gray-700">📐 면적 계산</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">제곱미터</div>
-                  <div className="text-xl font-bold text-purple-600">
-                    {area_m2.toFixed(2)} ㎡
-                  </div>
-                </div>
-                <div className="text-center p-3 bg-orange-50 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">평수</div>
-                  <div className="text-xl font-bold text-orange-600">
-                    {area_pyeong.toFixed(1)} 평
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 측정 세부사항 */}
-            <MeasurementDetails result={result} />
-
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-start gap-2">
-                <span className="text-blue-600 mt-0.5">💡</span>
-                <div>
-                  <div className="font-medium text-blue-800 mb-1">참고사항</div>
-                  <p className="text-sm text-blue-700">
-                    이 측정은 개선된 알고리즘으로 층고 {result.height_cm}cm를
-                    기준으로 계산되었습니다. 신뢰도가 높을수록 실제 크기에
-                    가까운 결과입니다.
-                  </p>
-                </div>
+            <div className="text-center p-3 bg-orange-50 rounded-lg">
+              <div className="text-sm text-gray-600 mb-1">평수</div>
+              <div className="text-xl font-bold text-orange-600">
+                {area_pyeong.toFixed(1)} 평
               </div>
             </div>
           </div>
         </div>
-      )}
 
-      {activeTab === "furniture" && (
-        <FurniturePlacement roomWidth={validWidth} roomHeight={validDepth} />
-      )}
+        {/* 측정 세부사항 */}
+        <MeasurementDetails result={result} />
 
-      {activeTab === "depth" && depthImageUrl && (
-        <div className="bg-white p-6 rounded-xl shadow-lg border">
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-2">
+            <span className="text-blue-600 mt-0.5">💡</span>
+            <div>
+              <div className="font-medium text-blue-800 mb-1">참고사항</div>
+              <p className="text-sm text-blue-700">
+                이 측정은 개선된 알고리즘으로 층고 {result.height_cm}cm를
+                기준으로 계산되었습니다. 신뢰도가 높을수록 실제 크기에 가까운
+                결과입니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {depthImageUrl && (
+        <div className="mt-8 bg-white p-6 rounded-xl shadow-lg border">
           <h2 className="font-bold mb-4 text-gray-800 flex items-center gap-2">
             🎨 Depth Map 시각화
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
