@@ -448,10 +448,10 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
         <div className="mt-4 p-4 bg-gray-50 rounded-lg">
           <h4 className="font-semibold text-gray-700 mb-2">💡 측정 팁</h4>
           <ul className="text-sm text-gray-600 space-y-1">
-            <li>• 모서리가 명확하게 보이는 지점을 선택하세요</li>
-            <li>• 첫 번째와 두 번째 점은 수직선상에 있어야 합니다</li>
-            <li>• 가구나 물건이 가리지 않는 벽면을 선택하세요</li>
-            <li>• 정면에서 찍은 사진일수록 정확도가 높습니다</li>
+            <li>모서리가 명확하게 보이는 지점을 선택하세요</li>
+            <li>첫 번째와 두 번째 점은 수직선상에 있어야 합니다</li>
+            <li>가구나 물건이 가리지 않는 벽면을 선택하세요</li>
+            <li>정면에서 찍은 사진일수록 정확도가 높습니다</li>
           </ul>
         </div>
       </div>

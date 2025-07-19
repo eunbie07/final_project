@@ -732,10 +732,10 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
             <p className="text-sm text-yellow-800">
               💡 <strong>사용법:</strong>
               <br />
-              • 가구: 자유롭게 배치
+              가구: 자유롭게 배치
               <br />
-              • 문/창문: 벽 근처에 드래그하면 자동으로 벽에 붙음
-              <br />• 드래그해서 오른쪽 방 평면도에 놓아보세요!
+              문/창문: 벽 근처에 드래그하면 자동으로 벽에 붙음
+              <br />드래그해서 오른쪽 방 평면도에 놓아보세요!
             </p>
           </div>
         </div>
@@ -1263,24 +1263,24 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
             <h4 className="font-medium text-gray-700 mb-2">📋 사용 가이드</h4>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>
-                • <strong>가구 배치:</strong> 자유롭게 드래그해서 배치
+                <strong>가구 배치:</strong> 자유롭게 드래그해서 배치
               </li>
               <li>
-                • <strong>문/창문:</strong> 벽 근처(30cm 이내)로 드래그하면
+                <strong>문/창문:</strong> 벽 근처(30cm 이내)로 드래그하면
                 자동으로 벽에 붙음
               </li>
               <li>
-                • <strong>이동:</strong> 배치된 항목을 클릭 선택 후 드래그로
+                <strong>이동:</strong> 배치된 항목을 클릭 선택 후 드래그로
                 이동
               </li>
               <li>
-                • <strong>회전:</strong> 가구는 90도씩 회전 가능
+                <strong>회전:</strong> 가구는 90도씩 회전 가능
               </li>
               <li>
-                • <strong>삭제:</strong> 선택된 항목의 빨간 × 버튼 클릭
+                <strong>삭제:</strong> 선택된 항목의 빨간 × 버튼 클릭
               </li>
               <li>
-                • <strong>자동 스냅:</strong> 문/창문은 가장 가까운 벽에 자동
+                <strong>자동 스냅:</strong> 문/창문은 가장 가까운 벽에 자동
                 정렬
               </li>
             </ul>
