@@ -1,5 +1,5 @@
 // frontend/src/components/FurniturePlacement.jsx
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 
 const FURNITURE_CATALOG = [
   // 침실 가구
@@ -9,7 +9,7 @@ const FURNITURE_CATALOG = [
     width: 100,
     height: 200,
     category: "bedroom",
-    color: "#8B4513",
+    color: "#FFB6C1",
     icon: "🛏️",
   },
   {
@@ -18,7 +18,7 @@ const FURNITURE_CATALOG = [
     width: 150,
     height: 200,
     category: "bedroom",
-    color: "#8B4513",
+    color: "#FFD1DC",
     icon: "🛏️",
   },
   {
@@ -27,7 +27,7 @@ const FURNITURE_CATALOG = [
     width: 160,
     height: 200,
     category: "bedroom",
-    color: "#8B4513",
+    color: "#FFC0CB",
     icon: "🛏️",
   },
   {
@@ -36,10 +36,9 @@ const FURNITURE_CATALOG = [
     width: 180,
     height: 200,
     category: "bedroom",
-    color: "#8B4513",
+    color: "#FFB7C5",
     icon: "🛏️",
   },
-
   // 책상/의자
   {
     id: "desk",
@@ -47,7 +46,7 @@ const FURNITURE_CATALOG = [
     width: 120,
     height: 60,
     category: "office",
-    color: "#654321",
+    color: "#98FB98",
     icon: "🪑",
   },
   {
@@ -56,10 +55,9 @@ const FURNITURE_CATALOG = [
     width: 50,
     height: 50,
     category: "office",
-    color: "#333333",
+    color: "#90EE90",
     icon: "🪑",
   },
-
   // 거실 가구
   {
     id: "sofa_2",
@@ -67,7 +65,7 @@ const FURNITURE_CATALOG = [
     width: 140,
     height: 80,
     category: "living",
-    color: "#4A5568",
+    color: "#87CEEB",
     icon: "🛋️",
   },
   {
@@ -76,7 +74,7 @@ const FURNITURE_CATALOG = [
     width: 180,
     height: 80,
     category: "living",
-    color: "#4A5568",
+    color: "#ADD8E6",
     icon: "🛋️",
   },
   {
@@ -85,7 +83,7 @@ const FURNITURE_CATALOG = [
     width: 100,
     height: 50,
     category: "living",
-    color: "#8B7355",
+    color: "#B0E0E6",
     icon: "🪑",
   },
   {
@@ -94,10 +92,9 @@ const FURNITURE_CATALOG = [
     width: 120,
     height: 40,
     category: "living",
-    color: "#2D3748",
+    color: "#E0FFFF",
     icon: "📺",
   },
-
   // 수납 가구
   {
     id: "wardrobe",
@@ -105,7 +102,7 @@ const FURNITURE_CATALOG = [
     width: 80,
     height: 60,
     category: "storage",
-    color: "#744C9E",
+    color: "#DDA0DD",
     icon: "🚪",
   },
   {
@@ -114,7 +111,7 @@ const FURNITURE_CATALOG = [
     width: 80,
     height: 30,
     category: "storage",
-    color: "#744C9E",
+    color: "#D8BFD8",
     icon: "📚",
   },
   {
@@ -123,75 +120,8 @@ const FURNITURE_CATALOG = [
     width: 100,
     height: 45,
     category: "storage",
-    color: "#E53E3E",
+    color: "#E6E6FA",
     icon: "💄",
-  },
-];
-
-// 문과 창문 카탈로그 추가
-const DOOR_WINDOW_CATALOG = [
-  {
-    id: "door_single",
-    name: "일반 문",
-    width: 80,
-    height: 10, // 벽 두께
-    category: "door",
-    color: "#8B4513",
-    icon: "🚪",
-  },
-  {
-    id: "door_double",
-    name: "이중 문",
-    width: 140,
-    height: 10,
-    category: "door",
-    color: "#8B4513",
-    icon: "🚪",
-  },
-  {
-    id: "door_sliding",
-    name: "슬라이딩 문",
-    width: 150,
-    height: 10,
-    category: "door",
-    color: "#654321",
-    icon: "🚪",
-  },
-  {
-    id: "window_small",
-    name: "작은 창문",
-    width: 60,
-    height: 10,
-    category: "window",
-    color: "#3B82F6",
-    icon: "🪟",
-  },
-  {
-    id: "window_medium",
-    name: "중간 창문",
-    width: 100,
-    height: 10,
-    category: "window",
-    color: "#3B82F6",
-    icon: "🪟",
-  },
-  {
-    id: "window_large",
-    name: "큰 창문",
-    width: 150,
-    height: 10,
-    category: "window",
-    color: "#3B82F6",
-    icon: "🪟",
-  },
-  {
-    id: "window_bay",
-    name: "베이 창문",
-    width: 200,
-    height: 10,
-    category: "window",
-    color: "#1E40AF",
-    icon: "🪟",
   },
 ];
 
@@ -201,15 +131,16 @@ const CATEGORIES = [
   { id: "living", name: "거실", icon: "🛋️" },
   { id: "office", name: "사무", icon: "🪑" },
   { id: "storage", name: "수납", icon: "📦" },
-  { id: "door", name: "문", icon: "🚪" },
-  { id: "window", name: "창문", icon: "🪟" },
 ];
 
 const FurnitureItem = ({ furniture, onDragStart }) => (
   <div
     className="p-3 border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm rounded-lg cursor-grab active:cursor-grabbing transition-all"
     draggable
-    onDragStart={(e) => onDragStart(e, furniture)}
+    onDragStart={(e) => {
+      e.dataTransfer.effectAllowed = "copy";
+      onDragStart(e, furniture);
+    }}
   >
     <div className="text-center">
       <div className="text-2xl mb-1">{furniture.icon}</div>
@@ -224,11 +155,9 @@ const FurnitureItem = ({ furniture, onDragStart }) => (
 const FurniturePlacement = ({ roomWidth, roomHeight }) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [placedFurniture, setPlacedFurniture] = useState([]);
-  const [placedDoorWindows, setPlacedDoorWindows] = useState([]); // 문/창문 별도 관리
   const [selectedFurnitureIndex, setSelectedFurnitureIndex] = useState(null);
-  const [selectedDoorWindowIndex, setSelectedDoorWindowIndex] = useState(null);
   const [draggedFurniture, setDraggedFurniture] = useState(null);
-  const [wallPlacementMode, setWallPlacementMode] = useState(false); // 벽 배치 모드
+  const [isDraggingPlaced, setIsDraggingPlaced] = useState(false);
   const canvasRef = useRef(null);
 
   // 유효성 검사
@@ -236,94 +165,10 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
   const validRoomHeight =
     isNaN(roomHeight) || roomHeight <= 0 ? 300 : roomHeight;
 
-  // 카테고리별 아이템 필터링
-  const filteredItems = [
-    ...FURNITURE_CATALOG.filter(
-      (item) => selectedCategory === "all" || item.category === selectedCategory
-    ),
-    ...DOOR_WINDOW_CATALOG.filter(
-      (item) => selectedCategory === "all" || item.category === selectedCategory
-    ),
-  ];
-
-  // 벽에 스냅시키는 함수 (문/창문용)
-  const snapToWall = (x, y, itemWidth, itemHeight) => {
-    const SNAP_THRESHOLD = 30; // 30cm 이내면 벽에 스냅
-
-    // 각 벽까지의 거리 계산
-    const distanceToTop = y;
-    const distanceToBottom = validRoomHeight - y;
-    const distanceToLeft = x;
-    const distanceToRight = validRoomWidth - x;
-
-    // 가장 가까운 벽 찾기
-    const minDistance = Math.min(
-      distanceToTop,
-      distanceToBottom,
-      distanceToLeft,
-      distanceToRight
-    );
-
-    if (minDistance > SNAP_THRESHOLD) {
-      return null; // 스냅하지 않음
-    }
-
-    let snappedX = x;
-    let snappedY = y;
-    let wall = "";
-
-    if (minDistance === distanceToTop) {
-      // 상단 벽에 스냅
-      snappedY = 0;
-      snappedX = Math.max(0, Math.min(x, validRoomWidth - itemWidth));
-      wall = "top";
-    } else if (minDistance === distanceToBottom) {
-      // 하단 벽에 스냅
-      snappedY = validRoomHeight - itemHeight;
-      snappedX = Math.max(0, Math.min(x, validRoomWidth - itemWidth));
-      wall = "bottom";
-    } else if (minDistance === distanceToLeft) {
-      // 좌측 벽에 스냅
-      snappedX = 0;
-      snappedY = Math.max(0, Math.min(y, validRoomHeight - itemHeight));
-      wall = "left";
-    } else if (minDistance === distanceToRight) {
-      // 우측 벽에 스냅
-      snappedX = validRoomWidth - itemWidth;
-      snappedY = Math.max(0, Math.min(y, validRoomHeight - itemHeight));
-      wall = "right";
-    }
-
-    return {
-      x: snappedX,
-      y: snappedY,
-      wall: wall,
-      rotation: wall === "left" || wall === "right" ? 90 : 0,
-    };
-  };
-
-  // 드래그 시작
-  const handleDragStart = (e, item) => {
-    setDraggedFurniture(item);
-    // 문/창문인 경우 벽 배치 모드 활성화
-    setWallPlacementMode(
-      item.category === "door" || item.category === "window"
-    );
-    e.dataTransfer.effectAllowed = "copy";
-  };
-
-  // 캔버스에 드롭
-  const handleDrop = (e) => {
-    e.preventDefault();
-    if (!draggedFurniture) return;
-
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    // 동적 SVG 크기 계산
+  // SVG 크기 계산
+  const svgDimensions = useMemo(() => {
     const aspectRatio = validRoomWidth / validRoomHeight;
-    const maxSize = 300;
+    const maxSize = 500;
 
     let svgWidth, svgHeight;
     if (aspectRatio >= 1) {
@@ -334,288 +179,242 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
       svgWidth = maxSize * aspectRatio;
     }
 
-    // SVG 좌표계로 변환 (마진 20px 고려)
-    const svgX = (x / rect.width) * (svgWidth + 40) - 20;
-    const svgY = (y / rect.height) * (svgHeight + 40) - 20;
+    return { svgWidth, svgHeight };
+  }, [validRoomWidth, validRoomHeight]);
 
-    // SVG 좌표를 실제 방 크기(cm)로 변환
-    let realX = (svgX / svgWidth) * validRoomWidth;
-    let realY = (svgY / svgHeight) * validRoomHeight;
+  // 카테고리별 아이템 필터링
+  const filteredItems = FURNITURE_CATALOG.filter(
+    (item) => selectedCategory === "all" || item.category === selectedCategory
+  );
 
-    const isDoorOrWindow =
-      draggedFurniture.category === "door" ||
-      draggedFurniture.category === "window";
-    let finalRotation = 0;
-    let wallInfo = null;
+  // SVG 좌표를 실제 방 좌표로 변환
+  const convertToRealCoordinates = useCallback(
+    (clientX, clientY) => {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const svgX = clientX - rect.left - 20;
+      const svgY = clientY - rect.top - 20;
 
-    if (isDoorOrWindow) {
-      // 문/창문은 벽에 스냅
-      const snapResult = snapToWall(
-        realX,
-        realY,
-        draggedFurniture.width,
-        draggedFurniture.height
-      );
+      const scaleX = validRoomWidth / svgDimensions.svgWidth;
+      const scaleY = validRoomHeight / svgDimensions.svgHeight;
 
-      if (!snapResult) {
-        alert("문과 창문은 벽 근처(30cm 이내)에 배치해야 합니다!");
-        setDraggedFurniture(null);
-        setWallPlacementMode(false);
-        return;
+      return {
+        x: svgX * scaleX,
+        y: svgY * scaleY,
+      };
+    },
+    [validRoomWidth, validRoomHeight, svgDimensions]
+  );
+
+  // 충돌 체크 함수
+  const checkCollision = useCallback(
+    (x, y, width, height, excludeIndex = -1, rotation = 0) => {
+      const actualWidth = rotation % 180 === 0 ? width : height;
+      const actualHeight = rotation % 180 === 0 ? height : width;
+
+      for (let i = 0; i < placedFurniture.length; i++) {
+        if (i === excludeIndex) continue;
+
+        const item = placedFurniture[i];
+        const itemRotation = item.rotation || 0;
+        const itemActualWidth =
+          itemRotation % 180 === 0 ? item.width : item.height;
+        const itemActualHeight =
+          itemRotation % 180 === 0 ? item.height : item.width;
+
+        if (
+          x < item.x + itemActualWidth &&
+          x + actualWidth > item.x &&
+          y < item.y + itemActualHeight &&
+          y + actualHeight > item.y
+        ) {
+          return true;
+        }
       }
 
-      realX = snapResult.x;
-      realY = snapResult.y;
-      finalRotation = snapResult.rotation;
-      wallInfo = snapResult.wall;
+      return false;
+    },
+    [placedFurniture]
+  );
 
-      console.log(`🚪 벽 스냅: ${draggedFurniture.name} → ${wallInfo} 벽`);
-    } else {
-      // 일반 가구는 기존 로직
+  // 드래그 시작
+  const handleDragStart = useCallback((e, item) => {
+    setDraggedFurniture(item);
+    e.dataTransfer.setData("application/json", JSON.stringify(item));
+  }, []);
+
+  // 드래그 오버
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+  }, []);
+
+  // 드롭
+  const handleDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      if (!draggedFurniture || isDraggingPlaced) return;
+
+      const coords = convertToRealCoordinates(e.clientX, e.clientY);
+
+      // 경계 체크
       const maxX = validRoomWidth - draggedFurniture.width;
       const maxY = validRoomHeight - draggedFurniture.height;
 
-      if (realX < 0 || realY < 0 || realX > maxX || realY > maxY) {
-        alert(`가구 위치가 경계를 벗어납니다!`);
-        setDraggedFurniture(null);
-        setWallPlacementMode(false);
-        return;
+      coords.x = Math.max(0, Math.min(coords.x, maxX));
+      coords.y = Math.max(0, Math.min(coords.y, maxY));
+
+      // 일반 가구 처리
+      if (
+        !checkCollision(
+          coords.x,
+          coords.y,
+          draggedFurniture.width,
+          draggedFurniture.height
+        )
+      ) {
+        const newItem = {
+          ...draggedFurniture,
+          x: coords.x,
+          y: coords.y,
+          rotation: 0,
+          id: `${draggedFurniture.id}_${Date.now()}`,
+        };
+        setPlacedFurniture((prev) => [...prev, newItem]);
+      } else {
+        alert("이 위치에는 다른 가구가 있습니다!");
       }
-    }
 
-    // 충돌 체크 (문/창문은 다른 문/창문과만, 가구는 가구끼리만)
-    const MARGIN = 5;
-    let hasCollision = false;
-
-    if (isDoorOrWindow) {
-      // 문/창문끼리 충돌 체크
-      hasCollision = placedDoorWindows.some((existing) => {
-        const actualWidth =
-          finalRotation % 180 === 0
-            ? draggedFurniture.width
-            : draggedFurniture.height;
-        const actualHeight =
-          finalRotation % 180 === 0
-            ? draggedFurniture.height
-            : draggedFurniture.width;
-
-        const existingRotation = existing.rotation || 0;
-        const existingActualWidth =
-          existingRotation % 180 === 0 ? existing.width : existing.height;
-        const existingActualHeight =
-          existingRotation % 180 === 0 ? existing.height : existing.width;
-
-        return !(
-          realX + actualWidth + MARGIN <= existing.x ||
-          realX >= existing.x + existingActualWidth + MARGIN ||
-          realY + actualHeight + MARGIN <= existing.y ||
-          realY >= existing.y + existingActualHeight + MARGIN
-        );
-      });
-    } else {
-      // 가구끼리 충돌 체크
-      hasCollision = placedFurniture.some((existing) => {
-        const existingRotation = existing.rotation || 0;
-        const existingActualWidth =
-          existingRotation % 180 === 0 ? existing.width : existing.height;
-        const existingActualHeight =
-          existingRotation % 180 === 0 ? existing.height : existing.width;
-
-        return !(
-          realX + draggedFurniture.width + MARGIN <= existing.x ||
-          realX >= existing.x + existingActualWidth + MARGIN ||
-          realY + draggedFurniture.height + MARGIN <= existing.y ||
-          realY >= existing.y + existingActualHeight + MARGIN
-        );
-      });
-    }
-
-    if (hasCollision) {
-      alert(
-        isDoorOrWindow
-          ? "다른 문/창문과 겹칩니다!"
-          : "다른 가구와 너무 가깝습니다!"
-      );
       setDraggedFurniture(null);
-      setWallPlacementMode(false);
-      return;
-    }
-
-    // 아이템 배치
-    const newItem = {
-      ...draggedFurniture,
-      x: realX,
-      y: realY,
-      rotation: finalRotation,
-      wall: wallInfo, // 문/창문의 경우 어느 벽인지 저장
-      id: `${draggedFurniture.id}_${Date.now()}`,
-    };
-
-    if (isDoorOrWindow) {
-      setPlacedDoorWindows([...placedDoorWindows, newItem]);
-    } else {
-      setPlacedFurniture([...placedFurniture, newItem]);
-    }
-
-    setDraggedFurniture(null);
-    setWallPlacementMode(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
+    },
+    [
+      draggedFurniture,
+      isDraggingPlaced,
+      convertToRealCoordinates,
+      validRoomWidth,
+      validRoomHeight,
+      checkCollision,
+    ]
+  );
 
   // 가구 선택
-  const handleSelectFurniture = (index) => {
-    setSelectedFurnitureIndex(selectedFurnitureIndex === index ? null : index);
-    setSelectedDoorWindowIndex(null); // 문/창문 선택 해제
-  };
+  const handleSelectFurniture = useCallback(
+    (index) => {
+      setSelectedFurnitureIndex(
+        selectedFurnitureIndex === index ? null : index
+      );
+    },
+    [selectedFurnitureIndex]
+  );
 
   // 가구 회전
-  const handleRotateFurniture = (index) => {
-    const furniture = placedFurniture[index];
-    const currentRotation = furniture.rotation || 0;
-    const newRotation = (currentRotation + 90) % 360;
+  const handleRotateFurniture = useCallback(
+    (index) => {
+      const furniture = placedFurniture[index];
+      const currentRotation = furniture.rotation || 0;
+      const newRotation = (currentRotation + 90) % 360;
 
-    // 회전 후 크기 계산 (90도, 270도 회전 시 가로세로 바뀜)
-    const newActualWidth =
-      newRotation % 180 === 0 ? furniture.width : furniture.height;
-    const newActualHeight =
-      newRotation % 180 === 0 ? furniture.height : furniture.width;
+      const newActualWidth =
+        newRotation % 180 === 0 ? furniture.width : furniture.height;
+      const newActualHeight =
+        newRotation % 180 === 0 ? furniture.height : furniture.width;
 
-    // 회전 후 방 경계 체크
-    const maxX = validRoomWidth - newActualWidth;
-    const maxY = validRoomHeight - newActualHeight;
+      // 회전 후 경계 체크
+      const maxX = validRoomWidth - newActualWidth;
+      const maxY = validRoomHeight - newActualHeight;
 
-    if (furniture.x > maxX || furniture.y > maxY) {
-      alert("회전하면 방 범위를 벗어납니다! 위치를 조정해주세요.");
-      return;
-    }
+      if (furniture.x > maxX || furniture.y > maxY) {
+        alert("회전하면 방 범위를 벗어납니다!");
+        return;
+      }
 
-    // 다른 가구와 충돌 체크 (회전된 크기로)
-    const MARGIN = 5;
-    const otherFurniture = placedFurniture.filter((_, i) => i !== index);
+      // 충돌 체크
+      if (
+        checkCollision(
+          furniture.x,
+          furniture.y,
+          furniture.width,
+          furniture.height,
+          index,
+          newRotation
+        )
+      ) {
+        alert("회전하면 다른 가구와 겹칩니다!");
+        return;
+      }
 
-    const hasCollision = otherFurniture.some((existing) => {
-      const newLeft = furniture.x - MARGIN;
-      const newRight = furniture.x + newActualWidth + MARGIN;
-      const newTop = furniture.y - MARGIN;
-      const newBottom = furniture.y + newActualHeight + MARGIN;
-
-      const existingActualWidth =
-        (existing.rotation || 0) % 180 === 0 ? existing.width : existing.height;
-      const existingActualHeight =
-        (existing.rotation || 0) % 180 === 0 ? existing.height : existing.width;
-
-      const existingLeft = existing.x - MARGIN;
-      const existingRight = existing.x + existingActualWidth + MARGIN;
-      const existingTop = existing.y - MARGIN;
-      const existingBottom = existing.y + existingActualHeight + MARGIN;
-
-      return !(
-        newRight <= existingLeft ||
-        newLeft >= existingRight ||
-        newBottom <= existingTop ||
-        newTop >= existingBottom
-      );
-    });
-
-    if (hasCollision) {
-      alert("회전하면 다른 가구와 겹칩니다! 위치를 조정해주세요.");
-      return;
-    }
-
-    // 회전 적용
-    const newPlaced = [...placedFurniture];
-    newPlaced[index] = {
-      ...furniture,
-      rotation: newRotation,
-    };
-    setPlacedFurniture(newPlaced);
-
-    console.log(`🔄 가구 회전: ${furniture.name} → ${newRotation}°`);
-  };
-
-  // 가구 이동
-  const handleMoveFurniture = (index, newX, newY) => {
-    // 경계 체크 (회전 고려)
-    const furniture = placedFurniture[index];
-    const rotation = furniture.rotation || 0;
-    const actualWidth =
-      rotation % 180 === 0 ? furniture.width : furniture.height;
-    const actualHeight =
-      rotation % 180 === 0 ? furniture.height : furniture.width;
-
-    const maxX = validRoomWidth - actualWidth;
-    const maxY = validRoomHeight - actualHeight;
-
-    // 경계 내로 제한
-    const clampedX = Math.max(0, Math.min(newX, maxX));
-    const clampedY = Math.max(0, Math.min(newY, maxY));
-
-    // 다른 가구와 충돌 체크 (현재 이동 중인 가구 제외)
-    const MARGIN = 5;
-    const otherFurniture = placedFurniture.filter((_, i) => i !== index);
-
-    const hasCollision = otherFurniture.some((existing) => {
-      const newLeft = clampedX - MARGIN;
-      const newRight = clampedX + actualWidth + MARGIN;
-      const newTop = clampedY - MARGIN;
-      const newBottom = clampedY + actualHeight + MARGIN;
-
-      const existingRotation = existing.rotation || 0;
-      const existingActualWidth =
-        existingRotation % 180 === 0 ? existing.width : existing.height;
-      const existingActualHeight =
-        existingRotation % 180 === 0 ? existing.height : existing.width;
-
-      const existingLeft = existing.x - MARGIN;
-      const existingRight = existing.x + existingActualWidth + MARGIN;
-      const existingTop = existing.y - MARGIN;
-      const existingBottom = existing.y + existingActualHeight + MARGIN;
-
-      return !(
-        newRight <= existingLeft ||
-        newLeft >= existingRight ||
-        newBottom <= existingTop ||
-        newTop >= existingBottom
-      );
-    });
-
-    // 충돌하지 않으면 이동
-    if (!hasCollision) {
       const newPlaced = [...placedFurniture];
       newPlaced[index] = {
         ...furniture,
-        x: clampedX,
-        y: clampedY,
+        rotation: newRotation,
       };
       setPlacedFurniture(newPlaced);
-    }
-  };
+    },
+    [placedFurniture, validRoomWidth, validRoomHeight, checkCollision]
+  );
+
+  // 가구 이동
+  const handleMoveFurniture = useCallback(
+    (index, newX, newY) => {
+      const furniture = placedFurniture[index];
+      const rotation = furniture.rotation || 0;
+      const actualWidth =
+        rotation % 180 === 0 ? furniture.width : furniture.height;
+      const actualHeight =
+        rotation % 180 === 0 ? furniture.height : furniture.width;
+
+      // 경계 체크
+      const maxX = validRoomWidth - actualWidth;
+      const maxY = validRoomHeight - actualHeight;
+
+      const clampedX = Math.max(0, Math.min(newX, maxX));
+      const clampedY = Math.max(0, Math.min(newY, maxY));
+
+      // 충돌 체크
+      if (
+        !checkCollision(
+          clampedX,
+          clampedY,
+          furniture.width,
+          furniture.height,
+          index,
+          rotation
+        )
+      ) {
+        const newPlaced = [...placedFurniture];
+        newPlaced[index] = {
+          ...furniture,
+          x: clampedX,
+          y: clampedY,
+        };
+        setPlacedFurniture(newPlaced);
+      }
+    },
+    [placedFurniture, validRoomWidth, validRoomHeight, checkCollision]
+  );
 
   // 가구 삭제
-  const handleDeleteFurniture = (index) => {
-    const newPlaced = [...placedFurniture];
-    newPlaced.splice(index, 1);
-    setPlacedFurniture(newPlaced);
-    setSelectedFurnitureIndex(null);
-  };
+  const handleDeleteFurniture = useCallback(
+    (index) => {
+      const newPlaced = [...placedFurniture];
+      newPlaced.splice(index, 1);
+      setPlacedFurniture(newPlaced);
+      setSelectedFurnitureIndex(null);
+    },
+    [placedFurniture]
+  );
 
   // 전체 초기화
-  const handleClearAll = () => {
-    const totalItems = placedFurniture.length + placedDoorWindows.length;
-    if (totalItems === 0) return;
-    if (confirm("모든 가구와 문/창문을 삭제하시겠습니까?")) {
+  const handleClearAll = useCallback(() => {
+    if (placedFurniture.length === 0) return;
+    if (confirm("모든 가구를 삭제하시겠습니까?")) {
       setPlacedFurniture([]);
-      setPlacedDoorWindows([]);
       setSelectedFurnitureIndex(null);
-      setSelectedDoorWindowIndex(null);
     }
-  };
+  }, [placedFurniture.length]);
 
-  // 공간 활용률 계산 (가구만)
-  const calculateSpaceUtilization = () => {
+  // 공간 활용률 계산
+  const calculateSpaceUtilization = useMemo(() => {
     const totalFurnitureArea = placedFurniture.reduce((sum, furniture) => {
       const rotation = furniture.rotation || 0;
       const actualWidth =
@@ -626,7 +425,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
     }, 0);
     const roomArea = validRoomWidth * validRoomHeight;
     return ((totalFurnitureArea / roomArea) * 100).toFixed(1);
-  };
+  }, [placedFurniture, validRoomWidth, validRoomHeight]);
 
   return (
     <div className="mt-8 p-6 bg-white rounded-xl shadow-lg border">
@@ -637,10 +436,8 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
         <div className="flex gap-2">
           <button
             onClick={handleClearAll}
-            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
-            disabled={
-              placedFurniture.length === 0 && placedDoorWindows.length === 0
-            }
+            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={placedFurniture.length === 0}
           >
             🗑️ 전체 삭제
           </button>
@@ -648,7 +445,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
       </div>
 
       {/* 통계 정보 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-50 p-4 rounded-lg">
           <div className="text-sm text-blue-600 font-medium">방 크기</div>
           <div className="text-lg font-bold text-blue-800">
@@ -661,34 +458,10 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
             {placedFurniture.length} 개
           </div>
         </div>
-        <div className="bg-orange-50 p-4 rounded-lg">
-          <div className="text-sm text-orange-600 font-medium">문/창문</div>
-          <div className="text-lg font-bold text-orange-800">
-            {placedDoorWindows.length} 개
-          </div>
-        </div>
         <div className="bg-purple-50 p-4 rounded-lg">
           <div className="text-sm text-purple-600 font-medium">공간 활용률</div>
           <div className="text-lg font-bold text-purple-800">
-            {calculateSpaceUtilization()}%
-          </div>
-        </div>
-      </div>
-
-      {/* 디버깅 정보 */}
-      <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
-        <div className="font-medium text-gray-700 mb-1">🔍 디버깅 정보</div>
-        <div className="text-gray-600 space-y-1">
-          <div>
-            입력된 방 크기: {roomWidth} × {roomHeight}
-          </div>
-          <div>
-            유효한 방 크기: {validRoomWidth} × {validRoomHeight}
-          </div>
-          <div>SVG 크기: 300 × 200 (viewBox)</div>
-          <div>
-            변환 비율: {(validRoomWidth / 300).toFixed(3)} ×{" "}
-            {(validRoomHeight / 200).toFixed(3)}
+            {calculateSpaceUtilization}%
           </div>
         </div>
       </div>
@@ -732,10 +505,10 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
             <p className="text-sm text-yellow-800">
               💡 <strong>사용법:</strong>
               <br />
-              가구: 자유롭게 배치
+              • 가구를 드래그해서 방에 배치
               <br />
-              문/창문: 벽 근처에 드래그하면 자동으로 벽에 붙음
-              <br />드래그해서 오른쪽 방 평면도에 놓아보세요!
+              • 배치된 항목 클릭 후 드래그로 이동
+              <br />• 녹색 버튼으로 회전, 빨간 버튼으로 삭제
             </p>
           </div>
         </div>
@@ -746,544 +519,349 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
             📐 방 평면도
           </h3>
 
-          {/* SVG 크기 동적 계산 */}
-          {(() => {
-            const aspectRatio = validRoomWidth / validRoomHeight;
-            const maxSize = 300;
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
+            <div className="mb-2 text-sm text-gray-600 text-center">
+              실제 비율: {validRoomWidth} × {validRoomHeight} cm (
+              {(validRoomWidth / validRoomHeight).toFixed(2)}:1)
+            </div>
 
-            let svgWidth, svgHeight;
-            if (aspectRatio >= 1) {
-              // 가로가 더 긴 경우
-              svgWidth = maxSize;
-              svgHeight = maxSize / aspectRatio;
-            } else {
-              // 세로가 더 긴 경우
-              svgHeight = maxSize;
-              svgWidth = maxSize * aspectRatio;
-            }
+            <div className="flex justify-center">
+              <svg
+                ref={canvasRef}
+                width={svgDimensions.svgWidth + 40}
+                height={svgDimensions.svgHeight + 40}
+                className="border border-gray-400 bg-white rounded-lg cursor-crosshair"
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
+                {/* 방 윤곽 */}
+                <rect
+                  x="20"
+                  y="20"
+                  width={svgDimensions.svgWidth}
+                  height={svgDimensions.svgHeight}
+                  fill="#f8f9fa"
+                  stroke="#343a40"
+                  strokeWidth="2"
+                />
 
-            console.log("🏠 SVG 비율 계산:", {
-              roomSize: `${validRoomWidth} × ${validRoomHeight}`,
-              aspectRatio: aspectRatio.toFixed(3),
-              svgSize: `${svgWidth.toFixed(0)} × ${svgHeight.toFixed(0)}`,
-            });
-
-            return (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
-                {/* 실제 비율 정보 표시 */}
-                <div className="mb-2 text-sm text-gray-600 text-center">
-                  실제 비율: {validRoomWidth} × {validRoomHeight} cm (
-                  {aspectRatio.toFixed(2)}:1)
-                </div>
-
-                <div className="flex justify-center">
-                  <svg
-                    ref={canvasRef}
-                    width={svgWidth + 40}
-                    height={svgHeight + 40}
-                    viewBox={`0 0 ${svgWidth + 40} ${svgHeight + 40}`}
-                    className="border border-gray-400 bg-white rounded-lg cursor-crosshair"
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
+                {/* 그리드 */}
+                <defs>
+                  <pattern
+                    id="grid"
+                    width="20"
+                    height="20"
+                    patternUnits="userSpaceOnUse"
                   >
-                    {/* 방 윤곽 */}
-                    <rect
-                      x="20"
-                      y="20"
-                      width={svgWidth}
-                      height={svgHeight}
-                      fill="#f8f9fa"
-                      stroke="#343a40"
-                      strokeWidth="2"
+                    <path
+                      d="M 20 0 L 0 0 0 20"
+                      fill="none"
+                      stroke="#e9ecef"
+                      strokeWidth="1"
                     />
+                  </pattern>
+                </defs>
+                <rect
+                  x="20"
+                  y="20"
+                  width={svgDimensions.svgWidth}
+                  height={svgDimensions.svgHeight}
+                  fill="url(#grid)"
+                />
 
-                    {/* 그리드 */}
-                    <defs>
-                      <pattern
-                        id="grid"
-                        width="20"
-                        height="20"
-                        patternUnits="userSpaceOnUse"
-                      >
-                        <path
-                          d="M 20 0 L 0 0 0 20"
+                {/* 배치된 가구들 */}
+                {placedFurniture.map((furniture, index) => {
+                  const scaleX = svgDimensions.svgWidth / validRoomWidth;
+                  const scaleY = svgDimensions.svgHeight / validRoomHeight;
+
+                  const rotation = furniture.rotation || 0;
+                  const actualWidth =
+                    rotation % 180 === 0 ? furniture.width : furniture.height;
+                  const actualHeight =
+                    rotation % 180 === 0 ? furniture.height : furniture.width;
+
+                  const scaledWidth = actualWidth * scaleX;
+                  const scaledHeight = actualHeight * scaleY;
+                  const scaledX = 20 + furniture.x * scaleX;
+                  const scaledY = 20 + furniture.y * scaleY;
+
+                  return (
+                    <g key={furniture.id}>
+                      {/* 선택된 가구 하이라이트 */}
+                      {selectedFurnitureIndex === index && (
+                        <rect
+                          x={scaledX - 5}
+                          y={scaledY - 5}
+                          width={scaledWidth + 10}
+                          height={scaledHeight + 10}
                           fill="none"
-                          stroke="#e9ecef"
-                          strokeWidth="1"
+                          stroke="#FbbF24"
+                          strokeWidth="2"
+                          strokeDasharray="5,5"
+                          opacity="0.7"
                         />
-                      </pattern>
-                    </defs>
-                    <rect
-                      x="20"
-                      y="20"
-                      width={svgWidth}
-                      height={svgHeight}
-                      fill="url(#grid)"
-                    />
+                      )}
 
-                    {/* 배치된 가구들 */}
-                    {placedFurniture.map((furniture, index) => {
-                      // 새로운 스케일링 적용
-                      const scaleX = svgWidth / validRoomWidth;
-                      const scaleY = svgHeight / validRoomHeight;
+                      {/* 가구 본체 */}
+                      <rect
+                        x={scaledX}
+                        y={scaledY}
+                        width={scaledWidth}
+                        height={scaledHeight}
+                        fill={furniture.color}
+                        stroke={
+                          selectedFurnitureIndex === index
+                            ? "#3B82F6"
+                            : "#374151"
+                        }
+                        strokeWidth={selectedFurnitureIndex === index ? 3 : 1}
+                        className="cursor-pointer hover:opacity-80 transition-opacity"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSelectFurniture(index);
 
-                      const rotation = furniture.rotation || 0;
-                      const actualWidth =
-                        rotation % 180 === 0
-                          ? furniture.width
-                          : furniture.height;
-                      const actualHeight =
-                        rotation % 180 === 0
-                          ? furniture.height
-                          : furniture.width;
+                          if (selectedFurnitureIndex === index) {
+                            setIsDraggingPlaced(true);
 
-                      const scaledWidth = actualWidth * scaleX;
-                      const scaledHeight = actualHeight * scaleY;
-                      const scaledX = 20 + furniture.x * scaleX;
-                      const scaledY = 20 + furniture.y * scaleY;
+                            const startCoords = convertToRealCoordinates(
+                              e.clientX,
+                              e.clientY
+                            );
+                            const offsetX = startCoords.x - furniture.x;
+                            const offsetY = startCoords.y - furniture.y;
 
-                      return (
-                        <g key={furniture.id}>
-                          {/* 여유 공간 표시 (선택된 가구만) */}
-                          {selectedFurnitureIndex === index && (
-                            <rect
-                              x={scaledX - 5 * scaleX}
-                              y={scaledY - 5 * scaleY}
-                              width={scaledWidth + 10 * scaleX}
-                              height={scaledHeight + 10 * scaleY}
-                              fill="none"
-                              stroke="#FbbF24"
-                              strokeWidth="1"
-                              strokeDasharray="3,3"
-                              opacity="0.7"
-                            />
-                          )}
+                            const handleMouseMove = (moveEvent) => {
+                              const currentCoords = convertToRealCoordinates(
+                                moveEvent.clientX,
+                                moveEvent.clientY
+                              );
+                              handleMoveFurniture(
+                                index,
+                                currentCoords.x - offsetX,
+                                currentCoords.y - offsetY
+                              );
+                            };
 
-                          {/* 가구 본체 */}
-                          <rect
-                            x={scaledX}
-                            y={scaledY}
-                            width={scaledWidth}
-                            height={scaledHeight}
-                            fill={furniture.color}
-                            stroke={
-                              selectedFurnitureIndex === index
-                                ? "#3B82F6"
-                                : "#374151"
-                            }
-                            strokeWidth={
-                              selectedFurnitureIndex === index ? 3 : 1
-                            }
-                            className={`cursor-pointer hover:opacity-80 transition-opacity ${
-                              selectedFurnitureIndex === index
-                                ? "cursor-move"
-                                : ""
-                            }`}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              if (selectedFurnitureIndex !== index) {
-                                handleSelectFurniture(index);
-                                return;
-                              }
-
-                              const svg = e.currentTarget.closest("svg");
-                              const rect = svg.getBoundingClientRect();
-
-                              const startMouseX = e.clientX;
-                              const startMouseY = e.clientY;
-                              const startFurnitureX = furniture.x;
-                              const startFurnitureY = furniture.y;
-
-                              const handleMouseMove = (moveEvent) => {
-                                const deltaX = moveEvent.clientX - startMouseX;
-                                const deltaY = moveEvent.clientY - startMouseY;
-
-                                const realDeltaX =
-                                  (deltaX / rect.width) * validRoomWidth;
-                                const realDeltaY =
-                                  (deltaY / rect.height) * validRoomHeight;
-
-                                const newX = startFurnitureX + realDeltaX;
-                                const newY = startFurnitureY + realDeltaY;
-
-                                handleMoveFurniture(index, newX, newY);
-                              };
-
-                              const handleMouseUp = () => {
-                                document.removeEventListener(
-                                  "mousemove",
-                                  handleMouseMove
-                                );
-                                document.removeEventListener(
-                                  "mouseup",
-                                  handleMouseUp
-                                );
-                              };
-
-                              document.addEventListener(
+                            const handleMouseUp = () => {
+                              setIsDraggingPlaced(false);
+                              document.removeEventListener(
                                 "mousemove",
                                 handleMouseMove
                               );
-                              document.addEventListener(
+                              document.removeEventListener(
                                 "mouseup",
                                 handleMouseUp
                               );
+                            };
+
+                            document.addEventListener(
+                              "mousemove",
+                              handleMouseMove
+                            );
+                            document.addEventListener("mouseup", handleMouseUp);
+                          }
+                        }}
+                      />
+
+                      {/* 가구 아이콘 */}
+                      <text
+                        x={scaledX + scaledWidth / 2}
+                        y={scaledY + scaledHeight / 2}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="16"
+                        fill="white"
+                        className="pointer-events-none select-none"
+                        style={{ userSelect: "none" }}
+                      >
+                        {furniture.icon}
+                      </text>
+
+                      {/* 선택된 가구 정보 표시 */}
+                      {selectedFurnitureIndex === index && (
+                        <g>
+                          {/* 가구 이름 */}
+                          <text
+                            x={scaledX + scaledWidth / 2}
+                            y={scaledY - 25}
+                            textAnchor="middle"
+                            fontSize="12"
+                            fill="#1F2937"
+                            className="pointer-events-none select-none font-medium"
+                          >
+                            {furniture.name}
+                            {rotation !== 0 && ` (${rotation}°)`}
+                          </text>
+
+                          {/* 가로 치수 */}
+                          <text
+                            x={scaledX + scaledWidth / 2}
+                            y={scaledY - 10}
+                            textAnchor="middle"
+                            fontSize="11"
+                            fill="#4B5563"
+                            className="pointer-events-none select-none"
+                          >
+                            {actualWidth}cm
+                          </text>
+
+                          {/* 세로 치수 */}
+                          <text
+                            x={scaledX - 10}
+                            y={scaledY + scaledHeight / 2}
+                            textAnchor="middle"
+                            fontSize="11"
+                            fill="#4B5563"
+                            className="pointer-events-none select-none"
+                            transform={`rotate(-90, ${scaledX - 10}, ${scaledY + scaledHeight / 2})`}
+                          >
+                            {actualHeight}cm
+                          </text>
+
+                          {/* 회전 버튼 */}
+                          <circle
+                            cx={scaledX + scaledWidth - 10}
+                            cy={scaledY + scaledHeight - 10}
+                            r="10"
+                            fill="#10B981"
+                            className="cursor-pointer hover:fill-green-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRotateFurniture(index);
                             }}
                           />
-
-                          {/* 가구 아이콘 */}
                           <text
-                            x={scaledX + scaledWidth / 2}
-                            y={scaledY + scaledHeight / 2}
+                            x={scaledX + scaledWidth - 10}
+                            y={scaledY + scaledHeight - 10}
                             textAnchor="middle"
                             dominantBaseline="middle"
-                            fontSize="12"
+                            fontSize="14"
                             fill="white"
                             className="pointer-events-none select-none"
                           >
-                            {furniture.icon}
+                            ↻
                           </text>
 
-                          {/* 회전 표시 */}
-                          {rotation !== 0 && (
-                            <text
-                              x={scaledX + scaledWidth / 2}
-                              y={scaledY + scaledHeight / 2 + 15}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                              fontSize="10"
-                              fill="white"
-                              className="pointer-events-none select-none"
-                            >
-                              {rotation}°
-                            </text>
-                          )}
-
-                          {/* 가구 치수 표시 (선택된 가구만) */}
-                          {selectedFurnitureIndex === index && (
-                            <g>
-                              {/* 가로 치수 */}
-                              <text
-                                x={scaledX + scaledWidth / 2}
-                                y={scaledY - 5}
-                                textAnchor="middle"
-                                fontSize="10"
-                                fill="#4B5563"
-                                className="pointer-events-none select-none"
-                              >
-                                {actualWidth}cm
-                              </text>
-
-                              {/* 세로 치수 */}
-                              <text
-                                x={scaledX - 5}
-                                y={scaledY + scaledHeight / 2}
-                                textAnchor="middle"
-                                fontSize="10"
-                                fill="#4B5563"
-                                className="pointer-events-none select-none"
-                                transform={`rotate(-90, ${scaledX - 5}, ${
-                                  scaledY + scaledHeight / 2
-                                })`}
-                              >
-                                {actualHeight}cm
-                              </text>
-
-                              {/* 가구 이름 */}
-                              <text
-                                x={scaledX + scaledWidth / 2}
-                                y={scaledY + scaledHeight + 15}
-                                textAnchor="middle"
-                                fontSize="10"
-                                fill="#1F2937"
-                                className="pointer-events-none select-none font-medium"
-                              >
-                                {furniture.name}{" "}
-                                {rotation !== 0 && `(${rotation}°)`}
-                              </text>
-                            </g>
-                          )}
-
-                          {/* 컨트롤 버튼들 (선택된 가구만) */}
-                          {selectedFurnitureIndex === index && (
-                            <g>
-                              {/* 회전 버튼 */}
-                              <circle
-                                cx={scaledX + scaledWidth - 8}
-                                cy={scaledY + scaledHeight - 8}
-                                r="8"
-                                fill="#10B981"
-                                className="cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRotateFurniture(index);
-                                }}
-                              />
-                              <text
-                                x={scaledX + scaledWidth - 8}
-                                y={scaledY + scaledHeight - 8}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                                fontSize="10"
-                                fill="white"
-                                className="pointer-events-none select-none"
-                              >
-                                ↻
-                              </text>
-
-                              {/* 삭제 버튼 */}
-                              <circle
-                                cx={scaledX + scaledWidth - 8}
-                                cy={scaledY + 8}
-                                r="8"
-                                fill="#EF4444"
-                                className="cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteFurniture(index);
-                                }}
-                              />
-                              <text
-                                x={scaledX + scaledWidth - 8}
-                                y={scaledY + 8}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                                fontSize="10"
-                                fill="white"
-                                className="pointer-events-none select-none"
-                              >
-                                ×
-                              </text>
-                            </g>
-                          )}
-                        </g>
-                      );
-                    })}
-
-                    {/* 배치된 문/창문들 */}
-                    {placedDoorWindows.map((item, index) => {
-                      const scaleX = svgWidth / validRoomWidth;
-                      const scaleY = svgHeight / validRoomHeight;
-
-                      const rotation = item.rotation || 0;
-                      const actualWidth =
-                        rotation % 180 === 0 ? item.width : item.height;
-                      const actualHeight =
-                        rotation % 180 === 0 ? item.height : item.width;
-
-                      const scaledWidth = actualWidth * scaleX;
-                      const scaledHeight = actualHeight * scaleY;
-                      const scaledX = 20 + item.x * scaleX;
-                      const scaledY = 20 + item.y * scaleY;
-
-                      const isSelected = selectedDoorWindowIndex === index;
-
-                      return (
-                        <g key={item.id}>
-                          {/* 문/창문 본체 */}
-                          <rect
-                            x={scaledX}
-                            y={scaledY}
-                            width={scaledWidth}
-                            height={scaledHeight}
-                            fill={item.color}
-                            stroke={isSelected ? "#F59E0B" : "#6B7280"}
-                            strokeWidth={isSelected ? 3 : 2}
-                            className="cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() =>
-                              setSelectedDoorWindowIndex(
-                                isSelected ? null : index
-                              )
-                            }
+                          {/* 삭제 버튼 */}
+                          <circle
+                            cx={scaledX + scaledWidth - 10}
+                            cy={scaledY + 10}
+                            r="10"
+                            fill="#EF4444"
+                            className="cursor-pointer hover:fill-red-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteFurniture(index);
+                            }}
                           />
-
-                          {/* 문/창문 아이콘 */}
                           <text
-                            x={scaledX + scaledWidth / 2}
-                            y={scaledY + scaledHeight / 2}
+                            x={scaledX + scaledWidth - 10}
+                            y={scaledY + 10}
                             textAnchor="middle"
                             dominantBaseline="middle"
-                            fontSize="12"
+                            fontSize="16"
                             fill="white"
                             className="pointer-events-none select-none"
                           >
-                            {item.icon}
+                            ×
                           </text>
-
-                          {/* 벽 정보 표시 (선택된 경우) */}
-                          {isSelected && item.wall && (
-                            <text
-                              x={scaledX + scaledWidth / 2}
-                              y={scaledY + scaledHeight + 15}
-                              textAnchor="middle"
-                              fontSize="10"
-                              fill="#F59E0B"
-                              className="pointer-events-none select-none font-medium"
-                            >
-                              {item.name} ({item.wall} 벽)
-                            </text>
-                          )}
-
-                          {/* 삭제 버튼 (선택된 경우) */}
-                          {isSelected && (
-                            <g>
-                              <circle
-                                cx={scaledX + scaledWidth - 8}
-                                cy={scaledY + 8}
-                                r="8"
-                                fill="#EF4444"
-                                className="cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const newPlaced = [...placedDoorWindows];
-                                  newPlaced.splice(index, 1);
-                                  setPlacedDoorWindows(newPlaced);
-                                  setSelectedDoorWindowIndex(null);
-                                }}
-                              />
-                              <text
-                                x={scaledX + scaledWidth - 8}
-                                y={scaledY + 8}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                                fontSize="10"
-                                fill="white"
-                                className="pointer-events-none select-none"
-                              >
-                                ×
-                              </text>
-                            </g>
-                          )}
                         </g>
-                      );
-                    })}
+                      )}
+                    </g>
+                  );
+                })}
 
-                    {/* 크기 표시 */}
-                    <text
-                      x={20 + svgWidth / 2}
-                      y={svgHeight + 35}
-                      textAnchor="middle"
-                      fontSize="12"
-                      fill="#666"
-                    >
-                      {validRoomWidth.toFixed(0)} cm
-                    </text>
-                    <text
-                      x="10"
-                      y={20 + svgHeight / 2}
-                      textAnchor="middle"
-                      fontSize="12"
-                      fill="#666"
-                      transform={`rotate(-90, 10, ${20 + svgHeight / 2})`}
-                    >
-                      {validRoomHeight.toFixed(0)} cm
-                    </text>
-                  </svg>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* 드롭 영역 안내 */}
-          <div className="mt-2 text-center">
-            <p className="text-sm text-gray-600">
-              💡 위 회색 영역에 가구를 드래그해서 놓으세요
-            </p>
+                {/* 크기 표시 */}
+                <text
+                  x={20 + svgDimensions.svgWidth / 2}
+                  y={15}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fill="#666"
+                >
+                  {validRoomWidth.toFixed(0)} cm
+                </text>
+                <text
+                  x="10"
+                  y={20 + svgDimensions.svgHeight / 2}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fill="#666"
+                  transform={`rotate(-90, 10, ${
+                    20 + svgDimensions.svgHeight / 2
+                  })`}
+                >
+                  {validRoomHeight.toFixed(0)} cm
+                </text>
+              </svg>
+            </div>
           </div>
 
-          {/* 선택된 항목 정보 */}
-          {selectedFurnitureIndex !== null && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">
-                선택된 가구: {placedFurniture[selectedFurnitureIndex].name}
-              </h4>
-              <div className="text-sm text-blue-700 space-y-1">
-                <div>
-                  크기:{" "}
-                  {(placedFurniture[selectedFurnitureIndex].rotation || 0) %
-                    180 ===
-                  0
-                    ? placedFurniture[selectedFurnitureIndex].width
-                    : placedFurniture[selectedFurnitureIndex].height}{" "}
-                  ×{" "}
-                  {(placedFurniture[selectedFurnitureIndex].rotation || 0) %
-                    180 ===
-                  0
-                    ? placedFurniture[selectedFurnitureIndex].height
-                    : placedFurniture[selectedFurnitureIndex].width}{" "}
-                  cm
-                </div>
-                <div>
-                  위치: ({Math.round(placedFurniture[selectedFurnitureIndex].x)}
-                  , {Math.round(placedFurniture[selectedFurnitureIndex].y)}) cm
-                </div>
-                <div>
-                  회전: {placedFurniture[selectedFurnitureIndex].rotation || 0}°
-                </div>
-              </div>
-              <div className="mt-2 flex gap-2">
-                <button
-                  onClick={() => handleRotateFurniture(selectedFurnitureIndex)}
-                  className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded font-medium"
-                >
-                  🔄 90° 회전
-                </button>
-              </div>
+          {/* 드롭 영역 안내 */}
+          {draggedFurniture && (
+            <div className="mt-2 text-center">
+              <p className="text-sm text-green-600 font-medium animate-pulse">
+                ✨ 위 회색 영역에 {draggedFurniture.name}을(를) 드래그해서
+                놓으세요
+              </p>
             </div>
           )}
 
-          {selectedDoorWindowIndex !== null && (
-            <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-              <h4 className="font-medium text-orange-800 mb-2">
-                선택된{" "}
-                {placedDoorWindows[selectedDoorWindowIndex].category === "door"
-                  ? "문"
-                  : "창문"}
-                : {placedDoorWindows[selectedDoorWindowIndex].name}
-              </h4>
-              <div className="text-sm text-orange-700 space-y-1">
-                <div>
-                  크기: {placedDoorWindows[selectedDoorWindowIndex].width} ×{" "}
-                  {placedDoorWindows[selectedDoorWindowIndex].height} cm
+          {/* 선택된 가구 정보 */}
+          {selectedFurnitureIndex !== null &&
+            placedFurniture[selectedFurnitureIndex] && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 className="font-medium text-blue-800 mb-2">
+                  선택된 가구: {placedFurniture[selectedFurnitureIndex].name}
+                </h4>
+                <div className="text-sm text-blue-700 space-y-1">
+                  <div>
+                    크기:{" "}
+                    {(placedFurniture[selectedFurnitureIndex].rotation || 0) %
+                      180 ===
+                    0
+                      ? placedFurniture[selectedFurnitureIndex].width
+                      : placedFurniture[selectedFurnitureIndex].height}{" "}
+                    ×{" "}
+                    {(placedFurniture[selectedFurnitureIndex].rotation || 0) %
+                      180 ===
+                    0
+                      ? placedFurniture[selectedFurnitureIndex].height
+                      : placedFurniture[selectedFurnitureIndex].width}{" "}
+                    cm
+                  </div>
+                  <div>
+                    위치: (
+                    {Math.round(placedFurniture[selectedFurnitureIndex].x)},{" "}
+                    {Math.round(placedFurniture[selectedFurnitureIndex].y)}) cm
+                  </div>
+                  <div>
+                    회전:{" "}
+                    {placedFurniture[selectedFurnitureIndex].rotation || 0}°
+                  </div>
                 </div>
-                <div>
-                  위치: {placedDoorWindows[selectedDoorWindowIndex].wall} 벽
-                </div>
-                <div>
-                  좌표: (
-                  {Math.round(placedDoorWindows[selectedDoorWindowIndex].x)},{" "}
-                  {Math.round(placedDoorWindows[selectedDoorWindowIndex].y)}) cm
+                <div className="mt-3 text-xs text-blue-600">
+                  💡 가구를 드래그하여 이동하거나, 녹색 버튼으로 회전할 수
+                  있습니다
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* 배치 가이드 */}
+          {/* 사용 가이드 */}
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
             <h4 className="font-medium text-gray-700 mb-2">📋 사용 가이드</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>
-                <strong>가구 배치:</strong> 자유롭게 드래그해서 배치
-              </li>
-              <li>
-                <strong>문/창문:</strong> 벽 근처(30cm 이내)로 드래그하면
-                자동으로 벽에 붙음
-              </li>
-              <li>
-                <strong>이동:</strong> 배치된 항목을 클릭 선택 후 드래그로
-                이동
-              </li>
-              <li>
-                <strong>회전:</strong> 가구는 90도씩 회전 가능
-              </li>
-              <li>
-                <strong>삭제:</strong> 선택된 항목의 빨간 × 버튼 클릭
-              </li>
-              <li>
-                <strong>자동 스냅:</strong> 문/창문은 가장 가까운 벽에 자동
-                정렬
-              </li>
-            </ul>
+            <div className="text-sm text-gray-600">
+              <strong className="text-gray-700">🪑 가구 배치</strong>
+              <ul className="mt-1 space-y-1 ml-4">
+                <li>• 왼쪽 목록에서 드래그하여 배치</li>
+                <li>• 클릭으로 선택, 드래그로 이동</li>
+                <li>• 녹색 버튼으로 90° 회전</li>
+                <li>• 빨간 버튼으로 삭제</li>
+              </ul>
+            </div>
+            <div className="mt-3 text-xs text-gray-500">
+              💡 가구가 겹치거나 방 밖으로 나가지 않도록 자동으로 제한됩니다
+            </div>
           </div>
         </div>
       </div>

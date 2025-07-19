@@ -2,24 +2,25 @@
 import React, { useState } from "react";
 import RoomCanvas from "./RoomCanvas";
 import FurniturePlacement from "./FurniturePlacement";
+import RoomBox from "./RoomBox";
 // import Room3DViewer from './Room3DViewer';
 
 const ConfidenceIndicator = ({ confidence, reliability }) => {
   const getColorClasses = (conf) => {
     if (conf > 0.8)
       return {
-        bg: "bg-green-50",
-        border: "border-green-200",
-        text: "text-green-800",
-        bar: "bg-green-500",
+        bg: "bg-rose-50",
+        border: "border-rose-200",
+        text: "text-rose-800",
+        bar: "bg-rose-500",
         icon: "🎯",
       };
     if (conf > 0.6)
       return {
-        bg: "bg-yellow-50",
-        border: "border-yellow-200",
-        text: "text-yellow-800",
-        bar: "bg-yellow-500",
+        bg: "bg-pink-50",
+        border: "border-pink-200",
+        text: "text-pink-800",
+        bar: "bg-pink-500",
         icon: "⚠️",
       };
     return {
@@ -74,10 +75,10 @@ const MeasurementDetails = ({ result }) => {
   const hasPerspectiveData = result.perspective_correction;
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 mt-4">
+    <div className="bg-rose-50 rounded-lg p-4 mt-4">
       <h4 className="font-semibold mb-3 text-gray-700 flex items-center gap-2">
         🔍 측정 세부사항
-        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+        <span className="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded-full">
           {result.method || "improved_midas_relative"}
         </span>
       </h4>
@@ -167,12 +168,12 @@ const RoomResult = ({ result, depthImageUrl }) => {
 
       {/* 경고 메시지 */}
       {result.warning && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg">
           <div className="flex items-center gap-2">
-            <span className="text-yellow-600">⚠️</span>
-            <span className="font-medium text-yellow-800">주의사항</span>
+            <span className="text-rose-600">⚠️</span>
+            <span className="font-medium text-rose-800">주의사항</span>
           </div>
-          <p className="text-yellow-700 mt-1">{result.warning}</p>
+          <p className="text-rose-700 mt-1">{result.warning}</p>
         </div>
       )}
 
@@ -183,7 +184,7 @@ const RoomResult = ({ result, depthImageUrl }) => {
             onClick={() => setActiveTab("measurements")}
             className={`px-6 py-3 font-medium transition-colors border-b-2 ${
               activeTab === "measurements"
-                ? "text-blue-600 border-blue-600"
+                ? "text-rose-600 border-rose-600"
                 : "text-gray-600 border-transparent hover:text-gray-800"
             }`}
           >
@@ -193,7 +194,7 @@ const RoomResult = ({ result, depthImageUrl }) => {
             onClick={() => setActiveTab("furniture")}
             className={`px-6 py-3 font-medium transition-colors border-b-2 ${
               activeTab === "furniture"
-                ? "text-blue-600 border-blue-600"
+                ? "text-rose-600 border-rose-600"
                 : "text-gray-600 border-transparent hover:text-gray-800"
             }`}
           >
@@ -204,7 +205,7 @@ const RoomResult = ({ result, depthImageUrl }) => {
               onClick={() => setActiveTab("depth")}
               className={`px-6 py-3 font-medium transition-colors border-b-2 ${
                 activeTab === "depth"
-                  ? "text-blue-600 border-blue-600"
+                  ? "text-rose-600 border-rose-600"
                   : "text-gray-600 border-transparent hover:text-gray-800"
               }`}
             >
@@ -221,10 +222,10 @@ const RoomResult = ({ result, depthImageUrl }) => {
           <RoomCanvas x={validWidth} y={validDepth} />
 
           {/* 측정 결과 표시 */}
-          <div className="mt-6 p-6 border rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-lg">
+          <div className="mt-6 p-6 border rounded-xl bg-gradient-to-br from-white to-rose-50 shadow-lg">
             <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
               📏 방 크기 측정 결과
-              <span className="text-sm font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+              <span className="text-sm font-normal bg-pink-100 text-pink-800 px-2 py-1 rounded-full">
                 개선된 알고리즘
               </span>
             </h2>
@@ -232,7 +233,7 @@ const RoomResult = ({ result, depthImageUrl }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="bg-white p-4 rounded-lg border shadow-sm">
                 <div className="text-sm text-gray-600 mb-1">가로 (Width)</div>
-                <div className="text-2xl font-bold text-blue-600 mb-1">
+                <div className="text-2xl font-bold text-rose-600 mb-1">
                   {width?.toFixed(1)} cm
                 </div>
                 <div className="text-sm text-gray-500">
@@ -242,7 +243,7 @@ const RoomResult = ({ result, depthImageUrl }) => {
 
               <div className="bg-white p-4 rounded-lg border shadow-sm">
                 <div className="text-sm text-gray-600 mb-1">세로 (Depth)</div>
-                <div className="text-2xl font-bold text-green-600 mb-1">
+                <div className="text-2xl font-bold text-pink-600 mb-1">
                   {depth?.toFixed(1)} cm
                 </div>
                 <div className="text-sm text-gray-500">
@@ -254,15 +255,15 @@ const RoomResult = ({ result, depthImageUrl }) => {
             <div className="bg-white p-4 rounded-lg border shadow-sm mb-6">
               <h3 className="font-semibold mb-3 text-gray-700">📐 면적 계산</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-purple-50 rounded-lg">
+                <div className="text-center p-3 bg-rose-50 rounded-lg">
                   <div className="text-sm text-gray-600 mb-1">제곱미터</div>
-                  <div className="text-xl font-bold text-purple-600">
+                  <div className="text-xl font-bold text-rose-600">
                     {area_m2.toFixed(2)} ㎡
                   </div>
                 </div>
-                <div className="text-center p-3 bg-orange-50 rounded-lg">
+                <div className="text-center p-3 bg-pink-50 rounded-lg">
                   <div className="text-sm text-gray-600 mb-1">평수</div>
-                  <div className="text-xl font-bold text-orange-600">
+                  <div className="text-xl font-bold text-pink-600">
                     {area_pyeong.toFixed(1)} 평
                   </div>
                 </div>
@@ -272,15 +273,15 @@ const RoomResult = ({ result, depthImageUrl }) => {
             {/* 측정 세부사항 */}
             <MeasurementDetails result={result} />
 
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-6 p-4 bg-pink-50 border border-pink-200 rounded-lg">
               <div className="flex items-start gap-2">
-                <span className="text-blue-600 mt-0.5">💡</span>
+                <span className="text-pink-600 mt-0.5">💡</span>
                 <div>
-                  <div className="font-medium text-blue-800 mb-1">참고사항</div>
-                  <p className="text-sm text-blue-700">
-                    이 측정은 개선된 알고리즘으로 층고 {result.height_cm}cm를
-                    기준으로 계산되었습니다. 신뢰도가 높을수록 실제 크기에
-                    가까운 결과입니다.
+                  <div className="font-medium text-pink-800 mb-1">참고사항</div>
+                  <p className="text-sm text-pink-700">
+                    이 측정은 개선된 알고리즘으로 층고{" "}
+                    {Math.round(result.height_cm)}cm를 기준으로 계산되었습니다.
+                    신뢰도가 높을수록 실제 크기에 가까운 결과입니다.
                   </p>
                 </div>
               </div>

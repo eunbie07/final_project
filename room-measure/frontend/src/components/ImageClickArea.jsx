@@ -7,21 +7,21 @@ const CLICK_INSTRUCTIONS = [
     step: 1,
     text: "바닥과 벽이 만나는 모서리 클릭",
     icon: "📍",
-    color: "bg-red-100 border-red-300 text-red-800",
+    color: "bg-rose-100 border-rose-300 text-rose-800",
     detail: "층고 측정의 기준점이 되는 바닥 모서리",
   },
   {
     step: 2,
     text: "천장과 벽이 만나는 모서리 클릭 (같은 벽)",
     icon: "📍",
-    color: "bg-blue-100 border-blue-300 text-blue-800",
+    color: "bg-pink-100 border-pink-300 text-pink-800",
     detail: "첫 번째 점과 수직선상에 있는 천장 모서리",
   },
   {
     step: 3,
     text: "왼쪽 벽의 바닥 모서리 클릭",
     icon: "📍",
-    color: "bg-green-100 border-green-300 text-green-800",
+    color: "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800",
     detail: "방의 세로 길이를 측정하기 위한 점",
   },
   {
@@ -34,7 +34,7 @@ const CLICK_INSTRUCTIONS = [
 ];
 
 const ClickGuide = ({ currentStep, warnings }) => (
-  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl mb-6 border border-blue-200">
+  <div className="bg-gradient-to-br from-rose-50 to-pink-100 p-6 rounded-xl mb-6 border border-pink-200">
     <h3 className="font-bold text-lg mb-4 text-gray-800 flex items-center gap-2">
       📋 클릭 순서 가이드
       <span className="text-sm font-normal text-gray-600">
@@ -50,7 +50,7 @@ const ClickGuide = ({ currentStep, warnings }) => (
             idx === currentStep
               ? `${instruction.color} shadow-md transform scale-105`
               : idx < currentStep
-              ? "bg-gray-100 border-gray-300 text-gray-600"
+              ? "bg-pink-50 border-pink-200 text-gray-600"
               : "bg-white border-gray-200 text-gray-500"
           }`}
         >
@@ -72,9 +72,9 @@ const ClickGuide = ({ currentStep, warnings }) => (
     </div>
 
     {warnings.length > 0 && (
-      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <div className="font-semibold text-yellow-800 mb-2">⚠️ 주의사항</div>
-        <ul className="text-sm text-yellow-700 space-y-1">
+      <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-lg">
+        <div className="font-semibold text-rose-800 mb-2">⚠️ 주의사항</div>
+        <ul className="text-sm text-rose-700 space-y-1">
           {warnings.map((warning, idx) => (
             <li key={idx}>• {warning}</li>
           ))}
@@ -85,7 +85,7 @@ const ClickGuide = ({ currentStep, warnings }) => (
 );
 
 const PointMarker = ({ point, index, isActive }) => {
-  const colors = ["red", "blue", "green", "purple"];
+  const colors = ["rose", "pink", "fuchsia", "purple"];
   const color = colors[index] || "gray";
 
   return (
