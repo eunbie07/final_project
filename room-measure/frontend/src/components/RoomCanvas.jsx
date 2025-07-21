@@ -7,8 +7,8 @@ const RoomCanvas = ({ x, y }) => {
   const validX = isNaN(x) || x <= 0 ? 400 : x; // 가로 (width)
   const validY = isNaN(y) || y <= 0 ? 300 : y; // 세로 (depth)
 
-  console.log("🏠 RoomCanvas 입력값:", { x: validX, y: validY });
-  console.log("🏠 실제 비율:", (validX / validY).toFixed(2));
+  console.log("RoomCanvas 입력값:", { x: validX, y: validY });
+  console.log("실제 비율:", (validX / validY).toFixed(2));
 
   // 최대 캔버스 크기 설정
   const maxCanvasSize = 400;
@@ -33,7 +33,7 @@ const RoomCanvas = ({ x, y }) => {
   canvasWidth = Math.max(200, Math.min(canvasWidth, 500));
   canvasHeight = Math.max(150, Math.min(canvasHeight, 400));
 
-  console.log("🖼️ 캔버스 크기:", {
+  console.log("캔버스 크기:", {
     width: canvasWidth.toFixed(0),
     height: canvasHeight.toFixed(0),
     ratio: (canvasWidth / canvasHeight).toFixed(2),
@@ -51,7 +51,7 @@ const RoomCanvas = ({ x, y }) => {
     <div className="flex flex-col items-center justify-center bg-white py-8 rounded-lg shadow-sm border border-gray-200">
       {/* Room layout 제목 */}
       <div className="mb-4 text-xl font-bold text-gray-800 text-center">
-        📐 Room Layout
+        <strong>Room Layout</strong>
       </div>
 
       {/* 실제 크기 정보 */}
@@ -194,7 +194,7 @@ const RoomCanvas = ({ x, y }) => {
 
       {/* 비율 정보 */}
       <div className="mt-4 text-xs text-gray-500 text-center max-w-md">
-        💡 <strong>비율 정보:</strong>
+        <strong>비율 정보:</strong>
         {aspectRatio >= 1.5
           ? " 가로가 매우 긴 방"
           : aspectRatio >= 1.2

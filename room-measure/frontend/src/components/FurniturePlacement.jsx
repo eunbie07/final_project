@@ -126,11 +126,11 @@ const FURNITURE_CATALOG = [
 ];
 
 const CATEGORIES = [
-  { id: "all", name: "전체", icon: "🏠" },
-  { id: "bedroom", name: "침실", icon: "🛏️" },
-  { id: "living", name: "거실", icon: "🛋️" },
-  { id: "office", name: "사무", icon: "🪑" },
-  { id: "storage", name: "수납", icon: "📦" },
+  { id: "all", name: "전체", icon: "" },
+  { id: "bedroom", name: "침실", icon: "" },
+  { id: "living", name: "거실", icon: "" },
+  { id: "office", name: "사무", icon: "" },
+  { id: "storage", name: "수납", icon: "" },
 ];
 
 const FurnitureItem = ({ furniture, onDragStart }) => (
@@ -431,36 +431,36 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
     <div className="mt-8 p-6 bg-white rounded-xl shadow-lg border">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          🏠 가구 배치 시뮬레이션
+          <strong>가구 배치 시뮬레이션</strong>
         </h2>
         <div className="flex gap-2">
           <button
             onClick={handleClearAll}
-            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={placedFurniture.length === 0}
           >
-            🗑️ 전체 삭제
+            <strong>전체 삭제</strong>
           </button>
         </div>
       </div>
 
       {/* 통계 정보 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <div className="text-sm text-blue-600 font-medium">방 크기</div>
-          <div className="text-lg font-bold text-blue-800">
+        <div className="bg-rose-50 p-4 rounded-lg">
+          <div className="text-sm text-rose-600 font-medium">          <strong>방 크기</strong></div>
+          <div className="text-lg font-bold text-rose-800">
             {validRoomWidth.toFixed(1)} × {validRoomHeight.toFixed(1)} cm
           </div>
         </div>
-        <div className="bg-green-50 p-4 rounded-lg">
-          <div className="text-sm text-green-600 font-medium">배치된 가구</div>
-          <div className="text-lg font-bold text-green-800">
+        <div className="bg-pink-50 p-4 rounded-lg">
+          <div className="text-sm text-pink-600 font-medium"><strong>배치된 가구</strong></div>
+          <div className="text-lg font-bold text-pink-800">
             {placedFurniture.length} 개
           </div>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <div className="text-sm text-purple-600 font-medium">공간 활용률</div>
-          <div className="text-lg font-bold text-purple-800">
+        <div className="bg-rose-100 p-4 rounded-lg">
+          <div className="text-sm text-rose-700 font-medium"><strong>공간 활용률</strong></div>
+          <div className="text-lg font-bold text-rose-800">
             {calculateSpaceUtilization}%
           </div>
         </div>
@@ -470,7 +470,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
         {/* 가구 카탈로그 */}
         <div className="lg:col-span-1">
           <h3 className="text-lg font-semibold mb-4 text-gray-700">
-            🛋️ 가구 선택
+            <strong>가구 선택</strong>
           </h3>
 
           {/* 카테고리 탭 */}
@@ -481,11 +481,11 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? "bg-blue-500 text-white"
+                    ? "bg-pink-500 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                {category.icon} {category.name}
+                {category.name}
               </button>
             ))}
           </div>
@@ -501,9 +501,9 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
             ))}
           </div>
 
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              💡 <strong>사용법:</strong>
+          <div className="mt-4 p-3 bg-pink-50 border border-pink-200 rounded-lg">
+            <p className="text-sm text-pink-800">
+              <strong>사용법:</strong>
               <br />
               • 가구를 드래그해서 방에 배치
               <br />
@@ -516,7 +516,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
         {/* 방 평면도 */}
         <div className="lg:col-span-2">
           <h3 className="text-lg font-semibold mb-4 text-gray-700">
-            📐 방 평면도
+            <strong>방 평면도</strong>
           </h3>
 
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
@@ -800,8 +800,8 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
           {/* 드롭 영역 안내 */}
           {draggedFurniture && (
             <div className="mt-2 text-center">
-              <p className="text-sm text-green-600 font-medium animate-pulse">
-                ✨ 위 회색 영역에 {draggedFurniture.name}을(를) 드래그해서
+              <p className="text-sm text-pink-600 font-medium animate-pulse">
+                위 회색 영역에 {draggedFurniture.name}을(를) 드래그해서
                 놓으세요
               </p>
             </div>
@@ -810,11 +810,11 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
           {/* 선택된 가구 정보 */}
           {selectedFurnitureIndex !== null &&
             placedFurniture[selectedFurnitureIndex] && (
-              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h4 className="font-medium text-blue-800 mb-2">
+              <div className="mt-4 p-4 bg-pink-50 border border-pink-200 rounded-lg">
+                <h4 className="font-medium text-pink-800 mb-2">
                   선택된 가구: {placedFurniture[selectedFurnitureIndex].name}
                 </h4>
-                <div className="text-sm text-blue-700 space-y-1">
+                <div className="text-sm text-pink-700 space-y-1">
                   <div>
                     크기:{" "}
                     {(placedFurniture[selectedFurnitureIndex].rotation || 0) %
@@ -840,8 +840,8 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
                     {placedFurniture[selectedFurnitureIndex].rotation || 0}°
                   </div>
                 </div>
-                <div className="mt-3 text-xs text-blue-600">
-                  💡 가구를 드래그하여 이동하거나, 녹색 버튼으로 회전할 수
+                <div className="mt-3 text-xs text-pink-600">
+                  가구를 드래그하여 이동하거나, 녹색 버튼으로 회전할 수
                   있습니다
                 </div>
               </div>
@@ -849,9 +849,9 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
 
           {/* 사용 가이드 */}
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium text-gray-700 mb-2">📋 사용 가이드</h4>
+            <h4 className="font-medium text-gray-700 mb-2"><strong>사용 가이드</strong></h4>
             <div className="text-sm text-gray-600">
-              <strong className="text-gray-700">🪑 가구 배치</strong>
+              <strong className="text-gray-700">가구 배치</strong>
               <ul className="mt-1 space-y-1 ml-4">
                 <li>• 왼쪽 목록에서 드래그하여 배치</li>
                 <li>• 클릭으로 선택, 드래그로 이동</li>
@@ -860,7 +860,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
               </ul>
             </div>
             <div className="mt-3 text-xs text-gray-500">
-              💡 가구가 겹치거나 방 밖으로 나가지 않도록 자동으로 제한됩니다
+              가구가 겹치거나 방 밖으로 나가지 않도록 자동으로 제한됩니다
             </div>
           </div>
         </div>

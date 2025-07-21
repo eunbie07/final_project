@@ -5,40 +5,40 @@ import axios from "axios";
 const CLICK_INSTRUCTIONS = [
   {
     step: 1,
-    text: "바닥과 벽이 만나는 모서리 클릭",
-    icon: "📍",
+    text: "Floor-wall corner",
+    icon: "1",
     color: "bg-rose-100 border-rose-300 text-rose-800",
-    detail: "층고 측정의 기준점이 되는 바닥 모서리",
+    detail: "Base point for height measurement",
   },
   {
     step: 2,
-    text: "천장과 벽이 만나는 모서리 클릭 (같은 벽)",
-    icon: "📍",
+    text: "Ceiling-wall corner (same wall)",
+    icon: "2", 
     color: "bg-pink-100 border-pink-300 text-pink-800",
-    detail: "첫 번째 점과 수직선상에 있는 천장 모서리",
+    detail: "Ceiling corner vertically above first point",
   },
   {
     step: 3,
-    text: "왼쪽 벽의 바닥 모서리 클릭",
-    icon: "📍",
-    color: "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800",
-    detail: "방의 세로 길이를 측정하기 위한 점",
+    text: "Left wall floor corner",
+    icon: "3",
+    color: "bg-rose-200 border-rose-400 text-rose-900",
+    detail: "Point for measuring room depth",
   },
   {
     step: 4,
-    text: "오른쪽 벽의 바닥 모서리 클릭",
-    icon: "📍",
-    color: "bg-purple-100 border-purple-300 text-purple-800",
-    detail: "방의 가로 길이를 측정하기 위한 점",
+    text: "Right wall floor corner", 
+    icon: "4",
+    color: "bg-pink-200 border-pink-400 text-pink-900",
+    detail: "Point for measuring room width",
   },
 ];
 
 const ClickGuide = ({ currentStep, warnings }) => (
-  <div className="bg-gradient-to-br from-rose-50 to-pink-100 p-6 rounded-xl mb-6 border border-pink-200">
-    <h3 className="font-bold text-lg mb-4 text-gray-800 flex items-center gap-2">
-      📋 클릭 순서 가이드
+  <div className="bg-gradient-to-br from-rose-50 to-pink-100 p-4 rounded-xl border border-pink-200">
+    <h3 className="font-bold text-lg mb-3 text-gray-800 flex items-center gap-2">
+      <strong>Click Guide</strong>
       <span className="text-sm font-normal text-gray-600">
-        ({currentStep}/4 완료)
+        ({currentStep}/4 completed)
       </span>
     </h3>
 
@@ -55,7 +55,7 @@ const ClickGuide = ({ currentStep, warnings }) => (
           }`}
         >
           <span className="text-xl flex-shrink-0 mt-0.5">
-            {idx < currentStep ? "✅" : instruction.icon}
+            {idx < currentStep ? "" : instruction.icon}
           </span>
           <div className="flex-1">
             <div
@@ -73,7 +73,7 @@ const ClickGuide = ({ currentStep, warnings }) => (
 
     {warnings.length > 0 && (
       <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-lg">
-        <div className="font-semibold text-rose-800 mb-2">⚠️ 주의사항</div>
+        <div className="font-semibold text-rose-800 mb-2">주의사항</div>
         <ul className="text-sm text-rose-700 space-y-1">
           {warnings.map((warning, idx) => (
             <li key={idx}>• {warning}</li>
@@ -87,21 +87,30 @@ const ClickGuide = ({ currentStep, warnings }) => (
 const PointMarker = ({ point, index, isActive }) => {
   const colors = ["rose", "pink", "fuchsia", "purple"];
   const color = colors[index] || "gray";
+  const isAutoDetected = point.autoDetected;
 
   return (
     <div
       className={`absolute transform -translate-x-1/2 -translate-y-1/2 ${
         isActive ? "animate-pulse" : ""
-      }`}
+      } ${isAutoDetected ? "animate-bounce" : ""}`}
       style={{ left: point.x, top: point.y }}
     >
       <div
-        className={`w-4 h-4 bg-${color}-500 border-2 border-white rounded-full shadow-lg`}
+        className={`w-4 h-4 ${
+          isAutoDetected 
+            ? `bg-blue-500 border-2 border-blue-200` 
+            : `bg-${color}-500 border-2 border-white`
+        } rounded-full shadow-lg`}
       />
       <div
-        className={`absolute -top-8 left-1/2 transform -translate-x-1/2 bg-${color}-600 text-white text-xs font-bold px-2 py-1 rounded shadow-lg`}
+        className={`absolute -top-8 left-1/2 transform -translate-x-1/2 ${
+          isAutoDetected 
+            ? "bg-blue-600" 
+            : `bg-${color}-600`
+        } text-white text-xs font-bold px-2 py-1 rounded shadow-lg`}
       >
-        {index + 1}
+        {isAutoDetected ? "AI" : index + 1}
       </div>
     </div>
   );
@@ -177,6 +186,8 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
   const [warnings, setWarnings] = useState([]);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [depthMeta, setDepthMeta] = useState({ width: 0, height: 0 });
+  const [isAutoDetecting, setIsAutoDetecting] = useState(false);
+  const [detectionMethod, setDetectionMethod] = useState("manual"); // "manual" or "auto"
   const imageRef = useRef(null);
 
   const currentStep = points.length;
@@ -191,10 +202,10 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
     const fetchDepthMeta = async () => {
       try {
         const response = await axios.get("http://localhost:3000/depth-meta");
-        console.log("📊 Depth meta 정보:", response.data);
+        console.log("Depth meta 정보:", response.data);
         setDepthMeta(response.data);
       } catch (error) {
-        console.error("❌ Depth meta 조회 실패:", error);
+        console.error("Depth meta 조회 실패:", error);
         // 기본값 사용
         setDepthMeta({ width: depthWidth || 256, height: depthHeight || 192 });
       }
@@ -208,7 +219,7 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
     if (imageRef.current) {
       const { naturalWidth, naturalHeight, clientWidth, clientHeight } =
         imageRef.current;
-      console.log("🖼️ 이미지 크기 정보:");
+      console.log("이미지 크기 정보:");
       console.log("   원본 크기:", naturalWidth, "x", naturalHeight);
       console.log("   표시 크기:", clientWidth, "x", clientHeight);
       console.log("   Depth 크기:", depthMeta.width, "x", depthMeta.height);
@@ -230,7 +241,7 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
       !depthMeta.width ||
       !depthMeta.height
     ) {
-      console.warn("⚠️ 좌표 변환에 필요한 정보가 부족합니다");
+      console.warn("좌표 변환에 필요한 정보가 부족합니다");
       return { x: Math.round(displayX), y: Math.round(displayY) };
     }
 
@@ -245,7 +256,7 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
     const clampedX = Math.max(0, Math.min(depthX, depthMeta.width - 1));
     const clampedY = Math.max(0, Math.min(depthY, depthMeta.height - 1));
 
-    console.log("🔄 좌표 변환:");
+    console.log("좌표 변환:");
     console.log(
       `   표시 좌표: (${displayX.toFixed(1)}, ${displayY.toFixed(1)})`
     );
@@ -263,7 +274,7 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
     const displayY = e.clientY - rect.top;
 
     console.log(
-      `🖱️ 클릭 ${points.length + 1}: 표시 좌표 (${displayX.toFixed(
+      `클릭 ${points.length + 1}: 표시 좌표 (${displayX.toFixed(
         1
       )}, ${displayY.toFixed(1)})`
     );
@@ -272,13 +283,13 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
     const depthCoords = convertToDepthCoordinates(displayX, displayY);
 
     try {
-      console.log(`📡 깊이 값 요청: (${depthCoords.x}, ${depthCoords.y})`);
+      console.log(`깊이 값 요청: (${depthCoords.x}, ${depthCoords.y})`);
 
       const depthResponse = await axios.get(
         `http://localhost:3000/get-depth-at-point?x=${depthCoords.x}&y=${depthCoords.y}`
       );
 
-      console.log("✅ 깊이 값 응답:", depthResponse.data);
+      console.log("깊이 값 응답:", depthResponse.data);
 
       // 표시용으로는 원래 클릭 좌표 사용, z값만 깊이 맵에서 가져옴
       const newPoint = {
@@ -293,9 +304,9 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
       const newPoints = [...points, newPoint];
       setPoints(newPoints);
 
-      console.log("📝 업데이트된 points:", newPoints);
+      console.log("업데이트된 points:", newPoints);
     } catch (error) {
-      console.error("❌ 깊이 값 조회 실패:", error);
+      console.error("깊이 값 조회 실패:", error);
 
       // 에러 메시지 개선
       let errorMessage = "깊이 값을 가져올 수 없습니다.";
@@ -333,68 +344,229 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
         z: point.z,
       }));
 
-      console.log("📤 서버로 전송할 좌표 (깊이 맵 기준):", convertedPoints);
-      await onComplete(convertedPoints);
+      console.log("서버로 전송할 좌표 (깊이 맵 기준):", convertedPoints);
+      await onComplete(convertedPoints, detectionMethod);
     } catch (error) {
-      console.error("❌ 측정 실패:", error);
+      console.error("측정 실패:", error);
       alert("측정에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleAutoDetect = async () => {
+    setIsAutoDetecting(true);
+    setDetectionMethod("auto");
+    setPoints([]);
+    setWarnings([]);
+
+    try {
+      // 이미지를 Canvas로 로드하고 그레이스케일로 변환
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      // 이미지를 Canvas에 그려서 그레이스케일로 변환
+      const img = new Image();
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      await new Promise((resolve) => {
+        img.onload = resolve;
+        img.src = URL.createObjectURL(blob);
+      });
+      
+      // Canvas 크기를 이미지 크기로 설정
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      // 이미지를 Canvas에 그리기
+      ctx.drawImage(img, 0, 0);
+      
+      // 그레이스케일 변환
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      
+      for (let i = 0; i < data.length; i += 4) {
+        // RGB를 그레이스케일로 변환 (가중평균)
+        const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+        data[i] = gray;     // Red
+        data[i + 1] = gray; // Green
+        data[i + 2] = gray; // Blue
+        // Alpha는 그대로 유지
+      }
+      
+      // 변환된 이미지 데이터를 다시 Canvas에 적용
+      ctx.putImageData(imageData, 0, 0);
+      
+      // Canvas를 Blob으로 변환
+      const grayscaleBlob = await new Promise(resolve => {
+        canvas.toBlob(resolve, 'image/jpeg', 0.9);
+      });
+      
+      const file = new File([grayscaleBlob], "room-image-grayscale.jpg", { type: "image/jpeg" });
+      
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("confidence_threshold", "0.7");
+
+      console.log("RoomNet 자동 감지 시작...");
+      
+      const autoDetectResponse = await axios.post(
+        "http://localhost:3000/auto-detect-room",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (autoDetectResponse.data.success) {
+        console.log("RoomNet 감지 성공:", autoDetectResponse.data);
+        
+        // 자동 감지된 포인트들을 표시용으로 변환
+        const detectedPoints = autoDetectResponse.data.detected_points.map((point, index) => ({
+          x: point.x,
+          y: point.y, 
+          z: point.z,
+          depthX: point.x,
+          depthY: point.y,
+          autoDetected: true
+        }));
+
+        setPoints(detectedPoints);
+        
+        // 자동 감지 결과를 표시하고 사용자가 확인할 수 있도록 대기
+        console.log("자동 감지 완료! 사용자 확인 대기 중...");
+        
+      } else {
+        console.warn("RoomNet 감지 실패:", autoDetectResponse.data);
+        alert(`자동 감지에 실패했습니다: ${autoDetectResponse.data.error}\n\n수동 4포인트 방식을 사용해주세요.`);
+        setDetectionMethod("manual");
+      }
+    } catch (error) {
+      console.error("자동 감지 오류:", error);
+      let errorMessage = "자동 감지 중 오류가 발생했습니다.";
+      
+      if (error.response?.status === 422) {
+        errorMessage = "이미지에서 방 경계를 자동으로 감지할 수 없습니다.";
+      } else if (error.response?.status === 500) {
+        errorMessage = "서버 오류가 발생했습니다.";
+      }
+      
+      alert(`${errorMessage}\n\n수동 4포인트 방식을 사용해주세요.`);
+      setDetectionMethod("manual");
+    } finally {
+      setIsAutoDetecting(false);
+    }
+  };
+
   const handleReset = () => {
     setPoints([]);
     setWarnings([]);
+    setDetectionMethod("manual");
   };
 
   return (
     <div className="mt-8">
-      <ClickGuide currentStep={currentStep} warnings={warnings} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 왼쪽: 클릭 가이드 */}
+        <div className="lg:col-span-1">
+          <ClickGuide currentStep={currentStep} warnings={warnings} />
+        </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-6">
+        {/* 오른쪽: 이미지 클릭 영역 */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-800">
-            📷 방 사진에서 포인트 선택
+            <strong>Select Points on Room Photo</strong>
           </h3>
           <div className="flex gap-2">
+            {/* Auto Detect Button */}
+            <button
+              onClick={handleAutoDetect}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                isAutoDetecting
+                  ? "bg-blue-400 text-white cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+              }`}
+              disabled={isAutoDetecting || isLoading}
+              title="AI로 방 경계를 자동 감지합니다"
+            >
+              {isAutoDetecting ? (
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span className="text-xs">AI 분석 중...</span>
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  AI
+                  <strong>Auto Detect</strong>
+                </span>
+              )}
+            </button>
+            
             <button
               onClick={handleReset}
               className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
-              disabled={points.length === 0}
+              disabled={points.length === 0 && !isAutoDetecting}
             >
-              🔄 다시 시작
+              <strong>Reset</strong>
             </button>
             <button
               onClick={handleSubmit}
               className={`px-6 py-2 rounded-lg font-medium transition-all ${
                 points.length === 4 && warnings.length === 0
-                  ? "bg-green-600 hover:bg-green-700 text-white shadow-lg"
+                  ? "bg-pink-600 hover:bg-pink-700 text-white shadow-lg"
                   : points.length === 4
                   ? "bg-yellow-600 hover:bg-yellow-700 text-white"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
-              disabled={points.length !== 4 || isLoading}
+              disabled={points.length !== 4 || isLoading || isAutoDetecting}
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  측정 중...
+                  Measuring...
                 </span>
               ) : warnings.length > 0 ? (
-                "⚠️ 경고 무시하고 측정"
+                <strong>Continue with Warnings</strong>
               ) : (
-                "📏 방 크기 측정하기"
+                <strong>Measure Room Size</strong>
               )}
             </button>
           </div>
         </div>
 
+        {/* Detection Method Indicator */}
+        {detectionMethod === "auto" && points.length > 0 && (
+          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">AI</span>
+                <span className="font-medium text-blue-800">RoomNet 자동 감지 완료!</span>
+              </div>
+              <span className="text-blue-600 text-sm font-medium">
+                {points.length}/4 포인트 감지됨
+              </span>
+            </div>
+            <div className="bg-white p-3 rounded border border-blue-300">
+              <p className="text-sm text-blue-700 mb-2">
+                <strong>자동 감지된 포인트들을 확인해주세요:</strong>
+              </p>
+              <ul className="text-xs text-blue-600 space-y-1">
+                <li>• 파란색 AI 마커들이 AI가 감지한 방 모서리입니다</li>
+                <li>• 포인트들이 정확한지 확인 후 "Measure Room Size" 버튼을 눌러주세요</li>
+                <li>• 부정확하면 "Reset" 후 수동으로 다시 선택하세요</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
         {/* 좌표 변환 정보 표시 (디버깅용) */}
         {depthMeta.width > 0 && imageSize.clientWidth > 0 && (
           <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm">
             <div className="font-medium text-gray-700 mb-1">
-              📊 좌표 변환 정보
+              <strong>좌표 변환 정보</strong>
             </div>
             <div className="text-gray-600 space-y-1">
               <div>
@@ -435,10 +607,10 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
 
           {/* 진행률 표시 */}
           <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white px-3 py-2 rounded-lg">
-            <div className="text-sm font-medium">진행률: {points.length}/4</div>
+            <div className="text-sm font-medium">Progress: {points.length}/4</div>
             <div className="w-24 h-2 bg-gray-600 rounded-full mt-1">
               <div
-                className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                className="h-full bg-pink-500 rounded-full transition-all duration-300"
                 style={{ width: `${(points.length / 4) * 100}%` }}
               />
             </div>
@@ -446,14 +618,17 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
         </div>
 
         <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold text-gray-700 mb-2">💡 측정 팁</h4>
+          <h4 className="font-semibold text-gray-700 mb-2"><strong>Measurement Tips</strong></h4>
           <ul className="text-sm text-gray-600 space-y-1">
-            <li>모서리가 명확하게 보이는 지점을 선택하세요</li>
-            <li>첫 번째와 두 번째 점은 수직선상에 있어야 합니다</li>
-            <li>가구나 물건이 가리지 않는 벽면을 선택하세요</li>
-            <li>정면에서 찍은 사진일수록 정확도가 높습니다</li>
+            <li>AI <strong>Auto Detect:</strong> Try AI-powered automatic room detection first</li>
+            <li><strong>Manual:</strong> Select 4 corner points if auto detection fails</li>
+            <li>First and second points should be vertically aligned</li>
+            <li>Choose walls not blocked by furniture or objects</li>
+            <li>Front-facing photos provide better accuracy</li>
           </ul>
+          </div>
         </div>
+      </div>
       </div>
     </div>
   );

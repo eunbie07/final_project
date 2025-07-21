@@ -537,7 +537,7 @@ const Room3DViewer = ({
                 : "bg-white text-gray-700 hover:bg-gray-100 border"
             }`}
           >
-            👤 사람 시점
+            <strong>사람 시점</strong>
           </button>
           <button
             onClick={() => setViewMode("overview")}
@@ -547,7 +547,7 @@ const Room3DViewer = ({
                 : "bg-white text-gray-700 hover:bg-gray-100 border"
             }`}
           >
-            🏠 전체 뷰
+            <strong>전체 뷰</strong>
           </button>
           <button
             onClick={() => setViewMode("bird")}
@@ -557,12 +557,12 @@ const Room3DViewer = ({
                 : "bg-white text-gray-700 hover:bg-gray-100 border"
             }`}
           >
-            🦅 탑뷰
+            <strong>탑뷰</strong>
           </button>
         </div>
 
         <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border">
-          <label className="text-sm font-medium text-gray-700">키:</label>
+          <label className="text-sm font-medium text-gray-700"><strong>키:</strong></label>
           <input
             type="range"
             min="150"
@@ -580,7 +580,7 @@ const Room3DViewer = ({
           onClick={onClose}
           className="ml-auto px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
         >
-          ← 2D로 돌아가기
+          <strong>← 2D로 돌아가기</strong>
         </button>
       </div>
 
@@ -596,7 +596,7 @@ const Room3DViewer = ({
         <div className="flex items-start justify-between">
           <div>
             <div className="font-medium text-blue-800 mb-1">
-              💡 실제 공간감 체험 - {validRoomWidth}×{validRoomHeight}cm (천장
+              <strong>실제 공간감 체험</strong> - {validRoomWidth}×{validRoomHeight}cm (천장
               2.3m)
             </div>
             <div className="text-sm text-blue-700">
@@ -614,10 +614,10 @@ const Room3DViewer = ({
             <div>
               <strong>현재 시점:</strong>{" "}
               {viewMode === "person"
-                ? "👤 사람"
+                ? "사람"
                 : viewMode === "overview"
-                ? "🏠 전체"
-                : "🦅 탑뷰"}
+                ? "전체"
+                : "탑뷰"}
             </div>
           </div>
         </div>
