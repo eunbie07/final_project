@@ -1535,27 +1535,28 @@ const WindowsOnWalls = React.memo(function WindowsOnWalls({
             break;
           case "back":
             // 뒷벽: x_position이 0이면 왼쪽, 1이면 오른쪽
-            // 사진에서는 x_position=0.3이 앞쪽(카메라 가까운 쪽)을 의미
+            // x_position=0.8이면 오른쪽 80% 지점 (실제 창문 위치)
             position = [
               (window.x_position - 0.5) * roomWidth, // 중앙 기준 좌우 배치
-              height3D, // 수정된 높이 계산
+              height3D, // 층고 기준 높이 계산
               -roomDepth / 2, // 벽 표면에 정확히 붙임
             ];
             break;
           case "left":
             // 왼쪽 벽: x_position이 0이면 앞쪽, 1이면 뒤쪽
+            // x_position=0.3이면 뒤쪽 30% 지점 (벽 안쪽에 안전하게)
             position = [
               -roomWidth / 2, // 벽 표면에 정확히 붙임
-              height3D, // 수정된 높이 계산
-              roomDepth / 2 - window.x_position * roomDepth, // 뒤쪽에서 앞쪽으로
+              height3D, // 층고 기준 높이 계산
+              roomDepth / 2 - window.x_position * roomDepth, // 앞쪽에서 뒤쪽으로
             ];
             break;
           case "right":
             // 오른쪽 벽: x_position이 0이면 앞쪽(카메라 쪽), 1이면 뒤쪽
-            // x_position=0.2면 앞쪽 20% 지점 (카메라에 가까운 쪽)
+            // x_position=0.7이면 뒤쪽 70% 지점 (실제 창문 위치)
             position = [
               roomWidth / 2, // 벽 표면에 정확히 붙임
-              height3D, // 수정된 높이 계산
+              height3D, // 층고 기준 높이 계산
               roomDepth / 2 - window.x_position * roomDepth, // 앞쪽에서 뒤쪽으로
             ];
             break;

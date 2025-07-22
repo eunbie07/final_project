@@ -182,11 +182,11 @@ def detect_windows_with_yolo(image_array):
         logger.info("YOLO 객체 기반 창문 감지 실패")
         logger.info("실제 사진 분석: 오른쪽 벽 상단에 창문이 보임")
         
-        # 실제 사진 기반 추론 창문 (카메라 시점 재분석)
-        # 3D 뷰어에서 카메라 뒤쪽(back 벽)에 창문이 위치해야 함
+        # 실제 사진 기반 추론 창문 (최종 정확한 분석)
+        # 실제 사진에서 창문은 뒤쪽 벽(back wall)에 위치함
         inferred_window = WindowInfo(
-            wall_position="back",   # 카메라 뒤쪽 벽 (실제 창문 위치)
-            x_position=0.8,         # 벽면 오른쪽 80% 지점
+            wall_position="back",   # 뒤쪽 벽 (카메라 반대편 - 실제 창문 위치)
+            x_position=0.8,         # 벽면 오른쪽 80% 지점 (사진의 오른쪽)
             y_position=0.2,         # 이미지 상단 20% (벽면 위쪽)
             width=0.35,             # 벽면의 35% 너비
             height=0.3,             # 벽면의 30% 높이
