@@ -1,7 +1,6 @@
 // frontend/src/components/RoomCanvas.jsx
 import React from "react";
 
-
 const RoomCanvas = ({ x, y }) => {
   // 유효성 검사 및 기본값 설정
   const validX = isNaN(x) || x <= 0 ? 400 : x; // 가로 (width)
@@ -64,42 +63,77 @@ const RoomCanvas = ({ x, y }) => {
         width={canvasWidth + 100}
         height={canvasHeight + 80}
         style={{ background: "#fff", display: "block" }}
+        viewBox={`0 0 ${canvasWidth + 100} ${canvasHeight + 80}`}
       >
-        {/* 방 평면도 윤곽 */}
-        <rect
-          x={50}
-          y={30}
-          width={canvasWidth}
-          height={canvasHeight}
-          fill="#f8fafc"
-          stroke="#1F2937"
-          strokeWidth={3}
-        />
+        {/* Y축 뒤집기 - 왼쪽 아래가 (0,0)이 되도록 변환 */}
+        <g transform={`scale(1, -1) translate(0, -${canvasHeight + 80})`}>
+          {/* 방 평면도 윤곽 */}
+          <rect
+            x={50}
+            y={50}
+            width={canvasWidth}
+            height={canvasHeight}
+            fill="#f8fafc"
+            stroke="#1F2937"
+            strokeWidth={3}
+          />
 
-        {/* 내부 그리드 (선택사항) */}
-        <defs>
-          <pattern
-            id="roomGrid"
-            width="20"
-            height="20"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M 20 0 L 0 0 0 20"
-              fill="none"
-              stroke="#e2e8f0"
-              strokeWidth="0.5"
-            />
-          </pattern>
-        </defs>
-        <rect
-          x={50}
-          y={30}
-          width={canvasWidth}
-          height={canvasHeight}
-          fill="url(#roomGrid)"
-        />
+          {/* 내부 그리드 (선택사항) */}
+          <defs>
+            <pattern
+              id="roomGrid"
+              width="20"
+              height="20"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 20 0 L 0 0 0 20"
+                fill="none"
+                stroke="#e2e8f0"
+                strokeWidth="0.5"
+              />
+            </pattern>
+          </defs>
+          <rect
+            x={50}
+            y={50}
+            width={canvasWidth}
+            height={canvasHeight}
+            fill="url(#roomGrid)"
+          />
 
+          {/* 좌표계 표시 (원점 표시) */}
+          <circle
+            cx={50}
+            cy={50}
+            r={3}
+            fill="#ef4444"
+            stroke="#ffffff"
+            strokeWidth={1}
+          />
+
+          {/* 방향 표시 (뒤집힌 상태에서는 텍스트도 뒤집어야 함) */}
+          <g transform={`scale(1, -1) translate(0, -${50 + canvasHeight / 2})`}>
+            <text
+              x={50 + canvasWidth / 2}
+              y={0}
+              textAnchor="middle"
+              style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
+            >
+              Width × Depth
+            </text>
+            <text
+              x={50 + canvasWidth / 2}
+              y={15}
+              textAnchor="middle"
+              style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
+            >
+              {validX} × {validY}
+            </text>
+          </g>
+        </g>
+
+        {/* 치수선과 텍스트는 정상 방향으로 유지 */}
         {/* 가로 치수 (하단) */}
         <text
           x={50 + canvasWidth / 2}
@@ -173,22 +207,14 @@ const RoomCanvas = ({ x, y }) => {
           strokeWidth={2}
         />
 
-        {/* 방향 표시 */}
+        {/* 원점 라벨 */}
         <text
-          x={50 + canvasWidth / 2}
-          y={30 + canvasHeight / 2}
+          x={50}
+          y={canvasHeight + 75}
           textAnchor="middle"
-          style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
+          style={{ fontSize: 10, fill: "#ef4444", fontWeight: 600 }}
         >
-          Width × Depth
-        </text>
-        <text
-          x={50 + canvasWidth / 2}
-          y={30 + canvasHeight / 2 + 15}
-          textAnchor="middle"
-          style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
-        >
-          {validX} × {validY}
+          (0,0)
         </text>
       </svg>
 
