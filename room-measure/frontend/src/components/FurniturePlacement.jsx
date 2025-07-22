@@ -414,6 +414,20 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
     }
   }, [placedFurniture.length]);
 
+  // 공간 활용률 계산
+  const calculateSpaceUtilization = useMemo(() => {
+    const totalFurnitureArea = placedFurniture.reduce((sum, furniture) => {
+      const rotation = furniture.rotation || 0;
+      const actualWidth =
+        rotation % 180 === 0 ? furniture.width : furniture.height;
+      const actualHeight =
+        rotation % 180 === 0 ? furniture.height : furniture.width;
+      return sum + actualWidth * actualHeight;
+    }, 0);
+    const roomArea = validRoomWidth * validRoomHeight;
+    return ((totalFurnitureArea / roomArea) * 100).toFixed(1);
+  }, [placedFurniture, validRoomWidth, validRoomHeight]);
+
   // JSON 저장 기능
   const handleSaveAsJson = useCallback(() => {
     if (placedFurniture.length === 0) {
@@ -507,20 +521,6 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
     validRoomHeight,
     calculateSpaceUtilization,
   ]);
-
-  // 공간 활용률 계산
-  const calculateSpaceUtilization = useMemo(() => {
-    const totalFurnitureArea = placedFurniture.reduce((sum, furniture) => {
-      const rotation = furniture.rotation || 0;
-      const actualWidth =
-        rotation % 180 === 0 ? furniture.width : furniture.height;
-      const actualHeight =
-        rotation % 180 === 0 ? furniture.height : furniture.width;
-      return sum + actualWidth * actualHeight;
-    }, 0);
-    const roomArea = validRoomWidth * validRoomHeight;
-    return ((totalFurnitureArea / roomArea) * 100).toFixed(1);
-  }, [placedFurniture, validRoomWidth, validRoomHeight]);
 
   return (
     <div className="mt-8 p-6 bg-white rounded-xl shadow-lg border">
