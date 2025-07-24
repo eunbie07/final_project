@@ -152,9 +152,13 @@ const FurnitureItem = ({ furniture, onDragStart }) => (
   </div>
 );
 
-const FurniturePlacement = ({ roomWidth, roomHeight }) => {
+const FurniturePlacement = ({
+  roomWidth,
+  roomHeight,
+  placedFurniture = [],
+  onFurnitureChange,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [placedFurniture, setPlacedFurniture] = useState([]);
   const [selectedFurnitureIndex, setSelectedFurnitureIndex] = useState(null);
   const [draggedFurniture, setDraggedFurniture] = useState(null);
   const [isDraggingPlaced, setIsDraggingPlaced] = useState(false);
@@ -281,7 +285,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
           rotation: 0,
           id: `${draggedFurniture.id}_${Date.now()}`,
         };
-        setPlacedFurniture((prev) => [...prev, newItem]);
+        onFurnitureChange([...placedFurniture, newItem]);
       } else {
         alert("이 위치에는 다른 가구가 있습니다!");
       }
@@ -349,7 +353,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
         ...furniture,
         rotation: newRotation,
       };
-      setPlacedFurniture(newPlaced);
+      onFurnitureChange(newPlaced);
     },
     [placedFurniture, validRoomWidth, validRoomHeight, checkCollision]
   );
@@ -388,7 +392,7 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
           x: clampedX,
           y: clampedY,
         };
-        setPlacedFurniture(newPlaced);
+        onFurnitureChange(newPlaced);
       }
     },
     [placedFurniture, validRoomWidth, validRoomHeight, checkCollision]
@@ -399,20 +403,20 @@ const FurniturePlacement = ({ roomWidth, roomHeight }) => {
     (index) => {
       const newPlaced = [...placedFurniture];
       newPlaced.splice(index, 1);
-      setPlacedFurniture(newPlaced);
+      onFurnitureChange(newPlaced);
       setSelectedFurnitureIndex(null);
     },
-    [placedFurniture]
+    [placedFurniture, onFurnitureChange]
   );
 
   // 전체 초기화
   const handleClearAll = useCallback(() => {
     if (placedFurniture.length === 0) return;
     if (confirm("모든 가구를 삭제하시겠습니까?")) {
-      setPlacedFurniture([]);
+      onFurnitureChange([]);
       setSelectedFurnitureIndex(null);
     }
-  }, [placedFurniture.length]);
+  }, [placedFurniture.length, onFurnitureChange]);
 
   // 공간 활용률 계산
   const calculateSpaceUtilization = useMemo(() => {

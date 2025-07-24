@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ImageUploader from "./components/ImageUploader";
 import ImageClickArea from "./components/ImageClickArea";
@@ -111,6 +111,20 @@ function App() {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [result, setResult] = useState(null);
+
+  // 🪑 가구 배치 상태 (FurniturePlacement ↔ RoomBox 연동)
+  const [placedFurniture, setPlacedFurniture] = useState([]);
+
+  // 🔍 placedFurniture 변경 감지 디버그
+  useEffect(() => {
+    console.log(
+      "📊 App.jsx - placedFurniture 변경:",
+      placedFurniture.length,
+      "개",
+      placedFurniture
+    );
+  }, [placedFurniture]);
+
   const [depthImageUrl, setDepthImageUrl] = useState(null);
   const [depthSize, setDepthSize] = useState({ width: 0, height: 0 });
   const [housingType, setHousingType] = useState(HOUSING_TYPES[0].value);
@@ -125,6 +139,15 @@ function App() {
   const [manualResult, setManualResult] = useState(null);
   const [autoResult, setAutoResult] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState("manual"); // "manual" or "auto"
+  const [roomMeasurementPoints, setRoomMeasurementPoints] = useState(null); // 방 측정 포인트 저장
+
+  // 방 측정 포인트를 전역으로 저장 (창문 감지에서 사용)
+  const updateRoomMeasurementPoints = (points) => {
+    setRoomMeasurementPoints(points);
+    // 전역 변수로도 저장
+    window.roomMeasurementPoints = points;
+    console.log("📐 방 측정 포인트 저장됨:", points);
+  };
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -197,6 +220,9 @@ function App() {
 
   const handlePointsSubmit = async (points, method = "manual") => {
     try {
+      // 방 측정 포인트 저장 (창문 감지에서 사용)
+      updateRoomMeasurementPoints(points);
+
       const payload = {
         points: points.map((pt) => ({
           x: parseFloat(pt.x),
@@ -954,6 +980,7 @@ function App() {
                           isFullscreen={isFullscreen}
                           uploadedImageFile={image}
                           uploadedImageUrl={imageUrl}
+                          placedFurniture={placedFurniture}
                         />
                       </div>
                     </div>
@@ -966,6 +993,8 @@ function App() {
                     <FurniturePlacement
                       roomWidth={result.width_cm}
                       roomHeight={result.depth_cm}
+                      placedFurniture={placedFurniture}
+                      onFurnitureChange={setPlacedFurniture}
                     />
                   </div>
                 )}
@@ -985,6 +1014,7 @@ function App() {
                   setDepthImageUrl(null);
                   setUploadStatus(null);
                   setUploadError(null);
+                  setPlacedFurniture([]); // 🪑 가구 배치 상태도 초기화
                 }}
                 className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg transition-colors shadow-lg"
               >
