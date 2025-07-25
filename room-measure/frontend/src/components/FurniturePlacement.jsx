@@ -1,5 +1,5 @@
 // frontend/src/components/FurniturePlacement.jsx
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 
 const FURNITURE_CATALOG = [
   // 침실 가구
@@ -163,6 +163,11 @@ const FurniturePlacement = ({
   const [draggedFurniture, setDraggedFurniture] = useState(null);
   const [isDraggingPlaced, setIsDraggingPlaced] = useState(false);
   const canvasRef = useRef(null);
+
+  // placedFurniture 변경 감지 (디버깅용)
+  useEffect(() => {
+    console.log('📐 FurniturePlacement - placedFurniture 업데이트됨:', placedFurniture);
+  }, [placedFurniture]);
 
   // 유효성 검사 - Width(X), Depth(Y) 단위: cm
   const validRoomWidth = isNaN(roomWidth) || roomWidth <= 0 ? 400 : roomWidth;

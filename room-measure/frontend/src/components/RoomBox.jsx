@@ -314,7 +314,10 @@ class CollisionDetector {
     const currentFurniture = furniture.find((f) => f.id === currentId);
     if (!currentFurniture) return [];
 
-    const currentSize = furniturePresets[currentFurniture.type].size;
+    // 현재 가구의 크기 정보를 안전하게 가져오기
+    const currentSize = currentFurniture.size ||
+      furniturePresets[currentFurniture.type]?.size || [100, 100, 100]; // 기본값
+
     const currentBox = this.createBoundingBox(newPosition, currentSize);
 
     const collisions = [];
@@ -322,7 +325,10 @@ class CollisionDetector {
     furniture.forEach((otherFurniture) => {
       if (otherFurniture.id === currentId) return;
 
-      const otherSize = furniturePresets[otherFurniture.type].size;
+      // 다른 가구의 크기 정보를 안전하게 가져오기
+      const otherSize = otherFurniture.size ||
+        furniturePresets[otherFurniture.type]?.size || [100, 100, 100]; // 기본값
+
       const otherBox = this.createBoundingBox(
         otherFurniture.position,
         otherSize
@@ -331,7 +337,10 @@ class CollisionDetector {
       if (this.isBoxOverlapping(currentBox, otherBox)) {
         collisions.push({
           id: otherFurniture.id,
-          name: furniturePresets[otherFurniture.type].name,
+          name:
+            furniturePresets[otherFurniture.type]?.name ||
+            otherFurniture.name ||
+            "가구",
           position: otherFurniture.position,
         });
       }
@@ -979,11 +988,19 @@ const DraggableHuman = React.memo(function DraggableHuman({
       const intersection = new THREE.Vector3();
 
       if (raycaster.ray.intersectPlane(plane, intersection)) {
-        const [roomWidth, roomDepth] = roomSize;
-
-        // 방 경계 내로 제한
+        const [roomWidth, , roomDepth] = roomSize;
+        
+        // 방 좌표계는 0에서 roomWidth/roomDepth까지 (중심 기준이 아님)
+        // 방 경계 내로 제한 (0 기준)
         let newX = Math.max(10, Math.min(roomWidth - 10, intersection.x));
         let newZ = Math.max(10, Math.min(roomDepth - 10, intersection.z));
+
+        console.log('👤 사람 드래그:', {
+          intersection: [intersection.x, intersection.z],
+          roomSize: [roomWidth, roomDepth],
+          bounds: [0, roomWidth, 0, roomDepth],
+          newPosition: [newX, newZ]
+        });
 
         onPositionChange([newX, 0, newZ]);
       }
@@ -993,11 +1010,6 @@ const DraggableHuman = React.memo(function DraggableHuman({
       setDragging(false);
       gl.domElement.style.cursor = "auto";
       onDragStateChange?.(false);
-
-      // 드래그 완료 후 2D 좌표 업데이트
-      if (updatePlacedFurniturePosition) {
-        updatePlacedFurniturePosition(id, position);
-      }
     };
 
     if (dragging) {
@@ -1237,6 +1249,12 @@ const DraggableFurnitureWithCollision = React.memo(
     // 드래그 상태 관리
     const dragStart = useRef(null);
     const isDraggingRef = useRef(false);
+    const lastValidPosition = useRef(position);
+    
+    // position이 변경될 때마다 lastValidPosition 업데이트
+    React.useEffect(() => {
+      lastValidPosition.current = position;
+    }, [position]);
 
     // 마우스/터치 다운 이벤트
     const handlePointerDown = useCallback(
@@ -1279,6 +1297,14 @@ const DraggableFurnitureWithCollision = React.memo(
 
             if (raycaster.ray.intersectPlane(plane, intersection)) {
               let newPosition = [intersection.x, size[1] / 2, intersection.z];
+              console.log('🖱️ 마우스 이동 - 계산된 새 위치:', newPosition);
+
+              // 극단적인 좌표값 방지 - 방 크기의 10배를 넘으면 무시
+              const maxDistance = Math.max(roomSize[0], roomSize[2]) * 10;
+              if (Math.abs(newPosition[0]) > maxDistance || Math.abs(newPosition[2]) > maxDistance) {
+                console.log('❌ 극단적인 좌표값 감지, 이동 무시:', newPosition);
+                return;
+              }
 
               if (enableSnap) {
                 newPosition = PositionSnapper.snapToGrid(newPosition, 25);
@@ -1289,18 +1315,46 @@ const DraggableFurnitureWithCollision = React.memo(
                   furniturePresets,
                   15
                 );
+                console.log('🧲 스냅 적용 후 위치:', newPosition);
               }
 
-              const finalPosition = CollisionDetector.adjustToValidPosition(
-                newPosition,
-                size,
-                roomSize,
-                [],
-                id,
-                furniturePresets
-              );
+              // 먼저 방 경계 내로 조정
+              const boundaryAdjustedPosition =
+                CollisionDetector.adjustToValidPosition(
+                  newPosition,
+                  size,
+                  roomSize,
+                  [],
+                  id,
+                  furniturePresets
+                );
 
-              onMove(id, finalPosition);
+              // 가구 충돌 체크
+              const furnitureCollisions =
+                CollisionDetector.checkFurnitureCollisions(
+                  furniture,
+                  id,
+                  boundaryAdjustedPosition,
+                  furniturePresets
+                );
+
+              // 충돌 상태 업데이트 (시각적 피드백용)
+              setCollisions(furnitureCollisions);
+
+              // 충돌 상태 체크
+              console.log('🔍 충돌 체크 결과:', {
+                collisions: furnitureCollisions.length,
+                position: boundaryAdjustedPosition
+              });
+
+              // 충돌이 없을 때만 이동 허용
+              if (furnitureCollisions.length === 0) {
+                console.log('✅ 충돌 없음, 이동 허용');
+                lastValidPosition.current = boundaryAdjustedPosition;
+                onMove(id, boundaryAdjustedPosition);
+              } else {
+                console.log('❌ 충돌 감지, 이동 차단:', furnitureCollisions);
+              }
             }
           }
         };
@@ -1309,14 +1363,17 @@ const DraggableFurnitureWithCollision = React.memo(
           dragStart.current = null;
 
           if (isDraggingRef.current) {
+            // 드래그 완료 후 2D 좌표 업데이트 - 마지막 유효 위치 사용
+            if (updatePlacedFurniturePosition) {
+              console.log('🎯 드래그 완료, 최종 위치:', lastValidPosition.current);
+              updatePlacedFurniturePosition(id, lastValidPosition.current);
+            }
+
+            // 상태 초기화
             isDraggingRef.current = false;
             setDragging(false);
             onDragStateChange?.(false);
-
-            // 드래그 완료 후 2D 좌표 업데이트
-            if (updatePlacedFurniturePosition) {
-              updatePlacedFurniturePosition(id, position);
-            }
+            setCollisions([]);
           }
 
           gl.domElement.style.cursor = "auto";
@@ -1420,19 +1477,21 @@ const DraggableFurnitureWithCollision = React.memo(
   }
 );
 
-// 창문 컴포넌트
+// 창문 컴포넌트 (개선된 디자인)
 const Window3D = React.memo(function Window3D({
   position,
   size,
   wallPosition,
   roomSize,
+  rotation = [0, 0, 0],
 }) {
   const [width, height, depth] = size;
-  const frameThickness = 4;
-  const glassThickness = 1;
+  const frameThickness = 6; // 프레임 두께 증가
+  const glassThickness = 2;
 
   return (
-    <group position={position}>
+    <group position={position} rotation={rotation}>
+      {/* 창문 프레임 */}
       <mesh castShadow receiveShadow>
         <boxGeometry
           args={[
@@ -1441,24 +1500,48 @@ const Window3D = React.memo(function Window3D({
             frameThickness,
           ]}
         />
-        <meshStandardMaterial color="#E0E0E0" roughness={0.3} metalness={0.1} />
+        <meshStandardMaterial color="#FFFFFF" roughness={0.2} metalness={0.1} />
       </mesh>
 
+      {/* 유리창 */}
       <mesh position={[0, 0, frameThickness / 2]} castShadow receiveShadow>
-        <boxGeometry args={[width * 0.9, height * 0.9, glassThickness]} />
+        <boxGeometry args={[width * 0.85, height * 0.85, glassThickness]} />
         <meshStandardMaterial
-          color="#87CEEB"
+          color="#B0E0E6"
           transparent={true}
-          opacity={0.5}
-          roughness={0.1}
+          opacity={0.3}
+          roughness={0.05}
           metalness={0.0}
         />
       </mesh>
+
+      {/* 창문 채색 (4분할) */}
+      <group position={[0, 0, frameThickness / 2 + 1]}>
+        {/* 세로 채색 */}
+        <mesh>
+          <boxGeometry args={[2, height * 0.8, 1]} />
+          <meshStandardMaterial color="#FFFFFF" />
+        </mesh>
+        {/* 가로 채색 */}
+        <mesh>
+          <boxGeometry args={[width * 0.8, 2, 1]} />
+          <meshStandardMaterial color="#FFFFFF" />
+        </mesh>
+      </group>
+
+      {/* 그림자 */}
+      <ContactShadows
+        position={[0, 0, -frameThickness]}
+        opacity={0.3}
+        scale={Math.max(width, height) * 1.1}
+        blur={2}
+        far={10}
+      />
     </group>
   );
 });
 
-// 벽에 창문을 배치하는 컴포넌트
+// 벽에 창문을 배치하는 컴포넌트 (개선된 위치 계산)
 const WindowsOnWalls = React.memo(function WindowsOnWalls({
   windows,
   roomSize,
@@ -1470,83 +1553,147 @@ const WindowsOnWalls = React.memo(function WindowsOnWalls({
   return (
     <group>
       {windows.map((window, index) => {
-        const windowWidth3D = window.width_meters * 100 || roomWidth * 0.3;
-        const windowHeight3D = window.height_meters * 100 || roomHeight * 0.4;
-
-        const halfWindowWidth = windowWidth3D / 2;
-        const halfWindowHeight = windowHeight3D / 2;
+        // 백엔드에서 전달된 실제 창문 크기 사용 (cm 단위로 변환)
+        const windowWidth3D = (window.width_meters || 1.2) * 100;
+        const windowHeight3D = (window.height_meters || 1.5) * 100;
 
         let position = [0, 0, 0];
-        const wallOffset = 2;
+        let rotation = [0, 0, 0];
+        const wallThickness = 5; // 벽 두께
 
         switch (window.wall_position) {
           case "front":
+            // 앞벽: Z 최대값
             position = [
               window.x_position * roomWidth,
               window.y_position * roomHeight,
-              roomDepth - wallOffset,
+              roomDepth - wallThickness,
             ];
+            rotation = [0, 0, 0]; // 앞을 향해 있음
             break;
           case "back":
+            // 뒷벽: Z=0 - 더 정확한 위치 계산
             position = [
               window.x_position * roomWidth,
-              window.y_position * roomHeight,
-              wallOffset,
+              Math.max(windowHeight3D / 2 + 30, window.y_position * roomHeight), // 최소 높이 보장
+              wallThickness,
             ];
+            rotation = [0, Math.PI, 0]; // 180도 회전
             break;
           case "left":
+            // 왼쪽 벽: X=0
             position = [
-              wallOffset,
-              window.y_position * roomHeight,
+              wallThickness,
+              Math.max(windowHeight3D / 2 + 30, window.y_position * roomHeight), // 최소 높이 보장
               window.x_position * roomDepth,
             ];
+            rotation = [0, Math.PI / 2, 0]; // 90도 회전
             break;
           case "right":
+            // 오른쪽 벽: X 최대값 - 더 정확한 위치 계산
             position = [
-              roomWidth - wallOffset,
-              window.y_position * roomHeight,
+              roomWidth - wallThickness,
+              Math.max(windowHeight3D / 2 + 30, window.y_position * roomHeight), // 최소 높이 보장
               window.x_position * roomDepth,
             ];
+            rotation = [0, -Math.PI / 2, 0]; // -90도 회전
             break;
           default:
-            position = [roomWidth / 2, roomHeight / 2, wallOffset];
+            // 기본값: 뒷벽 중앙 - 더 현실적인 높이
+            position = [
+              roomWidth / 2,
+              Math.max(windowHeight3D / 2 + 30, roomHeight * 0.7),
+              wallThickness,
+            ];
+            rotation = [0, Math.PI, 0];
         }
 
-        position[0] = Math.max(
-          halfWindowWidth,
-          Math.min(roomWidth - halfWindowWidth, position[0])
-        );
-        position[1] = Math.max(
-          halfWindowHeight,
-          Math.min(roomHeight - halfWindowHeight, position[1])
-        );
-        position[2] = Math.max(
-          halfWindowWidth,
-          Math.min(roomDepth - halfWindowWidth, position[2])
-        );
+        // 범위 제한 (더 현실적인 범위로)
+        const margin = 20; // 20cm 여백
+
+        // X 좌표 제한 - 벽별 처리
+        if (
+          window.wall_position === "front" ||
+          window.wall_position === "back"
+        ) {
+          position[0] = Math.max(
+            windowWidth3D / 2 + margin,
+            Math.min(roomWidth - windowWidth3D / 2 - margin, position[0])
+          );
+        }
+
+        // Y 좌표 제한 (높이) - 창문이 바닥 아래로 가지 않도록
+        const minHeight = windowHeight3D / 2 + 30; // 바닥에서 최소 30cm 위
+        const maxHeight = roomHeight - windowHeight3D / 2 - margin; // 천장에서 여백
+        position[1] = Math.max(minHeight, Math.min(maxHeight, position[1]));
+
+        // Z 좌표 제한 - 벽별 처리
+        if (
+          window.wall_position === "left" ||
+          window.wall_position === "right"
+        ) {
+          position[2] = Math.max(
+            windowWidth3D / 2 + margin,
+            Math.min(roomDepth - windowWidth3D / 2 - margin, position[2])
+          );
+        }
+
+        // 특별 위치 조정 - 뒷벽 창문의 경우 더 높은 위치로
+        if (window.wall_position === "back") {
+          const targetHeight = roomHeight * 0.75; // 높이의 75% 위치
+          position[1] = Math.max(position[1], targetHeight);
+        }
 
         return (
-          <Window3D
-            key={`window-${index}`}
-            position={position}
-            size={[windowWidth3D, windowHeight3D, 10]}
-            wallPosition={window.wall_position}
-            roomSize={roomSize}
-          />
+          <group key={`window-group-${index}`}>
+            <Window3D
+              key={`window-${index}`}
+              position={position}
+              size={[windowWidth3D, windowHeight3D, 10]}
+              wallPosition={window.wall_position}
+              roomSize={roomSize}
+              rotation={rotation}
+            />
+            {/* 창문 정보 텍스트 */}
+            <Text
+              position={[
+                position[0],
+                position[1] - windowHeight3D / 2 - 15,
+                position[2],
+              ]}
+              fontSize={8}
+              color="#666666"
+              anchorX="center"
+              anchorY="middle"
+            >
+              {`${(windowWidth3D / 100).toFixed(1)}m × ${(
+                windowHeight3D / 100
+              ).toFixed(1)}m`}
+            </Text>
+          </group>
         );
       })}
     </group>
   );
 });
 
-// 창문 감지 API 호출 함수
-const detectWindowsInImage = async (imageFile, roomPoints = null) => {
+// 창문 감지 API 호출 함수 (실제 방 크기 정보 포함)
+const detectWindowsInImage = async (
+  imageFile,
+  roomPoints = null,
+  roomDimensions = null
+) => {
   try {
     const formData = new FormData();
     formData.append("file", imageFile);
 
     if (roomPoints && roomPoints.length >= 2) {
       formData.append("room_points", JSON.stringify(roomPoints));
+    }
+
+    // 실제 방 크기 정보 추가
+    if (roomDimensions) {
+      formData.append("room_dimensions", JSON.stringify(roomDimensions));
     }
 
     const response = await fetch("http://localhost:3000/detect-windows", {
@@ -1603,12 +1750,20 @@ export default function RoomBox({
   const [showWindows, setShowWindows] = useState(false);
   const [isDetectingWindows, setIsDetectingWindows] = useState(false);
 
-  const roomSize = [w, d, h]; // [Width, Depth, Height] - 새로운 포인트 정의에 맞춤
+  const roomSize = [w, h, d]; // [Width, Height, Depth] - CollisionDetector 함수들과 일치
   const roomArea = (w * d) / 10000;
 
   const controlsRef = useRef();
 
+  // 드래그 중에는 업데이트하지 않는 ref
+  const isUpdatingFromDragRef = useRef(false);
+
   useEffect(() => {
+    // 드래그 중이거나 드래그에서 업데이트 중일 때는 건너뛰기
+    if (isDragging || isUpdatingFromDragRef.current) {
+      return;
+    }
+
     const converted = placedFurniture.map((item) => {
       const baseId = item.id
         ? item.id.split("_").slice(0, -1).join("_")
@@ -1639,8 +1794,9 @@ export default function RoomBox({
         original2D: item,
       };
     });
+    
     setFurniture(converted);
-  }, [placedFurniture, w, d]);
+  }, [placedFurniture, w, d, isDragging]);
 
   useEffect(() => {
     setHumanPosition([w / 2, 0, d / 2]);
@@ -1681,10 +1837,28 @@ export default function RoomBox({
         FURNITURE_PRESETS
       );
 
-      newFurniture.position = adjustedPosition;
-      setFurniture((prev) => [...prev, newFurniture]);
-      setSelectedFurniture(newFurniture.id);
-      setPlacementMode(null);
+      // 가구 충돌 체크
+      const furnitureCollisions = CollisionDetector.checkFurnitureCollisions(
+        furniture,
+        newFurniture.id,
+        adjustedPosition,
+        FURNITURE_PRESETS
+      );
+
+      // 충돌이 없을 때만 배치 허용
+      if (furnitureCollisions.length === 0) {
+        newFurniture.position = adjustedPosition;
+        setFurniture((prev) => [...prev, newFurniture]);
+        setSelectedFurniture(newFurniture.id);
+        setPlacementMode(null);
+      } else {
+        // 충돌이 있을 때 알림 표시
+        alert(
+          `다른 가구와 겹칩니다! (충돌: ${furnitureCollisions
+            .map((c) => c.name)
+            .join(", ")})`
+        );
+      }
     },
     [placementMode, furniture, roomSize]
   );
@@ -1710,47 +1884,150 @@ export default function RoomBox({
   );
 
   const handleMoveFurniture = useCallback((id, newPosition) => {
-    setFurniture((prev) =>
-      prev.map((f) => {
+    console.log('🚚 handleMoveFurniture 호출:', id, newPosition);
+    setFurniture((prev) => {
+      const updated = prev.map((f) => {
         if (f.id === id) {
+          console.log('🚚 가구 위치 변경:', f.position, '→', newPosition);
           return { ...f, position: newPosition };
         }
         return f;
-      })
-    );
+      });
+      console.log('🚚 furniture 상태 업데이트됨');
+      return updated;
+    });
+  }, []);
+
+  // 로컬 좌표 변환 (백엔드 없이도 작동)
+  const convertCoordinatesLocally = useCallback((id, newPosition, size, roomSize) => {
+    const [x3d, y3d, z3d] = newPosition;
+    const [roomWidth, roomHeight, roomDepth] = roomSize;
+    
+    console.log('🔧 좌표 변환 상세:', {
+      input_3d: { x3d, y3d, z3d },
+      furniture_size: size,
+      room_size: roomSize
+    });
+    
+    // 3D 중심 좌표 → 2D 왼쪽아래 좌표로 변환
+    let x_2d = x3d - size[0] / 2;
+    let z_2d = z3d - size[2] / 2;
+    
+    console.log('🔧 변환 전 2D 좌표:', { x_2d, z_2d });
+    
+    // 경계 검사 - 방 경계 내로 제한
+    const furniture_width = size[0];
+    const furniture_depth = size[2];
+    
+    x_2d = Math.max(0, Math.min(x_2d, roomWidth - furniture_width));
+    z_2d = Math.max(0, Math.min(z_2d, roomDepth - furniture_depth));
+    
+    console.log('🔧 경계 검사 후 2D 좌표:', { x_2d, z_2d });
+    
+    return { x: x_2d, z: z_2d };
   }, []);
 
   // 드래그 완료 시에만 2D 좌표 업데이트
   const updatePlacedFurniturePosition = useCallback(
     (id, newPosition) => {
+      console.log('🔄 updatePlacedFurniturePosition 호출:', id, newPosition);
+      console.log('onFurnitureChange 타입:', typeof onFurnitureChange);
+      
       if (typeof onFurnitureChange === "function") {
+        console.log('furniture 배열:', furniture);
         const furnitureItem = furniture.find((f) => f.id === id);
+        console.log('찾은 furnitureItem:', furnitureItem);
+        
         if (furnitureItem) {
-          const [x3d, y3d, z3d] = newPosition;
           const size = furnitureItem.size;
+          console.log('가구 크기:', size);
 
-          // 3D -> 2D 좌표 변환 명확화
-          // 3D 중심 좌표 → 2D 왼쪽아래 좌표로 변환
-          // 3D x → 2D x, 3D z → 2D y (실제로는 z로 저장)
-          const x2d = x3d - size[0] / 2; // 3D x 중심 → 2D x 왼쪽모서리
-          const z2d = z3d - size[2] / 2; // 3D z 중심 → 2D y 위쪽모서리 (z로 저장)
+          // 업데이트 중임을 표시
+          isUpdatingFromDragRef.current = true;
 
-          onFurnitureChange((prev) =>
-            prev.map((item) => {
+          // 로컬 좌표 변환
+          const converted2D = convertCoordinatesLocally(id, newPosition, size, roomSize);
+
+          console.log('🎯 3D → 2D 좌표 변환:', newPosition, '→', converted2D);
+
+          onFurnitureChange((prev) => {
+            console.log('이전 placedFurniture:', prev);
+            const updated = prev.map((item) => {
               if (item.id === id) {
-                return {
+                const newItem = {
                   ...item,
-                  x: x2d, // 2D x 좌표
-                  z: z2d, // 2D y 좌표 (z 필드에 저장)
+                  x: converted2D.x, // 2D x 좌표
+                  z: converted2D.z, // 2D y 좌표 (z 필드에 저장)
                 };
+                console.log('아이템 업데이트:', item, '→', newItem);
+                return newItem;
               }
               return item;
-            })
-          );
+            });
+            console.log('✅ 2D 좌표 업데이트 완료:', updated);
+            return updated;
+          });
+
+          // 짧은 지연 후 업데이트 플래그 해제
+          setTimeout(() => {
+            isUpdatingFromDragRef.current = false;
+            console.log('업데이트 플래그 해제됨');
+          }, 100);
+        } else {
+          console.log('❌ furnitureItem을 찾을 수 없음');
+        }
+      } else {
+        console.log('❌ onFurnitureChange가 함수가 아님');
+      }
+    },
+    [furniture, onFurnitureChange, convertCoordinatesLocally, roomSize]
+  );
+
+  // 드래그 완료 시 2D 좌표 업데이트 (실제 사용되는 함수)
+  const updatePlacedFurniturePositionOnDragEnd = useCallback(
+    (id, newPosition) => {
+      if (typeof onFurnitureChange === "function") {
+        const furnitureItem = furniture.find((f) => f.id === id);
+        
+        if (furnitureItem) {
+          const size = furnitureItem.size;
+
+          // 업데이트 중임을 표시
+          isUpdatingFromDragRef.current = true;
+
+          // 로컬 좌표 변환
+          const converted2D = convertCoordinatesLocally(id, newPosition, size, roomSize);
+
+          onFurnitureChange((prev) => {
+            console.log('🔄 3D→2D 업데이트 시작');
+            console.log('이전 placedFurniture:', prev);
+            console.log('변환된 2D 좌표:', converted2D);
+            
+            const updated = prev.map((item) => {
+              if (item.id === id) {
+                const newItem = {
+                  ...item,
+                  x: converted2D.x, // 2D x 좌표
+                  z: converted2D.z, // 2D y 좌표 (z 필드에 저장)
+                };
+                console.log('아이템 업데이트:', `${item.x},${item.z} → ${newItem.x},${newItem.z}`);
+                return newItem;
+              }
+              return item;
+            });
+            
+            console.log('✅ 업데이트된 placedFurniture:', updated);
+            return updated;
+          });
+
+          // 짧은 지연 후 업데이트 플래그 해제
+          setTimeout(() => {
+            isUpdatingFromDragRef.current = false;
+          }, 100);
         }
       }
     },
-    [furniture, onFurnitureChange]
+    [furniture, onFurnitureChange, convertCoordinatesLocally, roomSize]
   );
 
   const handleDetectWindows = useCallback(async () => {
@@ -1760,16 +2037,30 @@ export default function RoomBox({
     }
     setIsDetectingWindows(true);
     try {
-      const result = await detectWindowsInImage(uploadedImageFile, null);
+      // 실제 방 크기 정보 준비 (cm 단위)
+      const roomDimensions = {
+        width_cm: w,
+        height_cm: h,
+        depth_cm: d,
+      };
+
+      console.log("📜 창문 감지에 실제 방 크기 전달:", roomDimensions);
+
+      const result = await detectWindowsInImage(
+        uploadedImageFile,
+        null,
+        roomDimensions
+      );
       setDetectedWindows(result.windows);
       setShowWindows(true);
       alert(`${result.total_windows}개의 창문을 감지했습니다.`);
     } catch (error) {
+      console.error("창문 감지 오류:", error);
       alert("창문 감지에 실패했습니다.");
     } finally {
       setIsDetectingWindows(false);
     }
-  }, [uploadedImageFile]);
+  }, [uploadedImageFile, w, h, d]);
 
   const handleRotateFurniture = useCallback((id) => {
     setFurniture((prev) =>
@@ -2106,11 +2397,13 @@ export default function RoomBox({
                 enableSnap={enableSnap}
                 showCollisions={showCollisions}
                 onDragStateChange={setIsDragging}
-                updatePlacedFurniturePosition={updatePlacedFurniturePosition}
+                updatePlacedFurniturePosition={
+                  updatePlacedFurniturePositionOnDragEnd
+                }
               />
             ))}
 
-            {showWindows && (
+            {showWindows && detectedWindows.length > 0 && (
               <WindowsOnWalls windows={detectedWindows} roomSize={roomSize} />
             )}
 
