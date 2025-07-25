@@ -7,7 +7,7 @@ const FURNITURE_CATALOG = [
     id: "single_bed",
     name: "싱글 베드",
     width: 100,
-    height: 200,
+    depth: 200,
     category: "bedroom",
     color: "#FFB6C1",
     icon: "🛏️",
@@ -16,7 +16,7 @@ const FURNITURE_CATALOG = [
     id: "double_bed",
     name: "더블 베드",
     width: 150,
-    height: 200,
+    depth: 200,
     category: "bedroom",
     color: "#FFD1DC",
     icon: "🛏️",
@@ -25,7 +25,7 @@ const FURNITURE_CATALOG = [
     id: "queen_bed",
     name: "퀸 베드",
     width: 160,
-    height: 200,
+    depth: 200,
     category: "bedroom",
     color: "#FFC0CB",
     icon: "🛏️",
@@ -34,7 +34,7 @@ const FURNITURE_CATALOG = [
     id: "king_bed",
     name: "킹 베드",
     width: 180,
-    height: 200,
+    depth: 200,
     category: "bedroom",
     color: "#FFB7C5",
     icon: "🛏️",
@@ -44,7 +44,7 @@ const FURNITURE_CATALOG = [
     id: "desk",
     name: "책상",
     width: 120,
-    height: 60,
+    depth: 60,
     category: "office",
     color: "#98FB98",
     icon: "🪑",
@@ -53,7 +53,7 @@ const FURNITURE_CATALOG = [
     id: "chair",
     name: "의자",
     width: 50,
-    height: 50,
+    depth: 50,
     category: "office",
     color: "#90EE90",
     icon: "🪑",
@@ -63,7 +63,7 @@ const FURNITURE_CATALOG = [
     id: "sofa_2",
     name: "2인 소파",
     width: 140,
-    height: 80,
+    depth: 80,
     category: "living",
     color: "#87CEEB",
     icon: "🛋️",
@@ -72,7 +72,7 @@ const FURNITURE_CATALOG = [
     id: "sofa_3",
     name: "3인 소파",
     width: 180,
-    height: 80,
+    depth: 80,
     category: "living",
     color: "#ADD8E6",
     icon: "🛋️",
@@ -81,7 +81,7 @@ const FURNITURE_CATALOG = [
     id: "coffee_table",
     name: "커피 테이블",
     width: 100,
-    height: 50,
+    depth: 50,
     category: "living",
     color: "#B0E0E6",
     icon: "🪑",
@@ -90,7 +90,7 @@ const FURNITURE_CATALOG = [
     id: "tv_stand",
     name: "TV 스탠드",
     width: 120,
-    height: 40,
+    depth: 40,
     category: "living",
     color: "#E0FFFF",
     icon: "📺",
@@ -100,7 +100,7 @@ const FURNITURE_CATALOG = [
     id: "wardrobe",
     name: "옷장",
     width: 80,
-    height: 60,
+    depth: 60,
     category: "storage",
     color: "#DDA0DD",
     icon: "🚪",
@@ -109,7 +109,7 @@ const FURNITURE_CATALOG = [
     id: "bookshelf",
     name: "책장",
     width: 80,
-    height: 30,
+    depth: 30,
     category: "storage",
     color: "#D8BFD8",
     icon: "📚",
@@ -118,7 +118,7 @@ const FURNITURE_CATALOG = [
     id: "dresser",
     name: "화장대",
     width: 100,
-    height: 45,
+    depth: 45,
     category: "storage",
     color: "#E6E6FA",
     icon: "💄",
@@ -146,15 +146,15 @@ const FurnitureItem = ({ furniture, onDragStart }) => (
       <div className="text-2xl mb-1">{furniture.icon}</div>
       <div className="text-sm font-medium text-gray-700">{furniture.name}</div>
       <div className="text-xs text-gray-500">
-        {furniture.width} × {furniture.height} cm
+        {furniture.width} × {furniture.depth} cm
       </div>
     </div>
   </div>
 );
 
 const FurniturePlacement = ({
-  roomWidth,
-  roomHeight,
+  roomWidth, // Width(X축) - 가로, cm 단위
+  roomDepth, // Depth(Z축) - 세로, cm 단위 (3D와 일치)
   placedFurniture = [],
   onFurnitureChange,
 }) => {
@@ -164,14 +164,13 @@ const FurniturePlacement = ({
   const [isDraggingPlaced, setIsDraggingPlaced] = useState(false);
   const canvasRef = useRef(null);
 
-  // 유효성 검사
+  // 유효성 검사 - Width(X), Depth(Y) 단위: cm
   const validRoomWidth = isNaN(roomWidth) || roomWidth <= 0 ? 400 : roomWidth;
-  const validRoomHeight =
-    isNaN(roomHeight) || roomHeight <= 0 ? 300 : roomHeight;
+  const validRoomDepth = isNaN(roomDepth) || roomDepth <= 0 ? 300 : roomDepth;
 
   // SVG 크기 계산
   const svgDimensions = useMemo(() => {
-    const aspectRatio = validRoomWidth / validRoomHeight;
+    const aspectRatio = validRoomWidth / validRoomDepth;
     const maxSize = 500;
 
     let svgWidth, svgHeight;
@@ -184,14 +183,14 @@ const FurniturePlacement = ({
     }
 
     return { svgWidth, svgHeight };
-  }, [validRoomWidth, validRoomHeight]);
+  }, [validRoomWidth, validRoomDepth]);
 
   // 카테고리별 아이템 필터링
   const filteredItems = FURNITURE_CATALOG.filter(
     (item) => selectedCategory === "all" || item.category === selectedCategory
   );
 
-  // SVG 좌표를 실제 방 좌표로 변환 (왼쪽 아래가 0,0)
+  // 클라이언트 좌표를 실제 가구 배치 좌표로 변환
   const convertToRealCoordinates = useCallback(
     (clientX, clientY) => {
       const rect = canvasRef.current.getBoundingClientRect();
@@ -199,22 +198,25 @@ const FurniturePlacement = ({
       const svgY = clientY - rect.top - 20;
 
       const scaleX = validRoomWidth / svgDimensions.svgWidth;
-      const scaleY = validRoomHeight / svgDimensions.svgHeight;
+      const scaleZ = validRoomDepth / svgDimensions.svgHeight;
 
-      // Y좌표를 뒤집어서 왼쪽 아래가 (0,0)이 되도록 변환
+      // SVG 좌표를 방 좌표로 변환
+      // SVG x → 실제 x (가로축)
+      // SVG y → 실제 y (세로축) 하지만 z 필드에 저장
+      // 이는 나중에 3D에서 z축으로 사용됨
       return {
-        x: svgX * scaleX,
-        y: (svgDimensions.svgHeight - svgY) * scaleY,
+        x: svgX * scaleX, // 2D x 좌표 (3D에서도 x축)
+        z: svgY * scaleZ, // 2D y 좌표 (3D에서 z축으로 변환됨)
       };
     },
-    [validRoomWidth, validRoomHeight, svgDimensions]
+    [validRoomWidth, validRoomDepth, svgDimensions]
   );
 
   // 충돌 체크 함수
   const checkCollision = useCallback(
-    (x, y, width, height, excludeIndex = -1, rotation = 0) => {
-      const actualWidth = rotation % 180 === 0 ? width : height;
-      const actualHeight = rotation % 180 === 0 ? height : width;
+    (x, z, width, depth, excludeIndex = -1, rotation = 0) => {
+      const actualWidth = rotation % 180 === 0 ? width : depth;
+      const actualDepth = rotation % 180 === 0 ? depth : width;
 
       for (let i = 0; i < placedFurniture.length; i++) {
         if (i === excludeIndex) continue;
@@ -222,15 +224,15 @@ const FurniturePlacement = ({
         const item = placedFurniture[i];
         const itemRotation = item.rotation || 0;
         const itemActualWidth =
-          itemRotation % 180 === 0 ? item.width : item.height;
-        const itemActualHeight =
-          itemRotation % 180 === 0 ? item.height : item.width;
+          itemRotation % 180 === 0 ? item.width : item.depth;
+        const itemActualDepth =
+          itemRotation % 180 === 0 ? item.depth : item.width;
 
         if (
           x < item.x + itemActualWidth &&
           x + actualWidth > item.x &&
-          y < item.y + itemActualHeight &&
-          y + actualHeight > item.y
+          z < item.z + itemActualDepth &&
+          z + actualDepth > item.z
         ) {
           return true;
         }
@@ -264,24 +266,24 @@ const FurniturePlacement = ({
 
       // 경계 체크
       const maxX = validRoomWidth - draggedFurniture.width;
-      const maxY = validRoomHeight - draggedFurniture.height;
+      const maxZ = validRoomDepth - draggedFurniture.depth;
 
       coords.x = Math.max(0, Math.min(coords.x, maxX));
-      coords.y = Math.max(0, Math.min(coords.y, maxY));
+      coords.z = Math.max(0, Math.min(coords.z, maxZ));
 
       // 일반 가구 처리
       if (
         !checkCollision(
           coords.x,
-          coords.y,
+          coords.z,
           draggedFurniture.width,
-          draggedFurniture.height
+          draggedFurniture.depth
         )
       ) {
         const newItem = {
           ...draggedFurniture,
           x: coords.x,
-          y: coords.y,
+          z: coords.z,
           rotation: 0,
           id: `${draggedFurniture.id}_${Date.now()}`,
         };
@@ -297,8 +299,10 @@ const FurniturePlacement = ({
       isDraggingPlaced,
       convertToRealCoordinates,
       validRoomWidth,
-      validRoomHeight,
+      validRoomDepth,
       checkCollision,
+      placedFurniture,
+      onFurnitureChange,
     ]
   );
 
@@ -320,15 +324,15 @@ const FurniturePlacement = ({
       const newRotation = (currentRotation + 90) % 360;
 
       const newActualWidth =
-        newRotation % 180 === 0 ? furniture.width : furniture.height;
-      const newActualHeight =
-        newRotation % 180 === 0 ? furniture.height : furniture.width;
+        newRotation % 180 === 0 ? furniture.width : furniture.depth;
+      const newActualDepth =
+        newRotation % 180 === 0 ? furniture.depth : furniture.width;
 
       // 회전 후 경계 체크
       const maxX = validRoomWidth - newActualWidth;
-      const maxY = validRoomHeight - newActualHeight;
+      const maxZ = validRoomDepth - newActualDepth;
 
-      if (furniture.x > maxX || furniture.y > maxY) {
+      if (furniture.x > maxX || furniture.z > maxZ) {
         alert("회전하면 방 범위를 벗어납니다!");
         return;
       }
@@ -337,9 +341,9 @@ const FurniturePlacement = ({
       if (
         checkCollision(
           furniture.x,
-          furniture.y,
+          furniture.z,
           furniture.width,
-          furniture.height,
+          furniture.depth,
           index,
           newRotation
         )
@@ -355,33 +359,33 @@ const FurniturePlacement = ({
       };
       onFurnitureChange(newPlaced);
     },
-    [placedFurniture, validRoomWidth, validRoomHeight, checkCollision]
+    [placedFurniture, validRoomWidth, validRoomDepth, checkCollision]
   );
 
   // 가구 이동
   const handleMoveFurniture = useCallback(
-    (index, newX, newY) => {
+    (index, newX, newZ) => {
       const furniture = placedFurniture[index];
       const rotation = furniture.rotation || 0;
       const actualWidth =
-        rotation % 180 === 0 ? furniture.width : furniture.height;
-      const actualHeight =
-        rotation % 180 === 0 ? furniture.height : furniture.width;
+        rotation % 180 === 0 ? furniture.width : furniture.depth;
+      const actualDepth =
+        rotation % 180 === 0 ? furniture.depth : furniture.width;
 
       // 경계 체크
       const maxX = validRoomWidth - actualWidth;
-      const maxY = validRoomHeight - actualHeight;
+      const maxZ = validRoomDepth - actualDepth;
 
       const clampedX = Math.max(0, Math.min(newX, maxX));
-      const clampedY = Math.max(0, Math.min(newY, maxY));
+      const clampedZ = Math.max(0, Math.min(newZ, maxZ));
 
       // 충돌 체크
       if (
         !checkCollision(
           clampedX,
-          clampedY,
+          clampedZ,
           furniture.width,
-          furniture.height,
+          furniture.depth,
           index,
           rotation
         )
@@ -390,12 +394,12 @@ const FurniturePlacement = ({
         newPlaced[index] = {
           ...furniture,
           x: clampedX,
-          y: clampedY,
+          z: clampedZ,
         };
         onFurnitureChange(newPlaced);
       }
     },
-    [placedFurniture, validRoomWidth, validRoomHeight, checkCollision]
+    [placedFurniture, validRoomWidth, validRoomDepth, checkCollision]
   );
 
   // 가구 삭제
@@ -423,14 +427,14 @@ const FurniturePlacement = ({
     const totalFurnitureArea = placedFurniture.reduce((sum, furniture) => {
       const rotation = furniture.rotation || 0;
       const actualWidth =
-        rotation % 180 === 0 ? furniture.width : furniture.height;
-      const actualHeight =
-        rotation % 180 === 0 ? furniture.height : furniture.width;
-      return sum + actualWidth * actualHeight;
+        rotation % 180 === 0 ? furniture.width : furniture.depth;
+      const actualDepth =
+        rotation % 180 === 0 ? furniture.depth : furniture.width;
+      return sum + actualWidth * actualDepth;
     }, 0);
-    const roomArea = validRoomWidth * validRoomHeight;
+    const roomArea = validRoomWidth * validRoomDepth;
     return ((totalFurnitureArea / roomArea) * 100).toFixed(1);
-  }, [placedFurniture, validRoomWidth, validRoomHeight]);
+  }, [placedFurniture, validRoomWidth, validRoomDepth]);
 
   // JSON 저장 기능
   const handleSaveAsJson = useCallback(() => {
@@ -443,16 +447,16 @@ const FurniturePlacement = ({
     const saveData = {
       roomInfo: {
         width: validRoomWidth,
-        height: validRoomHeight,
-        area: ((validRoomWidth * validRoomHeight) / 10000).toFixed(1) + "㎡",
-        aspectRatio: (validRoomWidth / validRoomHeight).toFixed(2),
+        height: validRoomDepth,
+        area: ((validRoomWidth * validRoomDepth) / 10000).toFixed(1) + "㎡",
+        aspectRatio: (validRoomWidth / validRoomDepth).toFixed(2),
       },
       furniture: placedFurniture.map((furniture) => {
         const rotation = furniture.rotation || 0;
         const actualWidth =
-          rotation % 180 === 0 ? furniture.width : furniture.height;
-        const actualHeight =
-          rotation % 180 === 0 ? furniture.height : furniture.width;
+          rotation % 180 === 0 ? furniture.width : furniture.depth;
+        const actualDepth =
+          rotation % 180 === 0 ? furniture.depth : furniture.width;
 
         return {
           id: furniture.id,
@@ -460,20 +464,20 @@ const FurniturePlacement = ({
           category: furniture.category,
           originalSize: {
             width: furniture.width,
-            height: furniture.height,
+            depth: furniture.depth,
           },
           currentSize: {
             width: actualWidth,
-            height: actualHeight,
+            depth: actualDepth,
           },
           position: {
             leftBottom: {
               x: Math.round(furniture.x),
-              y: Math.round(furniture.y),
+              z: Math.round(furniture.z),
             },
             rightTop: {
               x: Math.round(furniture.x + actualWidth),
-              y: Math.round(furniture.y + actualHeight),
+              z: Math.round(furniture.z + actualDepth),
             },
           },
           rotation: rotation,
@@ -488,10 +492,10 @@ const FurniturePlacement = ({
           placedFurniture.reduce((sum, furniture) => {
             const rotation = furniture.rotation || 0;
             const actualWidth =
-              rotation % 180 === 0 ? furniture.width : furniture.height;
-            const actualHeight =
-              rotation % 180 === 0 ? furniture.height : furniture.width;
-            return sum + actualWidth * actualHeight;
+              rotation % 180 === 0 ? furniture.width : furniture.depth;
+            const actualDepth =
+              rotation % 180 === 0 ? furniture.depth : furniture.width;
+            return sum + actualWidth * actualDepth;
           }, 0) + " cm²",
       },
       metadata: {
@@ -507,7 +511,7 @@ const FurniturePlacement = ({
     const url = URL.createObjectURL(blob);
 
     const currentDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    const filename = `furniture_layout_${validRoomWidth}x${validRoomHeight}_${currentDate}.json`;
+    const filename = `furniture_layout_${validRoomWidth}x${validRoomDepth}_${currentDate}.json`;
 
     const link = document.createElement("a");
     link.href = url;
@@ -522,7 +526,7 @@ const FurniturePlacement = ({
   }, [
     placedFurniture,
     validRoomWidth,
-    validRoomHeight,
+    validRoomDepth,
     calculateSpaceUtilization,
   ]);
 
@@ -558,7 +562,7 @@ const FurniturePlacement = ({
             <strong>방 크기</strong>
           </div>
           <div className="text-lg font-bold text-rose-800">
-            {validRoomWidth.toFixed(1)} × {validRoomHeight.toFixed(1)} cm
+            {validRoomWidth.toFixed(1)} × {validRoomDepth.toFixed(1)} cm
           </div>
         </div>
         <div className="bg-pink-50 p-4 rounded-lg">
@@ -634,8 +638,9 @@ const FurniturePlacement = ({
 
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
             <div className="mb-2 text-sm text-gray-600 text-center">
-              실제 비율: {validRoomWidth} × {validRoomHeight} cm (
-              {(validRoomWidth / validRoomHeight).toFixed(2)}:1)
+              실제 비율: {validRoomWidth} × {validRoomDepth} cm (
+              {(validRoomWidth / validRoomDepth).toFixed(2)}:1) - 좌표: 왼쪽 위
+              (0,0)
             </div>
 
             <div className="flex justify-center">
@@ -682,10 +687,10 @@ const FurniturePlacement = ({
                   fill="url(#grid)"
                 />
 
-                {/* 원점 표시 (0,0) - 왼쪽 아래 */}
+                {/* 원점 표시 (0,0) - 왼쪽 위 */}
                 <circle
                   cx="20"
-                  cy={20 + svgDimensions.svgHeight}
+                  cy="20"
                   r="3"
                   fill="#ef4444"
                   stroke="#ffffff"
@@ -695,21 +700,19 @@ const FurniturePlacement = ({
                 {/* 배치된 가구들 */}
                 {placedFurniture.map((furniture, index) => {
                   const scaleX = svgDimensions.svgWidth / validRoomWidth;
-                  const scaleY = svgDimensions.svgHeight / validRoomHeight;
+                  const scaleZ = svgDimensions.svgHeight / validRoomDepth;
 
                   const rotation = furniture.rotation || 0;
                   const actualWidth =
-                    rotation % 180 === 0 ? furniture.width : furniture.height;
-                  const actualHeight =
-                    rotation % 180 === 0 ? furniture.height : furniture.width;
+                    rotation % 180 === 0 ? furniture.width : furniture.depth;
+                  const actualDepth =
+                    rotation % 180 === 0 ? furniture.depth : furniture.width;
 
                   const scaledWidth = actualWidth * scaleX;
-                  const scaledHeight = actualHeight * scaleY;
+                  const scaledDepth = actualDepth * scaleZ;
                   const scaledX = 20 + furniture.x * scaleX;
-                  // Y좌표를 뒤집어서 왼쪽 아래 기준으로 계산
-                  const scaledY =
-                    20 +
-                    (validRoomHeight - furniture.y - actualHeight) * scaleY;
+                  // SVG는 위쪽이 0이므로 Z좌표를 그대로 사용 (뒤집지 않음)
+                  const scaledY = 20 + furniture.z * scaleZ;
 
                   return (
                     <g key={furniture.id}>
@@ -719,7 +722,7 @@ const FurniturePlacement = ({
                           x={scaledX - 5}
                           y={scaledY - 5}
                           width={scaledWidth + 10}
-                          height={scaledHeight + 10}
+                          height={scaledDepth + 10}
                           fill="none"
                           stroke="#FbbF24"
                           strokeWidth="2"
@@ -733,7 +736,7 @@ const FurniturePlacement = ({
                         x={scaledX}
                         y={scaledY}
                         width={scaledWidth}
-                        height={scaledHeight}
+                        height={scaledDepth}
                         fill={furniture.color}
                         stroke={
                           selectedFurnitureIndex === index
@@ -754,7 +757,7 @@ const FurniturePlacement = ({
                               e.clientY
                             );
                             const offsetX = startCoords.x - furniture.x;
-                            const offsetY = startCoords.y - furniture.y;
+                            const offsetZ = startCoords.z - furniture.z;
 
                             const handleMouseMove = (moveEvent) => {
                               const currentCoords = convertToRealCoordinates(
@@ -764,7 +767,7 @@ const FurniturePlacement = ({
                               handleMoveFurniture(
                                 index,
                                 currentCoords.x - offsetX,
-                                currentCoords.y - offsetY
+                                currentCoords.z - offsetZ
                               );
                             };
 
@@ -792,7 +795,7 @@ const FurniturePlacement = ({
                       {/* 가구 아이콘 */}
                       <text
                         x={scaledX + scaledWidth / 2}
-                        y={scaledY + scaledHeight / 2}
+                        y={scaledY + scaledDepth / 2}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fontSize="16"
@@ -834,22 +837,22 @@ const FurniturePlacement = ({
                           {/* 세로 치수 */}
                           <text
                             x={scaledX - 10}
-                            y={scaledY + scaledHeight / 2}
+                            y={scaledY + scaledDepth / 2}
                             textAnchor="middle"
                             fontSize="11"
                             fill="#4B5563"
                             className="pointer-events-none select-none"
                             transform={`rotate(-90, ${scaledX - 10}, ${
-                              scaledY + scaledHeight / 2
+                              scaledY + scaledDepth / 2
                             })`}
                           >
-                            {actualHeight}cm
+                            {actualDepth}cm
                           </text>
 
                           {/* 회전 버튼 */}
                           <circle
                             cx={scaledX + scaledWidth - 10}
-                            cy={scaledY + scaledHeight - 10}
+                            cy={scaledY + scaledDepth - 10}
                             r="10"
                             fill="#10B981"
                             className="cursor-pointer hover:fill-green-600"
@@ -860,7 +863,7 @@ const FurniturePlacement = ({
                           />
                           <text
                             x={scaledX + scaledWidth - 10}
-                            y={scaledY + scaledHeight - 10}
+                            y={scaledY + scaledDepth - 10}
                             textAnchor="middle"
                             dominantBaseline="middle"
                             fontSize="14"
@@ -919,13 +922,13 @@ const FurniturePlacement = ({
                     20 + svgDimensions.svgHeight / 2
                   })`}
                 >
-                  {validRoomHeight.toFixed(0)} cm
+                  {validRoomDepth.toFixed(0)} cm
                 </text>
 
                 {/* 원점 라벨 */}
                 <text
                   x="20"
-                  y={20 + svgDimensions.svgHeight + 15}
+                  y="15"
                   textAnchor="middle"
                   style={{ fontSize: 10, fill: "#ef4444", fontWeight: 600 }}
                 >
@@ -958,12 +961,12 @@ const FurniturePlacement = ({
                       180 ===
                     0
                       ? placedFurniture[selectedFurnitureIndex].width
-                      : placedFurniture[selectedFurnitureIndex].height}{" "}
+                      : placedFurniture[selectedFurnitureIndex].depth}{" "}
                     ×{" "}
                     {(placedFurniture[selectedFurnitureIndex].rotation || 0) %
                       180 ===
                     0
-                      ? placedFurniture[selectedFurnitureIndex].height
+                      ? placedFurniture[selectedFurnitureIndex].depth
                       : placedFurniture[selectedFurnitureIndex].width}{" "}
                     cm
                   </div>
@@ -974,22 +977,22 @@ const FurniturePlacement = ({
                       const actualWidth =
                         rotation % 180 === 0
                           ? furniture.width
-                          : furniture.height;
-                      const actualHeight =
+                          : furniture.depth;
+                      const actualDepth =
                         rotation % 180 === 0
-                          ? furniture.height
+                          ? furniture.depth
                           : furniture.width;
 
                       const leftBottomX = Math.round(furniture.x);
-                      const leftBottomY = Math.round(furniture.y);
+                      const leftBottomZ = Math.round(furniture.z);
                       const rightTopX = Math.round(furniture.x + actualWidth);
-                      const rightTopY = Math.round(furniture.y + actualHeight);
+                      const rightTopZ = Math.round(furniture.z + actualDepth);
 
                       return (
                         <>
-                          위치 (왼쪽아래): ({leftBottomX}, {leftBottomY}) cm
+                          위치 (왼쪽아래): ({leftBottomX}, {leftBottomZ}) cm
                           <br />
-                          위치 (오른쪽위): ({rightTopX}, {rightTopY}) cm
+                          위치 (오른쪽위): ({rightTopX}, {rightTopZ}) cm
                         </>
                       );
                     })()}

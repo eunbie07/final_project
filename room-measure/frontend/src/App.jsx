@@ -115,14 +115,15 @@ function App() {
   // 🪑 가구 배치 상태 (FurniturePlacement ↔ RoomBox 연동)
   const [placedFurniture, setPlacedFurniture] = useState([]);
 
-  // 🔍 placedFurniture 변경 감지 디버그
+  // 🔍 placedFurniture 변경 감지 디버그 (개발 모드에서만)
   useEffect(() => {
-    console.log(
-      "📊 App.jsx - placedFurniture 변경:",
-      placedFurniture.length,
-      "개",
-      placedFurniture
-    );
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        "📊 App.jsx - placedFurniture 변경:",
+        placedFurniture.length,
+        "개"
+      );
+    }
   }, [placedFurniture]);
 
   const [depthImageUrl, setDepthImageUrl] = useState(null);
@@ -981,6 +982,7 @@ function App() {
                           uploadedImageFile={image}
                           uploadedImageUrl={imageUrl}
                           placedFurniture={placedFurniture}
+                          onFurnitureChange={setPlacedFurniture}
                         />
                       </div>
                     </div>
@@ -992,7 +994,7 @@ function App() {
                     {/* 가구 배치 - 전체 폭 활용 */}
                     <FurniturePlacement
                       roomWidth={result.width_cm}
-                      roomHeight={result.depth_cm}
+                      roomDepth={result.depth_cm}
                       placedFurniture={placedFurniture}
                       onFurnitureChange={setPlacedFurniture}
                     />

@@ -2176,9 +2176,9 @@ def detect_windows_with_4points(image_array, point1, point2, point3, point4):
         return []
     
     # 방의 실제 크기 계산 (포인트 간 거리 기준)
-    room_width_pixels = abs(point2['x'] - point1['x'])  # 1번-2번 거리 (방 너비)
-    room_depth_pixels = abs(point3['y'] - point1['y'])  # 1번-3번 거리 (방 깊이) 
-    room_height_pixels = abs(point4['y'] - point3['y']) # 3번-4번 거리 (방 높이)
+    room_width_pixels = abs(point4['x'] - point1['x'])  # 1번-4번 거리 (방 가로/Width)
+    room_depth_pixels = abs(point3['y'] - point1['y'])  # 1번-3번 거리 (방 세로/Depth)
+    room_height_pixels = abs(point2['y'] - point1['y']) # 1번-2번 거리 (방 높이/Height)
     
     # 실제 방 크기 (미터) - 일반적인 원룸 기준
     actual_room_width = 4.0   # 4m

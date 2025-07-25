@@ -86,37 +86,44 @@ const Player = ({ roomSize }) => {
   }, []);
 
   useFrame((state, delta) => {
-    velocity.current.x -= velocity.current.x * 10.0 * delta;
-    velocity.current.z -= velocity.current.z * 10.0 * delta;
+    // walkthrough 모드일 때만 카메라를 직접 조작
+    if (
+      !state.controls ||
+      state.controls.constructor.name !== "OrbitControls"
+    ) {
+      velocity.current.x -= velocity.current.x * 10.0 * delta;
+      velocity.current.z -= velocity.current.z * 10.0 * delta;
 
-    direction.current.z =
-      Number(moveForward.current) - Number(moveBackward.current);
-    direction.current.x = Number(moveRight.current) - Number(moveLeft.current);
-    direction.current.normalize(); // this ensures consistent movements in all directions
+      direction.current.z =
+        Number(moveForward.current) - Number(moveBackward.current);
+      direction.current.x =
+        Number(moveRight.current) - Number(moveLeft.current);
+      direction.current.normalize();
 
-    if (moveForward.current || moveBackward.current)
-      velocity.current.z -= direction.current.z * 400.0 * delta;
-    if (moveLeft.current || moveRight.current)
-      velocity.current.x -= direction.current.x * 400.0 * delta;
+      if (moveForward.current || moveBackward.current)
+        velocity.current.z -= direction.current.z * 400.0 * delta;
+      if (moveLeft.current || moveRight.current)
+        velocity.current.x -= direction.current.x * 400.0 * delta;
 
-    camera.translateX(velocity.current.x * delta);
-    camera.translateZ(velocity.current.z * delta);
+      camera.translateX(velocity.current.x * delta);
+      camera.translateZ(velocity.current.z * delta);
 
-    // Simple collision with room boundaries (cm 단위)
-    const [roomWidth, roomHeight, roomDepth] = roomSize;
-    const halfRoomWidth = roomWidth / 2;
-    const halfRoomDepth = roomDepth / 2;
-    const playerHeight = 170; // Eye level (cm)
+      // 방 경계 제한 (cm 단위)
+      const [roomWidth, roomHeight, roomDepth] = roomSize;
+      const halfRoomWidth = roomWidth / 2;
+      const halfRoomDepth = roomDepth / 2;
+      const playerHeight = 170; // 눈높이 (cm)
 
-    camera.position.x = Math.max(
-      -halfRoomWidth + 20,
-      Math.min(halfRoomWidth - 20, camera.position.x)
-    );
-    camera.position.z = Math.max(
-      -halfRoomDepth + 20,
-      Math.min(halfRoomDepth - 20, camera.position.z)
-    );
-    camera.position.y = playerHeight; // Keep player at eye level
+      camera.position.x = Math.max(
+        -halfRoomWidth + 20,
+        Math.min(halfRoomWidth - 20, camera.position.x)
+      );
+      camera.position.z = Math.max(
+        -halfRoomDepth + 20,
+        Math.min(halfRoomDepth - 20, camera.position.z)
+      );
+      camera.position.y = playerHeight;
+    }
   });
 
   return <PointerLockControls />;
@@ -139,76 +146,102 @@ const FURNITURE_ID_MAPPING = {
   dresser: "dresser",
 };
 
-// 가구 프리셋 정의 (cm 단위로 완전 통일)
+// 가구 프리셋 정의 (FurniturePlacement와 통합, cm 단위)
 const FURNITURE_PRESETS = {
   // 침실 가구
   single_bed: {
     name: "싱글 베드",
     size: [100, 60, 200], // width, height, depth (cm)
     color: "#FFB6C1",
+    icon: "🛏️",
+    category: "bedroom",
   },
   double_bed: {
     name: "더블 베드",
     size: [150, 60, 200],
     color: "#FFD1DC",
+    icon: "🛏️",
+    category: "bedroom",
   },
   queen_bed: {
     name: "퀸 베드",
     size: [160, 60, 200],
     color: "#FFC0CB",
+    icon: "🛏️",
+    category: "bedroom",
   },
   king_bed: {
     name: "킹 베드",
     size: [180, 60, 200],
     color: "#FFB7C5",
+    icon: "🛏️",
+    category: "bedroom",
   },
   // 책상/의자
   desk: {
     name: "책상",
     size: [120, 75, 60],
     color: "#98FB98",
+    icon: "🪑",
+    category: "office",
   },
   chair: {
     name: "의자",
     size: [50, 85, 50],
     color: "#90EE90",
+    icon: "🪑",
+    category: "office",
   },
   // 거실 가구
   sofa_2: {
     name: "2인 소파",
     size: [140, 85, 80],
     color: "#87CEEB",
+    icon: "🛋️",
+    category: "living",
   },
   sofa_3: {
     name: "3인 소파",
     size: [180, 85, 80],
     color: "#ADD8E6",
+    icon: "🛋️",
+    category: "living",
   },
   coffee_table: {
     name: "커피 테이블",
     size: [100, 45, 50],
     color: "#B0E0E6",
+    icon: "🪑",
+    category: "living",
   },
   tv_stand: {
     name: "TV 스탠드",
     size: [120, 50, 40],
     color: "#E0FFFF",
+    icon: "📺",
+    category: "living",
   },
   // 수납 가구
   wardrobe: {
     name: "옷장",
     size: [80, 200, 60],
     color: "#DDA0DD",
+    icon: "🚪",
+    category: "storage",
   },
   bookshelf: {
     name: "책장",
     size: [80, 180, 30],
     color: "#D8BFD8",
+    icon: "📚",
+    category: "storage",
   },
   dresser: {
     name: "화장대",
     size: [100, 75, 45],
     color: "#E6E6FA",
+    icon: "💄",
+    category: "storage",
   },
 };
 
@@ -253,21 +286,20 @@ class CollisionDetector {
     );
   }
 
-  static isWithinRoomBounds(position, size, roomSize, margin = 0.05) {
+  static isWithinRoomBounds(position, size, roomSize, margin = 5) {
     const [x, y, z] = position;
     const [width, height, depth] = size;
     const [roomWidth, roomHeight, roomDepth] = roomSize;
 
-    const halfWidth = width / 2 + margin;
-    const halfDepth = depth / 2 + margin;
-    const halfRoomWidth = roomWidth / 2;
-    const halfRoomDepth = roomDepth / 2;
+    const halfWidth = width / 2;
+    const halfDepth = depth / 2;
 
+    // 왼쪽 아래 (0,0,0) 기준 좌표계에서 경계 확인 (cm 단위)
     return (
-      x - halfWidth >= -halfRoomWidth &&
-      x + halfWidth <= halfRoomWidth &&
-      z - halfDepth >= -halfRoomDepth &&
-      z + halfDepth <= halfRoomDepth &&
+      x - halfWidth >= margin &&
+      x + halfWidth <= roomWidth - margin &&
+      z - halfDepth >= margin &&
+      z + halfDepth <= roomDepth - margin &&
       y >= 0 &&
       y + height <= roomHeight
     );
@@ -308,27 +340,26 @@ class CollisionDetector {
     return collisions;
   }
 
-  static checkWallCollisions(position, size, roomSize, margin = 0.05) {
+  static checkWallCollisions(position, size, roomSize, margin = 5) {
     const [x, y, z] = position;
     const [width, height, depth] = size;
     const [roomWidth, roomHeight, roomDepth] = roomSize;
 
     const collisions = [];
-    const halfWidth = width / 2 + margin;
-    const halfDepth = depth / 2 + margin;
-    const halfRoomWidth = roomWidth / 2;
-    const halfRoomDepth = roomDepth / 2;
+    const halfWidth = width / 2;
+    const halfDepth = depth / 2;
 
-    if (x - halfWidth < -halfRoomWidth) {
+    // 왼쪽 아래 (0,0,0) 기준 좌표계에서 벽 충돌 감지 (cm 단위)
+    if (x - halfWidth < margin) {
       collisions.push({ type: "wall", direction: "left" });
     }
-    if (x + halfWidth > halfRoomWidth) {
+    if (x + halfWidth > roomWidth - margin) {
       collisions.push({ type: "wall", direction: "right" });
     }
-    if (z - halfDepth < -halfRoomDepth) {
+    if (z - halfDepth < margin) {
       collisions.push({ type: "wall", direction: "back" });
     }
-    if (z + halfDepth > halfRoomDepth) {
+    if (z + halfDepth > roomDepth - margin) {
       collisions.push({ type: "wall", direction: "front" });
     }
 
@@ -349,16 +380,16 @@ class CollisionDetector {
 
     const halfWidth = width / 2;
     const halfDepth = depth / 2;
-    const halfRoomWidth = roomWidth / 2;
-    const halfRoomDepth = roomDepth / 2;
+
+    const margin = 5; // 벽에서 5cm 떨어진 위치
 
     x = Math.max(
-      -halfRoomWidth + halfWidth,
-      Math.min(halfRoomWidth - halfWidth, x)
+      halfWidth + margin,
+      Math.min(roomWidth - halfWidth - margin, x)
     );
     z = Math.max(
-      -halfRoomDepth + halfDepth,
-      Math.min(halfRoomDepth - halfDepth, z)
+      halfDepth + margin,
+      Math.min(roomDepth - halfDepth - margin, z)
     );
     y = Math.max(height / 2, y);
 
@@ -368,7 +399,8 @@ class CollisionDetector {
 
 // 위치 스냅 유틸리티
 class PositionSnapper {
-  static snapToGrid(position, gridSize = 0.5) {
+  static snapToGrid(position, gridSize = 5) {
+    // cm 단위로 스냅
     const [x, y, z] = position;
     return [
       Math.round(x / gridSize) * gridSize,
@@ -382,7 +414,7 @@ class PositionSnapper {
     size,
     furniture,
     furniturePresets,
-    snapDistance = 0.1
+    snapDistance = 15 // cm 단위
   ) {
     const [x, y, z] = position;
     const [width, height, depth] = size;
@@ -391,7 +423,10 @@ class PositionSnapper {
     let snappedZ = z;
 
     furniture.forEach((otherFurniture) => {
-      const otherSize = furniturePresets[otherFurniture.type].size;
+      const otherSize =
+        otherFurniture.size || furniturePresets[otherFurniture.type]?.size;
+      if (!otherSize) return;
+
       const [otherX, otherY, otherZ] = otherFurniture.position;
       const [otherWidth, otherHeight, otherDepth] = otherSize;
 
@@ -427,7 +462,7 @@ const DimensionArrow = React.memo(function DimensionArrow({ start, end }) {
     const direction = new THREE.Vector3()
       .subVectors(endVec, startVec)
       .normalize();
-    const arrowSize = 0.1;
+    const arrowSize = 10;
     const perpendicular = new THREE.Vector3(-direction.z, 0, direction.x);
 
     return {
@@ -495,7 +530,7 @@ const DimensionLabel = React.memo(function DimensionLabel({
     <group position={position} rotation={rotation}>
       <Text
         position={[0, 0, 0]}
-        fontSize={0.1}
+        fontSize={12}
         color={DIMENSION_COLOR}
         anchorX="center"
         anchorY="middle"
@@ -513,41 +548,49 @@ const FurnitureDimensions = React.memo(function FurnitureDimensions({
   size,
   selected,
 }) {
-  if (!selected) return null;
+  if (!selected || !size) return null;
 
   const [width, height, depth] = size;
   const [x, y, z] = position;
+  const offset = 5;
+
+  const baseY = y - height / 2; // 최하단 높이(y = 0에 붙음)
 
   return (
     <group>
+      {/* 가로 치수선 (앞쪽에) */}
       <DimensionArrow
-        start={[x - width / 2, y, z + depth / 2 + 0.05]}
-        end={[x + width / 2, y, z + depth / 2 + 0.05]}
+        start={[x - width / 2, baseY, z + depth / 2 + offset]}
+        end={[x + width / 2, baseY, z + depth / 2 + offset]}
       />
       <DimensionLabel
-        position={[x, y, z + depth / 2 + 0.1]}
-        text={`${width.toFixed(1)}m`}
-        rotation={[-Math.PI / 2, 0, 0]}
+        position={[x, baseY + 8, z + depth / 2 + offset]}
+        text={`${width.toFixed(0)}cm`}
       />
 
+      {/* 세로 치수선 (오른쪽에) */}
       <DimensionArrow
-        start={[x + width / 2 + 0.05, y, z - depth / 2]}
-        end={[x + width / 2 + 0.05, y, z + depth / 2]}
+        start={[x + width / 2 + offset, baseY, z - depth / 2]}
+        end={[x + width / 2 + offset, baseY, z + depth / 2]}
       />
       <DimensionLabel
-        position={[x + width / 2 + 0.1, y, z]}
-        text={`${depth.toFixed(1)}m`}
-        rotation={[-Math.PI / 2, Math.PI / 2, 0]}
+        position={[x + width / 2 + offset + 8, baseY + 8, z]}
+        text={`${depth.toFixed(0)}cm`}
+        rotation={[0, Math.PI / 2, 0]}
       />
 
+      {/* 높이 치수선 (위쪽으로) */}
       <DimensionArrow
-        start={[x + width / 2 + 0.05, 0, z + depth / 2 + 0.05]}
-        end={[x + width / 2 + 0.05, height, z + depth / 2 + 0.05]}
+        start={[x + width / 2 + offset, baseY, z + depth / 2 + offset]}
+        end={[x + width / 2 + offset, baseY + height, z + depth / 2 + offset]}
       />
       <DimensionLabel
-        position={[x + width / 2 + 0.1, height / 2, z + depth / 2 + 0.05]}
-        text={`${height.toFixed(1)}m`}
-        rotation={[0, 0, Math.PI / 2]}
+        position={[
+          x + width / 2 + offset + 8,
+          baseY + height / 2,
+          z + depth / 2 + offset,
+        ]}
+        text={`${height.toFixed(0)}cm`}
       />
     </group>
   );
@@ -582,11 +625,11 @@ const ValidPlacementArea = React.memo(function ValidPlacementArea({
   selectedFurnitureSize,
 }) {
   const [roomWidth, roomHeight, roomDepth] = roomSize;
-  const gridSize = 0.3;
+  const gridSize = 30;
   const validPositions = [];
 
-  for (let x = -roomWidth / 2; x <= roomWidth / 2; x += gridSize) {
-    for (let z = -roomDepth / 2; z <= roomDepth / 2; z += gridSize) {
+  for (let x = 0; x <= roomWidth; x += gridSize) {
+    for (let z = 0; z <= roomDepth; z += gridSize) {
       const testPosition = [x, selectedFurnitureSize[1] / 2, z];
 
       if (
@@ -600,13 +643,8 @@ const ValidPlacementArea = React.memo(function ValidPlacementArea({
       }
 
       const hasCollision = furniture.some((f) => {
-        // 🪑 매핑된 가구 타입에 따른 크기 정보 가져오기
-        let otherSize;
-        if (f.original2D && f.size) {
-          otherSize = f.size; // FurniturePlacement에서 온 가구는 계산된 size 사용
-        } else {
-          otherSize = furniturePresets[f.type]?.size || [1, 1, 1]; // 프리셋 가구의 size 사용
-        }
+        let otherSize = f.size || furniturePresets[f.type]?.size;
+        if (!otherSize) return false;
 
         const currentBox = CollisionDetector.createBoundingBox(
           testPosition,
@@ -628,8 +666,8 @@ const ValidPlacementArea = React.memo(function ValidPlacementArea({
   return (
     <group>
       {validPositions.map((pos, index) => (
-        <mesh key={index} position={[pos[0], 0.001, pos[2]]}>
-          <circleGeometry args={[0.05]} />
+        <mesh key={index} position={[pos[0], 0.1, pos[2]]}>
+          <circleGeometry args={[5]} />
           <meshBasicMaterial color="#4ade80" transparent opacity={0.6} />
         </mesh>
       ))}
@@ -669,7 +707,7 @@ const CollisionAlert = React.memo(function CollisionAlert({
 // 스냅 그리드 컴포넌트
 const SnapGrid = React.memo(function SnapGrid({
   roomSize,
-  gridSize = 0.5,
+  gridSize = 50,
   visible = false,
 }) {
   if (!visible) return null;
@@ -677,29 +715,29 @@ const SnapGrid = React.memo(function SnapGrid({
   const [roomWidth, roomHeight, roomDepth] = roomSize;
   const lines = [];
 
-  for (let x = -roomWidth / 2; x <= roomWidth / 2; x += gridSize) {
+  for (let x = 0; x <= roomWidth; x += gridSize) {
     lines.push(
       <Line
         key={`vertical-${x}`}
         points={[
-          [x, 0.002, -roomDepth / 2],
-          [x, 0.002, roomDepth / 2],
+          [x, 0.2, 0],
+          [x, 0.2, roomDepth],
         ]}
-        color="#94a3b8"
+        color="#e0e0e0"
         lineWidth={1}
       />
     );
   }
 
-  for (let z = -roomDepth / 2; z <= roomDepth / 2; z += gridSize) {
+  for (let z = 0; z <= roomDepth; z += gridSize) {
     lines.push(
       <Line
         key={`horizontal-${z}`}
         points={[
-          [-roomWidth / 2, 0.002, z],
-          [roomWidth / 2, 0.002, z],
+          [0, 0.2, z],
+          [roomWidth, 0.2, z],
         ]}
-        color="#94a3b8"
+        color="#e0e0e0"
         lineWidth={1}
       />
     );
@@ -794,27 +832,38 @@ const WalkingMetrics = React.memo(function WalkingMetrics({
 });
 
 // 시점 프리셋
-const ViewPresets = React.memo(function ViewPresets({ onViewChange }) {
+const ViewPresets = React.memo(function ViewPresets({
+  onViewChange,
+  roomSize,
+}) {
+  const [w, h, d] = roomSize;
   const presets = [
-    { name: "조감도", position: [0, 6, 0], target: [0, 0, 0] },
-    { name: "입구", position: [-2.5, 1.7, 2.5], target: [0, 1, 0] },
-    { name: "코너", position: [2.5, 2, 2.5], target: [0, 0, 0] },
     {
-      name: "눈높이",
-      position: [0, 1.7, 2.5],
-      target: [0, 1.7, 0],
+      name: "조감도",
+      position: [w / 2, h * 2, d / 2],
+      target: [w / 2, 0, d / 2],
     },
     {
-      name: "가구시점",
-      position: [1, 0.8, 1],
-      target: [0, 0.8, -1],
+      name: "입구",
+      position: [w / 2, h * 0.75, d + d * 0.1],
+      target: [w / 2, h * 0.5, 0],
+    },
+    {
+      name: "코너",
+      position: [w + w * 0.1, h, d + d * 0.1],
+      target: [0, 0, 0],
+    },
+    {
+      name: "눈높이",
+      position: [w / 2, 170, d * 0.8],
+      target: [w / 2, 160, 0],
     },
   ];
 
   return (
     <div className="bg-white/90 backdrop-blur p-2 rounded-lg">
       <h4 className="font-semibold text-xs mb-2">시점 변경</h4>
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-2 gap-1">
         {presets.map((preset) => (
           <button
             key={preset.name}
@@ -831,42 +880,20 @@ const ViewPresets = React.memo(function ViewPresets({ onViewChange }) {
 
 // 향상된 조명과 그림자
 const EnhancedLighting = React.memo(function EnhancedLighting({ roomSize }) {
+  const [w, h, d] = roomSize;
   return (
     <>
-      <ambientLight intensity={0.3} color="#f0f8ff" />
-
+      <ambientLight intensity={0.7} />
       <directionalLight
-        position={[0, 4, 0]}
+        position={[w, h * 1.5, d]}
         intensity={0.8}
         castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={10}
-        shadow-camera-left={-roomSize[0] / 2}
-        shadow-camera-right={roomSize[0] / 2}
-        shadow-camera-top={roomSize[2] / 2}
-        shadow-camera-bottom={-roomSize[2] / 2}
-        shadow-bias={-0.0001}
-      />
-
-      <directionalLight
-        position={[-3, 2, 1]}
-        intensity={0.4}
-        color="#fff8dc"
-        castShadow
-      />
-
-      <pointLight
-        position={[1, 2, 1]}
-        intensity={0.3}
-        color="#ffeb3b"
-        distance={3}
-      />
-
-      <pointLight
-        position={[0, 0.1, 0]}
-        intensity={0.2}
-        color="#e3f2fd"
-        distance={4}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-far={h * 3}
+        shadow-camera-left={-w}
+        shadow-camera-right={w}
+        shadow-camera-top={d}
+        shadow-camera-bottom={-d}
       />
     </>
   );
@@ -877,228 +904,151 @@ const FloorGrid = React.memo(function FloorGrid({ roomSize, visible = true }) {
   if (!visible) return null;
 
   const [roomWidth, roomHeight, roomDepth] = roomSize;
-  const gridSize = 1;
+  const gridSize = 100; // 1m
   const lines = [];
 
-  for (
-    let x = -Math.floor(roomWidth / 2);
-    x <= Math.floor(roomWidth / 2);
-    x += gridSize
-  ) {
+  for (let x = 0; x <= roomWidth; x += gridSize) {
     lines.push(
       <Line
         key={`major-v-${x}`}
         points={[
-          [x, 0.003, -roomDepth / 2],
-          [x, 0.003, roomDepth / 2],
+          [x, 0.3, 0],
+          [x, 0.3, roomDepth],
         ]}
-        color="#666666"
-        lineWidth={2}
+        color="#cccccc"
+        lineWidth={1}
       />
     );
   }
 
-  for (
-    let z = -Math.floor(roomDepth / 2);
-    z <= Math.floor(roomDepth / 2);
-    z += gridSize
-  ) {
+  for (let z = 0; z <= roomDepth; z += gridSize) {
     lines.push(
       <Line
         key={`major-h-${z}`}
         points={[
-          [-roomWidth / 2, 0.003, z],
-          [roomWidth / 2, 0.003, z],
+          [0, 0.3, z],
+          [roomWidth, 0.3, z],
         ]}
-        color="#666666"
-        lineWidth={2}
+        color="#cccccc"
+        lineWidth={1}
       />
     );
   }
 
-  for (let x = -roomWidth / 2; x <= roomWidth / 2; x += 0.5) {
-    if (x % 1 !== 0) {
-      lines.push(
-        <Line
-          key={`minor-v-${x}`}
-          points={[
-            [x, 0.002, -roomDepth / 2],
-            [x, 0.002, roomDepth / 2],
-          ]}
-          color="#cccccc"
-          lineWidth={1}
-        />
-      );
-    }
-  }
-
-  // 거리 표시 라벨
-  const labels = [];
-  for (
-    let x = -Math.floor(roomWidth / 2);
-    x <= Math.floor(roomWidth / 2);
-    x += gridSize
-  ) {
-    if (x !== 0) {
-      labels.push(
-        <Text
-          key={`label-x-${x}`}
-          position={[x, 0.01, roomDepth / 2 + 0.2]}
-          fontSize={0.08}
-          color="#666666"
-          anchorX="center"
-          rotation={[-Math.PI / 2, 0, 0]}
-        >
-          {Math.abs(x)}m
-        </Text>
-      );
-    }
-  }
-
-  return <group>{[...lines, ...labels]}</group>;
+  return <group>{lines}</group>;
 });
 
-// 드래그 가능한 사람 모델
+// 드래그 가능한 사람 모델 (cm 단위로 수정)
 const DraggableHuman = React.memo(function DraggableHuman({
   height = 170,
   position,
   onPositionChange,
   roomSize,
-  onDragStateChange, // 드래그 상태 변경 콜백
+  onDragStateChange,
 }) {
-  const { scene, animations, error } = useGLTF("/human.glb");
+  const { scene, error } = useGLTF("/human.glb");
   const modelRef = useRef();
-  const mixerRef = useRef();
-  const [hovered, setHovered] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const { camera, gl } = useThree();
-
-  // human.glb 스케일 계산
+  const { camera, gl, raycaster, mouse } = useThree();
   const [modelHeight, setModelHeight] = useState(2.0);
 
   useEffect(() => {
     if (scene) {
       const box = new THREE.Box3().setFromObject(scene);
       const actualHeight = box.max.y - box.min.y;
-      console.log("human.glb 실제 높이:", actualHeight);
       setModelHeight(actualHeight);
     }
   }, [scene]);
 
-  // 목표 높이 170cm로 스케일 계산 (human.glb는 원래 m 단위이므로 1.7m로 계산)
-  const targetHeight = 1.7; // m 단위 (170cm)
-  const finalScale = modelHeight > 0 ? targetHeight / modelHeight : 0.01;
+  const targetHeight = 170;
+  const finalScale = modelHeight > 0 ? targetHeight / modelHeight : 85;
 
-  console.log(
-    "human.glb - 높이:",
-    modelHeight,
-    "스케일:",
-    finalScale.toFixed(4)
-  );
-
-  // 애니메이션 비활성화 (스케일 문제 해결을 위해)
-  // useEffect(() => {
-  //   if (scene && animations && animations.length > 0) {
-  //     mixerRef.current = new THREE.AnimationMixer(scene);
-  //     // 애니메이션 코드 주석 처리
-  //   }
-  // }, [scene, animations, dragging]);
-
-  // useFrame((state, delta) => {
-  //   if (mixerRef.current) {
-  //     mixerRef.current.update(delta);
-  //   }
-  // });
-
-  // 드래그 관련 refs
-  const planeRef = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
-  const raycasterRef = useRef(new THREE.Raycaster());
-  const intersectionRef = useRef(new THREE.Vector3());
-  const mouseRef = useRef(new THREE.Vector2());
-
-  const handlePointerMove = useCallback(
-    (event) => {
+  // 전역 마우스 이벤트로 드래그 처리
+  useEffect(() => {
+    const handleMouseMove = (event) => {
       if (!dragging) return;
 
       const rect = gl.domElement.getBoundingClientRect();
-      mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-      raycasterRef.current.setFromCamera(mouseRef.current, camera);
-      if (
-        raycasterRef.current.ray.intersectPlane(
-          planeRef.current,
-          intersectionRef.current
-        )
-      ) {
-        let newPosition = [
-          intersectionRef.current.x,
-          0,
-          intersectionRef.current.z,
-        ];
+      raycaster.setFromCamera({ x, y }, camera);
 
-        // 방 경계 체크
-        const [roomWidth, roomHeight, roomDepth] = roomSize;
-        const clampedX = Math.max(
-          -roomWidth / 2 + 0.2,
-          Math.min(roomWidth / 2 - 0.2, newPosition[0])
-        );
-        const clampedZ = Math.max(
-          -roomDepth / 2 + 0.2,
-          Math.min(roomDepth / 2 - 0.2, newPosition[2])
-        );
+      // y=0 평면과의 교차점 계산
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const intersection = new THREE.Vector3();
 
-        onPositionChange([clampedX, 0, clampedZ]);
+      if (raycaster.ray.intersectPlane(plane, intersection)) {
+        const [roomWidth, roomDepth] = roomSize;
+
+        // 방 경계 내로 제한
+        let newX = Math.max(10, Math.min(roomWidth - 10, intersection.x));
+        let newZ = Math.max(10, Math.min(roomDepth - 10, intersection.z));
+
+        onPositionChange([newX, 0, newZ]);
       }
-    },
-    [dragging, camera, gl, onPositionChange, roomSize]
-  );
+    };
 
-  useEffect(() => {
+    const handleMouseUp = () => {
+      setDragging(false);
+      gl.domElement.style.cursor = "auto";
+      onDragStateChange?.(false);
+
+      // 드래그 완료 후 2D 좌표 업데이트
+      if (updatePlacedFurniturePosition) {
+        updatePlacedFurniturePosition(id, position);
+      }
+    };
+
     if (dragging) {
-      onDragStateChange?.(true); // 사람 드래그 시작 알림
-      window.addEventListener("pointermove", handlePointerMove);
-      window.addEventListener("pointerup", () => {
-        setDragging(false);
-        gl.domElement.style.cursor = "grab";
-        onDragStateChange?.(false); // 사람 드래그 종료 알림
-      });
-
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
       return () => {
-        window.removeEventListener("pointermove", handlePointerMove);
-        onDragStateChange?.(false); // 컴포넌트 정리 시에도 드래그 종료
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
       };
     }
-  }, [dragging, handlePointerMove, gl, onDragStateChange]);
+  }, [
+    dragging,
+    camera,
+    gl,
+    raycaster,
+    onPositionChange,
+    roomSize,
+    onDragStateChange,
+  ]);
 
-  // GLB 로딩 실패시 fallback 모델
+  const handlePointerDown = useCallback(
+    (e) => {
+      e.stopPropagation();
+      setDragging(true);
+      gl.domElement.style.cursor = "grabbing";
+      onDragStateChange?.(true);
+    },
+    [gl, onDragStateChange]
+  );
+
   if (error || !scene) {
     return (
       <group position={position}>
-        <mesh position={[0, 0.85, 0]}>
-          <cylinderGeometry args={[0.12, 0.18, 1.7]} />
-          <meshStandardMaterial color="#666666" opacity={0.7} transparent />
+        <mesh
+          position={[position[0], size[1] / 2, position[2]]}
+          onPointerDown={handlePointerDown}
+        >
+          <cylinderGeometry args={[15, 20, height]} />
+          <meshStandardMaterial color="#666666" opacity={0.8} transparent />
         </mesh>
-
-        <ContactShadows
-          position={[0, 0.01, 0]}
-          opacity={0.3}
-          scale={0.6}
-          blur={2}
-          far={1}
-        />
-
         <Text
-          position={[0.4, 1.0, 0]}
-          fontSize={0.08}
+          position={[30, height * 0.8, 0]}
+          fontSize={15}
           color="#333333"
           anchorX="left"
           fontWeight="bold"
           backgroundColor="#FFFFFF"
           backgroundOpacity={0.8}
-          padding={0.02}
+          padding={2}
         >
-          {height}cm
+          {height}cm (fallback)
         </Text>
       </group>
     );
@@ -1106,64 +1056,36 @@ const DraggableHuman = React.memo(function DraggableHuman({
 
   return (
     <group position={position}>
+      {/* GLB 모델 표시 */}
       <primitive
         ref={modelRef}
         object={scene.clone()}
         scale={[finalScale, finalScale, finalScale]}
+        position={[0, 0, 0]}
         castShadow
         receiveShadow
-        onPointerDown={(e) => {
-          e.stopPropagation();
-          setDragging(true);
-          gl.domElement.style.cursor = "grabbing";
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHovered(true);
-          gl.domElement.style.cursor = "grab";
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation();
-          setHovered(false);
-          if (!dragging) gl.domElement.style.cursor = "auto";
-        }}
+        onPointerDown={handlePointerDown}
       />
 
       <ContactShadows
         position={[0, 0.01, 0]}
         opacity={0.4}
-        scale={1.0}
+        scale={50}
         blur={3}
-        far={2}
+        far={20}
       />
-
       <Text
-        position={[0.3, 1.8, 0]}
-        fontSize={0.08}
+        position={[30, height * 0.8, 0]}
+        fontSize={15}
         color="#333333"
         anchorX="left"
         fontWeight="bold"
         backgroundColor="#FFFFFF"
         backgroundOpacity={0.8}
-        padding={0.02}
+        padding={2}
       >
-        {height}cm
+        {height}cm (GLB)
       </Text>
-
-      {dragging && (
-        <Text
-          position={[0.3, 1.6, 0]}
-          fontSize={0.06}
-          color="#E53E3E"
-          anchorX="left"
-          fontWeight="bold"
-          backgroundColor="#FFFFFF"
-          backgroundOpacity={0.8}
-          padding={0.02}
-        >
-          Walking
-        </Text>
-      )}
     </group>
   );
 });
@@ -1181,11 +1103,11 @@ const DistanceMeasurer = React.memo(function DistanceMeasurer({
 
   const distance = Math.sqrt(
     Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[2] - point1[2], 2)
-  ).toFixed(2);
+  ).toFixed(0);
 
   const midpoint = [
     (point1[0] + point2[0]) / 2,
-    Math.max(point1[1], point2[1]) + 0.1,
+    Math.max(point1[1], point2[1]) + 10,
     (point1[2] + point2[2]) / 2,
   ];
 
@@ -1194,15 +1116,15 @@ const DistanceMeasurer = React.memo(function DistanceMeasurer({
       <Line points={[point1, point2]} color="#FF4081" lineWidth={3} />
       <Text
         position={midpoint}
-        fontSize={0.1}
+        fontSize={12}
         color="#FF4081"
         anchorX="center"
         fontWeight="bold"
         backgroundColor="#FFFFFF"
         backgroundOpacity={0.8}
-        padding={0.02}
+        padding={2}
       >
-        {distance}m
+        {distance}cm
       </Text>
     </group>
   );
@@ -1226,7 +1148,7 @@ const Wall = React.memo(function Wall({
         clearcoat={0.2}
         opacity={isWindow ? 0.3 : 1}
         transparent={isWindow}
-        side={THREE.FrontSide}
+        side={THREE.DoubleSide} // Render both sides
       />
     </mesh>
   );
@@ -1238,16 +1160,9 @@ const SpaceUtilization = React.memo(function SpaceUtilization({
   roomArea,
 }) {
   const furnitureArea = furniture.reduce((total, item) => {
-    // 🪑 매핑된 타입을 통해 FURNITURE_PRESETS에서 크기 정보 가져오기
-    let area = 0;
-
-    // 🎯 FURNITURE_PRESETS의 통일된 크기 정보 사용 (cm 단위)
-    const preset = FURNITURE_PRESETS[item.type];
-    if (preset && preset.size) {
-      // FURNITURE_PRESETS의 실제 크기 사용 (width × depth, cm²)
-      area = (preset.size[0] * preset.size[2]) / 10000; // cm² → m²
-    }
-
+    const size = item.size || FURNITURE_PRESETS[item.type]?.size;
+    if (!size) return total;
+    const area = (size[0] * size[2]) / 10000; // cm² → m²
     return total + area;
   }, 0);
 
@@ -1288,7 +1203,7 @@ const SpaceUtilization = React.memo(function SpaceUtilization({
   );
 });
 
-// 향상된 가구 컴포넌트 (기존 + 개선된 시각효과)
+// 향상된 가구 컴포넌트 (드래그 시스템 개선)
 const DraggableFurnitureWithCollision = React.memo(
   function DraggableFurnitureWithCollision({
     id,
@@ -1303,153 +1218,157 @@ const DraggableFurnitureWithCollision = React.memo(
     roomSize,
     enableSnap = true,
     showCollisions = true,
-    onCollisionAlert, // 충돌 알림을 상위 컴포넌트로 전달
-    onDragStateChange, // 드래그 상태 변경 알림
-    customFurnitureData = null, // 🪑 커스텀 가구 데이터
+    onCollisionAlert,
+    onDragStateChange,
+    customFurnitureData = null,
+    updatePlacedFurniturePosition,
   }) {
     const mesh = useRef();
 
-    // 🪑 커스텀 가구 또는 프리셋 가구 정보 사용
-    const preset = customFurnitureData
-      ? {
-          size: customFurnitureData.size,
-          color: customFurnitureData.color,
-          name: customFurnitureData.name,
-        }
-      : furniturePresets[type];
+    const preset = customFurnitureData || furniturePresets[type];
+    const size = preset?.size || [100, 100, 100];
+    const color = preset?.color || "#cccccc";
+
     const [hovered, setHovered] = useState(false);
     const [dragging, setDragging] = useState(false);
     const [collisions, setCollisions] = useState([]);
-    const { camera, gl } = useThree();
+    const { camera, gl, raycaster, mouse } = useThree();
 
-    const planeRef = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
-    const raycasterRef = useRef(new THREE.Raycaster());
-    const intersectionRef = useRef(new THREE.Vector3());
-    const mouseRef = useRef(new THREE.Vector2());
+    // 드래그 상태 관리
+    const dragStart = useRef(null);
+    const isDraggingRef = useRef(false);
 
-    const handlePointerMove = useCallback(
-      (event) => {
-        if (!dragging) return;
+    // 마우스/터치 다운 이벤트
+    const handlePointerDown = useCallback(
+      (e) => {
+        e.stopPropagation();
 
         const rect = gl.domElement.getBoundingClientRect();
-        mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouseRef.current.y =
-          -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-        raycasterRef.current.setFromCamera(mouseRef.current, camera);
-        if (
-          raycasterRef.current.ray.intersectPlane(
-            planeRef.current,
-            intersectionRef.current
-          )
-        ) {
-          let newPosition = [
-            intersectionRef.current.x,
-            preset.size[1] / 2,
-            intersectionRef.current.z,
-          ];
+        dragStart.current = { x, y };
+        isDraggingRef.current = false;
 
-          if (enableSnap) {
-            newPosition = PositionSnapper.snapToGrid(newPosition, 0.25);
-            newPosition = PositionSnapper.snapToFurniture(
-              newPosition,
-              preset.size,
-              furniture.filter((f) => f.id !== id),
-              furniturePresets,
-              0.15
-            );
+        onSelect(id);
+        gl.domElement.style.cursor = "grabbing";
+
+        const handleMouseMove = (moveEvent) => {
+          if (!dragStart.current) return;
+
+          const moveRect = gl.domElement.getBoundingClientRect();
+          const moveX =
+            ((moveEvent.clientX - moveRect.left) / moveRect.width) * 2 - 1;
+          const moveY =
+            -((moveEvent.clientY - moveRect.top) / moveRect.height) * 2 + 1;
+
+          // 최소 이동 거리 체크 (의도하지 않은 미세한 드래그 방지)
+          const deltaX = Math.abs(moveX - dragStart.current.x);
+          const deltaY = Math.abs(moveY - dragStart.current.y);
+
+          if (deltaX > 0.01 || deltaY > 0.01) {
+            if (!isDraggingRef.current) {
+              isDraggingRef.current = true;
+              setDragging(true);
+              onDragStateChange?.(true);
+            }
+
+            raycaster.setFromCamera({ x: moveX, y: moveY }, camera);
+            const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+            const intersection = new THREE.Vector3();
+
+            if (raycaster.ray.intersectPlane(plane, intersection)) {
+              let newPosition = [intersection.x, size[1] / 2, intersection.z];
+
+              if (enableSnap) {
+                newPosition = PositionSnapper.snapToGrid(newPosition, 25);
+                newPosition = PositionSnapper.snapToFurniture(
+                  newPosition,
+                  size,
+                  furniture.filter((f) => f.id !== id),
+                  furniturePresets,
+                  15
+                );
+              }
+
+              const finalPosition = CollisionDetector.adjustToValidPosition(
+                newPosition,
+                size,
+                roomSize,
+                [],
+                id,
+                furniturePresets
+              );
+
+              onMove(id, finalPosition);
+            }
+          }
+        };
+
+        const handleMouseUp = () => {
+          dragStart.current = null;
+
+          if (isDraggingRef.current) {
+            isDraggingRef.current = false;
+            setDragging(false);
+            onDragStateChange?.(false);
+
+            // 드래그 완료 후 2D 좌표 업데이트
+            if (updatePlacedFurniturePosition) {
+              updatePlacedFurniturePosition(id, position);
+            }
           }
 
-          // 충돌 감지는 일단 비활성화하고 가구 이동만 허용
-          const wallCollisions = CollisionDetector.checkWallCollisions(
-            newPosition,
-            preset.size,
-            roomSize
-          );
+          gl.domElement.style.cursor = "auto";
+          document.removeEventListener("mousemove", handleMouseMove);
+          document.removeEventListener("mouseup", handleMouseUp);
+        };
 
-          if (wallCollisions.length > 0) {
-            // 벽 충돌만 처리 - 방 경계 내로 제한
-            const adjustedPosition = CollisionDetector.adjustToValidPosition(
-              newPosition,
-              preset.size,
-              roomSize,
-              [],
-              id,
-              furniturePresets
-            );
-            onMove(id, adjustedPosition);
-          } else {
-            // 충돌이 없으면 자유롭게 이동
-            onMove(id, newPosition);
-          }
-
-          setCollisions(wallCollisions);
-        }
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
       },
       [
-        dragging,
-        camera,
         gl,
         id,
+        onSelect,
         onMove,
-        preset.size,
+        onDragStateChange,
+        updatePlacedFurniturePosition,
+        position,
+        camera,
+        raycaster,
+        size,
+        enableSnap,
         furniture,
         furniturePresets,
         roomSize,
-        enableSnap,
-        showCollisions,
-        onCollisionAlert,
       ]
     );
 
-    useEffect(() => {
-      if (dragging) {
-        onDragStateChange?.(true); // 드래그 시작 알림
-        window.addEventListener("pointermove", handlePointerMove);
-        window.addEventListener("pointerup", () => {
-          setDragging(false);
-          setCollisions([]);
-          gl.domElement.style.cursor = "grab";
-          onDragStateChange?.(false); // 드래그 종료 알림
-        });
-
-        return () => {
-          window.removeEventListener("pointermove", handlePointerMove);
-          onDragStateChange?.(false); // 컴포넌트 정리 시에도 드래그 종료
-        };
-      }
-    }, [dragging, handlePointerMove, gl, onDragStateChange]);
-
     const hasCollision = collisions.length > 0;
-    const materialColor = hasCollision ? "#ff9999" : preset.color;
+    const materialColor = hasCollision ? "#ff9999" : color;
 
     return (
-      <group>
+      <group position={position}>
         <mesh
           ref={mesh}
-          position={position}
           rotation={rotation}
-          onPointerDown={(e) => {
-            e.stopPropagation();
-            setDragging(true);
-            onSelect(id);
-            gl.domElement.style.cursor = "grabbing";
-          }}
+          onPointerDown={handlePointerDown}
           onPointerOver={(e) => {
             e.stopPropagation();
             setHovered(true);
-            gl.domElement.style.cursor = "grab";
+            if (!dragging) gl.domElement.style.cursor = "grab";
           }}
           onPointerOut={(e) => {
             e.stopPropagation();
             setHovered(false);
             if (!dragging) gl.domElement.style.cursor = "auto";
           }}
-          scale={hovered ? [1.02, 1, 1.02] : [1, 1, 1]}
+          scale={hovered ? 1.02 : 1}
           castShadow
           receiveShadow
         >
-          <boxGeometry args={preset?.size || [1, 1, 1]} />
+          <boxGeometry args={size} />
           <meshStandardMaterial
             color={materialColor}
             roughness={0.7}
@@ -1461,21 +1380,17 @@ const DraggableFurnitureWithCollision = React.memo(
           />
         </mesh>
 
-        {/* 개선된 그림자 */}
         <ContactShadows
-          position={[position[0], 0.01, position[2]]}
-          opacity={0.3}
-          scale={Math.max(preset?.size?.[0] || 1, preset?.size?.[2] || 1) * 1.2}
+          position={[0, -size[1] / 2 + 0.1, 0]}
+          opacity={0.4}
+          scale={Math.max(size[0], size[2]) * 1.2}
           blur={2}
-          far={preset?.size?.[1] || 1}
+          far={size[1]}
         />
 
-        {/* 선택된 가구 하이라이트 */}
         {selected && (
-          <mesh position={position}>
-            <boxGeometry
-              args={(preset?.size || [1, 1, 1]).map((s) => s + 0.05)}
-            />
+          <mesh>
+            <boxGeometry args={size.map((s) => s + 5)} />
             <meshBasicMaterial
               color="#4fc3f7"
               transparent
@@ -1487,8 +1402,8 @@ const DraggableFurnitureWithCollision = React.memo(
 
         {hasCollision && showCollisions && (
           <CollisionIndicator
-            position={position}
-            size={preset.size.map((s) => s + 0.02)}
+            position={[0, 0, 0]}
+            size={size.map((s) => s + 2)}
             collisionType={
               collisions.some((c) => c.type === "wall") ? "wall" : "furniture"
             }
@@ -1496,8 +1411,8 @@ const DraggableFurnitureWithCollision = React.memo(
         )}
 
         <FurnitureDimensions
-          position={position}
-          size={preset.size}
+          position={[0, 0, 0]}
+          size={size}
           selected={selected}
         />
       </group>
@@ -1513,20 +1428,11 @@ const Window3D = React.memo(function Window3D({
   roomSize,
 }) {
   const [width, height, depth] = size;
-  const frameThickness = 0.04; // 더 두꺼운 프레임으로 잘 보이게
-  const glassThickness = 0.01; // 더 두꺼운 유리
-
-  console.log(
-    `🪟 Window3D 렌더링: 위치=[${position[0].toFixed(2)}, ${position[1].toFixed(
-      2
-    )}, ${position[2].toFixed(2)}], 크기=[${width.toFixed(2)}, ${height.toFixed(
-      2
-    )}, ${depth.toFixed(2)}]`
-  );
+  const frameThickness = 4;
+  const glassThickness = 1;
 
   return (
     <group position={position}>
-      {/* 메인 창문 프레임 - 더 진한 색상으로 잘 보이게 */}
       <mesh castShadow receiveShadow>
         <boxGeometry
           args={[
@@ -1538,7 +1444,6 @@ const Window3D = React.memo(function Window3D({
         <meshStandardMaterial color="#E0E0E0" roughness={0.3} metalness={0.1} />
       </mesh>
 
-      {/* 유리 - 더 잘 보이게 */}
       <mesh position={[0, 0, frameThickness / 2]} castShadow receiveShadow>
         <boxGeometry args={[width * 0.9, height * 0.9, glassThickness]} />
         <meshStandardMaterial
@@ -1547,42 +1452,6 @@ const Window3D = React.memo(function Window3D({
           opacity={0.5}
           roughness={0.1}
           metalness={0.0}
-        />
-      </mesh>
-
-      {/* 가로 구분선 - 더 진한 색상 */}
-      <mesh position={[0, 0, frameThickness / 2 + 0.005]} castShadow>
-        <boxGeometry
-          args={[width * 0.9, frameThickness * 0.5, glassThickness + 0.005]}
-        />
-        <meshStandardMaterial color="#808080" roughness={0.4} metalness={0.2} />
-      </mesh>
-
-      {/* 세로 구분선 - 더 진한 색상 */}
-      <mesh position={[0, 0, frameThickness / 2 + 0.005]} castShadow>
-        <boxGeometry
-          args={[frameThickness * 0.5, height * 0.9, glassThickness + 0.005]}
-        />
-        <meshStandardMaterial color="#808080" roughness={0.4} metalness={0.2} />
-      </mesh>
-
-      {/* 창문 손잡이 */}
-      <mesh
-        position={[width * 0.35, -height * 0.15, frameThickness / 2 + 0.01]}
-        castShadow
-      >
-        <cylinderGeometry args={[0.015, 0.015, 0.03]} />
-        <meshStandardMaterial color="#A0A0A0" roughness={0.1} metalness={0.8} />
-      </mesh>
-
-      {/* 디버깅용 빨간 테두리 - 창문 위치 확인 */}
-      <mesh position={[0, 0, -0.02]}>
-        <boxGeometry args={[width + 0.1, height + 0.1, 0.005]} />
-        <meshBasicMaterial
-          color="#FF0000"
-          transparent={true}
-          opacity={0.3}
-          wireframe={true}
         />
       </mesh>
     </group>
@@ -1598,153 +1467,69 @@ const WindowsOnWalls = React.memo(function WindowsOnWalls({
 
   if (!windows || windows.length === 0) return null;
 
-  console.log("🪟 창문 렌더링:", windows);
-  console.log("🏠 방 크기:", roomSize);
-
   return (
     <group>
       {windows.map((window, index) => {
-        // 먼저 층고 계산 (roomHeight는 이미 미터 단위)
-        const ceilingHeight = roomHeight; // 이미 미터 단위
+        const windowWidth3D = window.width_meters * 100 || roomWidth * 0.3;
+        const windowHeight3D = window.height_meters * 100 || roomHeight * 0.4;
 
-        // 백엔드에서 계산된 실제 창문 크기 사용 (우선순위)
-        let windowWidth3D, windowHeight3D;
-
-        // 원본 사진에 맞는 적절한 창문 크기로 설정
-        // 원본 사진 분석: 창문이 벽의 약 30-35% 정도 차지
-        windowWidth3D = roomWidth * 0.35; // 방 너비의 35% (적절한 크기)
-        windowHeight3D = roomHeight * 0.3; // 방 높이의 30% (적절한 크기)
-
-        console.log(
-          `🎯 원본 사진 기준 적절한 창문 크기: ${windowWidth3D.toFixed(
-            2
-          )}m × ${windowHeight3D.toFixed(2)}m`
-        );
         const halfWindowWidth = windowWidth3D / 2;
         const halfWindowHeight = windowHeight3D / 2;
 
-        // 실제 이미지 좌표를 3D 공간으로 변환
-        // 이미지에서 창문 좌표: (0,0,0)과 (409,548,230) - 단위: cm
-
-        // 창문의 중심 위치 계산
-        let windowX, windowY, windowZ;
         let position = [0, 0, 0];
-        const wallOffset = 0.02; // 벽에서의 오프셋
+        const wallOffset = 2;
 
-        console.log(`🔍 창문 ${index} 원본 데이터:`, window);
-        console.log(`🔍 창문 ${index} 벽 위치: ${window.wall_position}`);
-        console.log(
-          `🔍 창문 ${index} x_position: ${window.x_position}, y_position: ${window.y_position}`
-        );
-
-        // 🚨 모든 창문을 원본 사진에 맞게 강제로 오른쪽 벽에 배치
-        // 백엔드 결과 무시하고 원본 사진 기준으로 강제 설정
-        windowX = roomWidth - wallOffset; // 오른쪽 벽 (확실하게)
-        windowY = roomHeight * 0.75; // 상단 75% 높이 (더 높게)
-        windowZ = roomDepth * 0.25; // 뒤쪽 25% 위치 (더 뒤로)
-        console.log(
-          `🔧 창문 ${index} 강제 배치: 오른쪽 벽 상단 (원본 사진 완전 무시하고 강제 적용)`
-        );
-
-        // 아래 벽 판단 로직 완전히 무시하고 바로 점프
-        if (false) {
-          // 기존 로직 유지
-          // API가 front 벽으로 잘못 인식하는 경우가 많아서,
-          // 실제 사진을 기준으로 뒷벽으로 강제 변경
-          const actualWallPosition =
-            window.wall_position === "front" ? "back" : window.wall_position;
-          console.log(
-            `🔧 벽 위치 보정: ${window.wall_position} → ${actualWallPosition}`
-          );
-
-          switch (actualWallPosition) {
-            case "front": // 앞벽 (Z = roomDepth)
-              windowX = window.x_position * roomWidth;
-              windowY = window.y_position * roomHeight;
-              windowZ = roomDepth - wallOffset;
-              break;
-
-            case "back": // 뒷벽 (Z = 0) - 백엔드가 잘못 판단한 경우 오른쪽 벽으로 강제 변경
-              // 원본 사진 기준: 뒷벽으로 잘못 인식된 창문을 오른쪽 벽으로 이동
-              windowX = roomWidth - wallOffset; // 오른쪽 벽으로 강제 이동
-              windowY = roomHeight * 0.7; // 상단 높이
-              windowZ = roomDepth * 0.3; // 뒤쪽 위치
-              console.log(
-                `🔧 뒷벽으로 잘못 인식된 창문을 오른쪽 벽으로 강제 이동`
-              );
-              break;
-
-            case "left": // 왼쪽벽 (X = 0)
-              windowX = wallOffset;
-              windowY = window.y_position * roomHeight;
-              windowZ = window.x_position * roomDepth;
-              break;
-
-            case "right": // 오른쪽벽 (X = roomWidth) - 올바른 경우
-              windowX = roomWidth - wallOffset;
-              windowY = roomHeight * 0.7; // 상단 높이로 조정
-              windowZ = roomDepth * 0.3; // 뒤쪽 위치로 조정
-              console.log(`✅ 오른쪽 벽 창문 - 올바른 위치`);
-              break;
-
-            default: // 기본값: 뒷벽
-              windowX = window.x_position * roomWidth;
-              windowY = roomHeight * 0.6;
-              windowZ = wallOffset;
-          }
+        switch (window.wall_position) {
+          case "front":
+            position = [
+              window.x_position * roomWidth,
+              window.y_position * roomHeight,
+              roomDepth - wallOffset,
+            ];
+            break;
+          case "back":
+            position = [
+              window.x_position * roomWidth,
+              window.y_position * roomHeight,
+              wallOffset,
+            ];
+            break;
+          case "left":
+            position = [
+              wallOffset,
+              window.y_position * roomHeight,
+              window.x_position * roomDepth,
+            ];
+            break;
+          case "right":
+            position = [
+              roomWidth - wallOffset,
+              window.y_position * roomHeight,
+              window.x_position * roomDepth,
+            ];
+            break;
+          default:
+            position = [roomWidth / 2, roomHeight / 2, wallOffset];
         }
 
-        // 창문이 방 범위를 벗어나지 않게 클램핑
-        const clampedX = Math.max(
-          -roomWidth / 2 + halfWindowWidth,
-          Math.min(roomWidth / 2 - halfWindowWidth, windowX)
+        position[0] = Math.max(
+          halfWindowWidth,
+          Math.min(roomWidth - halfWindowWidth, position[0])
         );
-        const clampedY = Math.max(
+        position[1] = Math.max(
           halfWindowHeight,
-          Math.min(roomHeight - halfWindowHeight, windowY)
+          Math.min(roomHeight - halfWindowHeight, position[1])
         );
-        const clampedZ = Math.max(
-          -roomDepth / 2 + halfWindowWidth,
-          Math.min(roomDepth / 2 - halfWindowWidth, windowZ)
+        position[2] = Math.max(
+          halfWindowWidth,
+          Math.min(roomDepth - halfWindowWidth, position[2])
         );
-
-        position = [clampedX, clampedY, clampedZ];
-
-        console.log(`🪟 창문 ${index} 3D 위치:`, position);
-        console.log(
-          `🪟 창문 ${index} 벽면 위치: ${
-            window.wall_position
-          } 벽, X=${clampedX.toFixed(2)}m, Y=${clampedY.toFixed(
-            2
-          )}m, Z=${clampedZ.toFixed(2)}m`
-        );
-        console.log(
-          `🪟 창문 ${index} 크기: ${windowWidth3D.toFixed(
-            2
-          )}m × ${windowHeight3D.toFixed(2)}m${
-            window.width_meters && window.height_meters
-              ? " (백엔드 계산됨)"
-              : " (프론트엔드 추정)"
-          }`
-        );
-        console.log(
-          `🪟 창문 ${index} 이미지 좌표: x=${window.x_position.toFixed(
-            3
-          )}, y=${window.y_position.toFixed(3)}`
-        );
-        if (window.width_meters && window.height_meters) {
-          console.log(
-            `🎯 창문 ${index} 백엔드 실제 크기: ${window.width_meters.toFixed(
-              2
-            )}m × ${window.height_meters.toFixed(2)}m`
-          );
-        }
 
         return (
           <Window3D
             key={`window-${index}`}
             position={position}
-            size={[windowWidth3D, windowHeight3D, 0.1]}
+            size={[windowWidth3D, windowHeight3D, 10]}
             wallPosition={window.wall_position}
             roomSize={roomSize}
           />
@@ -1757,41 +1542,28 @@ const WindowsOnWalls = React.memo(function WindowsOnWalls({
 // 창문 감지 API 호출 함수
 const detectWindowsInImage = async (imageFile, roomPoints = null) => {
   try {
-    console.log("🔍 창문 감지 시작:", imageFile.name, imageFile.size, "bytes");
-    if (roomPoints) {
-      console.log("📐 방 측정 포인트 전송:", roomPoints);
-    }
-
     const formData = new FormData();
     formData.append("file", imageFile);
 
-    // 방 측정 포인트 추가 (있는 경우)
     if (roomPoints && roomPoints.length >= 2) {
       formData.append("room_points", JSON.stringify(roomPoints));
     }
-
-    console.log("📡 API 호출: http://localhost:3000/detect-windows");
 
     const response = await fetch("http://localhost:3000/detect-windows", {
       method: "POST",
       body: formData,
     });
 
-    console.log("📥 응답 상태:", response.status, response.statusText);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("❌ API 오류:", errorText);
       throw new Error(
         `HTTP error! status: ${response.status}, message: ${errorText}`
       );
     }
 
-    const result = await response.json();
-    console.log("✅ 창문 감지 결과:", result);
-    return result;
+    return await response.json();
   } catch (error) {
-    console.error("❌ 창문 감지 오류:", error);
+    console.error("창문 감지 오류:", error);
     throw error;
   }
 };
@@ -1803,111 +1575,75 @@ export default function RoomBox({
   depth = 400,
   isFullscreen = false,
   uploadedImageFile = null,
-  uploadedImageUrl = null,
-  placedFurniture = [], // 🪑 가구 배치 정보
+  placedFurniture = [],
+  onFurnitureChange = null,
 }) {
-  // 🎯 3D도 cm 단위로 통일 (스케일 제거)
-  const scale = 1; // cm 단위 그대로 사용
-  const w = width; // cm
-  const h = height; // cm
-  const d = depth; // cm
-
-  // 🪑 FurniturePlacement에서 전달받은 가구 데이터를 3D 좌표로 변환 (FURNITURE_PRESETS 통일)
-  const convertedFurniture = useMemo(() => {
-    return placedFurniture.map((item, index) => {
-      // 🔄 FurniturePlacement ID → RoomBox type 변환
-      const mappedType = FURNITURE_ID_MAPPING[item.id] || "desk";
-
-      // 🎯 FURNITURE_PRESETS에서 실제 크기와 색상 가져오기 (이미 cm 단위)
-      const presetData = FURNITURE_PRESETS[mappedType];
-      const furnitureSize = presetData
-        ? presetData.size // 이미 cm 단위
-        : [120, 75, 60]; // 기본값: 책상 크기 (cm)
-      const furnitureColor = presetData ? presetData.color : item.color;
-
-      // FurniturePlacement 좌표계 (cm, 왼쪽 아래 원점) → RoomBox 3D 좌표계 변환
-      const x3d = item.x; // cm 그대로 사용
-      const z3d = item.y; // y → z, cm 그대로 사용
-
-      // 회전 변환: FurniturePlacement 도 → 라디안
-      const rotY = (item.rotation || 0) * (Math.PI / 180);
-
-      // 🎯 가구 크기 (cm 단위)
-      const scaledSize = [
-        furnitureSize[0], // 너비 (cm)
-        furnitureSize[1], // 높이 (cm)
-        furnitureSize[2], // 깊이 (cm)
-      ];
-
-      return {
-        id: item.id || `furniture-${index}`, // FurniturePlacement의 실제 ID 사용
-        type: mappedType, // 매핑된 가구 타입 사용
-        name: presetData ? presetData.name : item.name, // FURNITURE_PRESETS의 이름 사용
-        color: furnitureColor, // FURNITURE_PRESETS의 색상 사용
-        size: scaledSize, // FURNITURE_PRESETS의 실제 크기 사용
-        position: [
-          x3d - w / 2 + scaledSize[0] / 2, // 중심 좌표로 변환 (cm)
-          scaledSize[1] / 2, // 바닥에서 높이/2 (cm)
-          z3d - d / 2 + scaledSize[2] / 2, // 중심 좌표로 변환 (cm)
-        ],
-        rotation: [0, rotY, 0],
-        original2D: item, // 원본 2D 데이터 보존
-      };
-    });
-  }, [placedFurniture, w, h, d, scale]);
+  const w = width;
+  const h = height;
+  const d = depth;
 
   const [furniture, setFurniture] = useState([]);
-
-  // 🧹 placedFurniture가 비어있으면 furniture도 비우기
-  useEffect(() => {
-    if (placedFurniture.length === 0) {
-      console.log("🧹 placedFurniture가 비어있어서 furniture 초기화");
-      setFurniture([]);
-    }
-  }, [placedFurniture.length]);
   const [selectedFurniture, setSelectedFurniture] = useState(null);
-
-  // 🔄 placedFurniture → furniture 상태 동기화 (단일 진실 소스)
-  useEffect(() => {
-    console.log("🔄 가구 상태 동기화:", {
-      placedCount: placedFurniture.length,
-      convertedCount: convertedFurniture.length,
-      furnitureIds: convertedFurniture.map((f) => f.id),
-    });
-
-    // convertedFurniture를 furniture 상태로 동기화
-    setFurniture(convertedFurniture);
-  }, [convertedFurniture]);
   const [showSnapGrid, setShowSnapGrid] = useState(false);
   const [showFloorGrid, setShowFloorGrid] = useState(false);
   const [enableSnap, setEnableSnap] = useState(true);
   const [showCollisions, setShowCollisions] = useState(true);
   const [placementMode, setPlacementMode] = useState(null);
   const [activeView, setActiveView] = useState("조감도");
-  const [walkthroughMode, setWalkthroughMode] = useState(false); // New state for walkthrough mode
+  const [walkthroughMode, setWalkthroughMode] = useState(false);
   const [collisionAlert, setCollisionAlert] = useState({
     visible: false,
     collisions: [],
   });
-  const [measurementMode, setMeasurementMode] = useState(false); // 거리 측정 모드
-  const [measurePoints, setMeasurePoints] = useState([null, null]); // 측정 포인트들
-  const [humanPosition, setHumanPosition] = useState([2.2, 0, 2.7]); // 사람 위치 (임시 초기값)
-  const [isDraggingFurniture, setIsDraggingFurniture] = useState(false); // 가구 드래그 상태
-  const [detectedWindows, setDetectedWindows] = useState([]); // 감지된 창문들
-  const [showWindows, setShowWindows] = useState(false); // 창문 표시 여부
-  const [isDetectingWindows, setIsDetectingWindows] = useState(false); // 창문 감지 중
+  const [measurementMode, setMeasurementMode] = useState(false);
+  const [measurePoints, setMeasurePoints] = useState([null, null]);
+  const [humanPosition, setHumanPosition] = useState([w / 2, 0, d / 2]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [detectedWindows, setDetectedWindows] = useState([]);
+  const [showWindows, setShowWindows] = useState(false);
+  const [isDetectingWindows, setIsDetectingWindows] = useState(false);
 
-  const roomSize = [w, h, d];
-  const roomArea = (width * depth) / 10000;
-
-  // 3번 포인트(왼쪽 앞 모서리)를 (0,0,0)으로 설정하기 위한 오프셋
-  const originOffset = [w / 2, 0, d / 2]; // [x, y, z] 오프셋
+  const roomSize = [w, d, h]; // [Width, Depth, Height] - 새로운 포인트 정의에 맞춤
+  const roomArea = (w * d) / 10000;
 
   const controlsRef = useRef();
 
-  // 방 크기가 변경될 때 사람 위치를 방 중앙으로 업데이트
   useEffect(() => {
-    setHumanPosition([w * 0.5, 0, d * 0.5]);
+    const converted = placedFurniture.map((item) => {
+      const baseId = item.id
+        ? item.id.split("_").slice(0, -1).join("_")
+        : "desk";
+      const mappedType = FURNITURE_ID_MAPPING[baseId] || "desk";
+      const presetData = FURNITURE_PRESETS[mappedType];
+      const furnitureSize = presetData.size;
+
+      // 2D -> 3D 좌표 변환 명확화
+      // FurniturePlacement: 실제로는 (x, y) 좌표를 {x: x, z: y} 형태로 저장
+      // RoomBox 3D: (x, y, z) 좌표계
+      // 따라서: 2D x → 3D x, 2D y → 3D z
+      const x3d = item.x; // 2D x → 3D x (가로축 동일)
+      const z3d = item.z; // 2D y → 3D z (2D의 세로축이 3D의 깊이축으로)
+
+      return {
+        id: item.id,
+        type: mappedType,
+        name: presetData.name,
+        color: presetData.color,
+        size: furnitureSize,
+        position: [
+          x3d + furnitureSize[0] / 2, // 3D x (왼쪽 모서리 → 중심)
+          furnitureSize[1] / 2, // 3D y (바닥 → 중심 높이)
+          z3d + furnitureSize[2] / 2, // 3D z (뒤쪽 모서리 → 중심)
+        ],
+        rotation: [0, (item.rotation || 0) * (Math.PI / 180), 0],
+        original2D: item,
+      };
+    });
+    setFurniture(converted);
+  }, [placedFurniture, w, d]);
+
+  useEffect(() => {
+    setHumanPosition([w / 2, 0, d / 2]);
   }, [w, d]);
 
   const handleViewChange = useCallback((preset) => {
@@ -1919,31 +1655,26 @@ export default function RoomBox({
     }
   }, []);
 
-  const handleCollisionAlert = useCallback((collisions) => {
-    setCollisionAlert({ visible: true, collisions });
-    setTimeout(() => {
-      setCollisionAlert({ visible: false, collisions: [] });
-    }, 2000);
-  }, []);
-
-  const handleAddFurniture = useCallback((type) => {
-    setPlacementMode(type);
-  }, []);
-
   const handlePlaceFurniture = useCallback(
     (position) => {
       if (!placementMode) return;
 
+      const preset = FURNITURE_PRESETS[placementMode];
+      if (!preset) return;
+
       const newFurniture = {
-        id: Date.now(),
+        id: `${placementMode}_${Date.now()}`,
         type: placementMode,
         position: position,
         rotation: [0, 0, 0],
+        size: preset.size,
+        name: preset.name,
+        color: preset.color,
       };
 
       const adjustedPosition = CollisionDetector.adjustToValidPosition(
         position,
-        FURNITURE_PRESETS[placementMode].size,
+        newFurniture.size,
         roomSize,
         furniture,
         newFurniture.id,
@@ -1961,7 +1692,6 @@ export default function RoomBox({
   const handleFloorClick = useCallback(
     (event) => {
       event.stopPropagation();
-
       if (placementMode) {
         const position = [
           event.point.x,
@@ -1969,18 +1699,11 @@ export default function RoomBox({
           event.point.z,
         ];
         handlePlaceFurniture(position);
-        return;
-      }
-
-      if (measurementMode) {
+      } else if (measurementMode) {
         const clickPoint = [event.point.x, event.point.y, event.point.z];
-        setMeasurePoints((prev) => {
-          if (!prev[0]) {
-            return [clickPoint, null];
-          } else {
-            return [prev[0], clickPoint];
-          }
-        });
+        setMeasurePoints((prev) =>
+          prev[0] ? [prev[0], clickPoint] : [clickPoint, null]
+        );
       }
     },
     [placementMode, handlePlaceFurniture, measurementMode]
@@ -1988,104 +1711,63 @@ export default function RoomBox({
 
   const handleMoveFurniture = useCallback((id, newPosition) => {
     setFurniture((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, position: newPosition } : f))
+      prev.map((f) => {
+        if (f.id === id) {
+          return { ...f, position: newPosition };
+        }
+        return f;
+      })
     );
   }, []);
 
-  // 창문 감지 핸들러
-  const handleDetectWindows = useCallback(async () => {
-    // 업로드된 이미지가 있으면 그것을 사용, 없으면 파일 선택
-    if (uploadedImageFile) {
-      console.log("📸 업로드된 이미지 사용:", uploadedImageFile.name);
+  // 드래그 완료 시에만 2D 좌표 업데이트
+  const updatePlacedFurniturePosition = useCallback(
+    (id, newPosition) => {
+      if (typeof onFurnitureChange === "function") {
+        const furnitureItem = furniture.find((f) => f.id === id);
+        if (furnitureItem) {
+          const [x3d, y3d, z3d] = newPosition;
+          const size = furnitureItem.size;
 
-      // 방 측정 포인트 정보 수집 (App.jsx에서 전달받은 경우)
-      const roomMeasurementPoints = window.roomMeasurementPoints || null;
+          // 3D -> 2D 좌표 변환 명확화
+          // 3D 중심 좌표 → 2D 왼쪽아래 좌표로 변환
+          // 3D x → 2D x, 3D z → 2D y (실제로는 z로 저장)
+          const x2d = x3d - size[0] / 2; // 3D x 중심 → 2D x 왼쪽모서리
+          const z2d = z3d - size[2] / 2; // 3D z 중심 → 2D y 위쪽모서리 (z로 저장)
 
-      if (roomMeasurementPoints) {
-        console.log("📐 방 측정 포인트 사용:", roomMeasurementPoints);
-      } else {
-        console.log("📐 방 측정 포인트 없음, 기본 방법 사용");
-      }
-
-      setIsDetectingWindows(true);
-      try {
-        const result = await detectWindowsInImage(
-          uploadedImageFile,
-          roomMeasurementPoints
-        );
-        console.log("📊 전체 감지 결과:", result);
-        console.log("🏠 현재 방 크기 (미터):", roomSize);
-        console.log("🏠 현재 방 크기 (cm):", [width, height, depth]);
-
-        setDetectedWindows(result.windows);
-        setShowWindows(true);
-
-        const pointsUsed = result.measurement_points_used
-          ? " (층고 기준 정확한 위치)"
-          : " (이미지 분석 기준)";
-        const message =
-          `${result.total_windows}개의 창문을 감지했습니다!${pointsUsed}\n\n` +
-          result.windows
-            .map(
-              (w, i) =>
-                `창문 ${i + 1}: ${w.wall_position} 벽\n` +
-                `  위치: x=${w.x_position.toFixed(3)}, y=${w.y_position.toFixed(
-                  3
-                )}\n` +
-                `  신뢰도: ${(w.confidence * 100).toFixed(0)}%`
-            )
-            .join("\n\n");
-
-        alert(message);
-
-        console.log("🪟 감지된 창문들:", result.windows);
-      } catch (error) {
-        console.error("창문 감지 실패:", error);
-        alert("창문 감지에 실패했습니다. 다시 시도해주세요.");
-      } finally {
-        setIsDetectingWindows(false);
-      }
-    } else {
-      // 업로드된 이미지가 없으면 파일 선택
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
-
-      input.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        setIsDetectingWindows(true);
-        try {
-          const result = await detectWindowsInImage(file, null);
-          console.log("📊 전체 감지 결과:", result);
-
-          setDetectedWindows(result.windows);
-          setShowWindows(true);
-
-          const message =
-            `${result.total_windows}개의 창문을 감지했습니다!\n\n` +
-            result.windows
-              .map(
-                (w, i) =>
-                  `창문 ${i + 1}: ${w.wall_position} 벽 (${(
-                    w.confidence * 100
-                  ).toFixed(0)}% 신뢰도)`
-              )
-              .join("\n");
-
-          alert(message);
-
-          console.log("🪟 감지된 창문들:", result.windows);
-        } catch (error) {
-          console.error("창문 감지 실패:", error);
-          alert("창문 감지에 실패했습니다. 다시 시도해주세요.");
-        } finally {
-          setIsDetectingWindows(false);
+          onFurnitureChange((prev) =>
+            prev.map((item) => {
+              if (item.id === id) {
+                return {
+                  ...item,
+                  x: x2d, // 2D x 좌표
+                  z: z2d, // 2D y 좌표 (z 필드에 저장)
+                };
+              }
+              return item;
+            })
+          );
         }
-      };
+      }
+    },
+    [furniture, onFurnitureChange]
+  );
 
-      input.click();
+  const handleDetectWindows = useCallback(async () => {
+    if (!uploadedImageFile) {
+      alert("먼저 이미지를 업로드해주세요.");
+      return;
+    }
+    setIsDetectingWindows(true);
+    try {
+      const result = await detectWindowsInImage(uploadedImageFile, null);
+      setDetectedWindows(result.windows);
+      setShowWindows(true);
+      alert(`${result.total_windows}개의 창문을 감지했습니다.`);
+    } catch (error) {
+      alert("창문 감지에 실패했습니다.");
+    } finally {
+      setIsDetectingWindows(false);
     }
   }, [uploadedImageFile]);
 
@@ -2099,9 +1781,18 @@ export default function RoomBox({
     );
   }, []);
 
-  const handleDeleteFurniture = useCallback((id) => {
-    setFurniture((prev) => prev.filter((f) => f.id !== id));
-    setSelectedFurniture(null);
+  const handleDeleteFurniture = useCallback(
+    (id) => {
+      setFurniture((prev) => prev.filter((f) => f.id !== id));
+      if (selectedFurniture === id) {
+        setSelectedFurniture(null);
+      }
+    },
+    [selectedFurniture]
+  );
+
+  const handleAddFurniture = useCallback((type) => {
+    setPlacementMode(type);
   }, []);
 
   const selectedFurnitureData = useMemo(
@@ -2109,37 +1800,15 @@ export default function RoomBox({
     [furniture, selectedFurniture]
   );
 
-  // 키보드 이벤트 핸들러
   useEffect(() => {
     const handleKeyPress = (event) => {
-      switch (event.key.toLowerCase()) {
-        case "escape":
-          setPlacementMode(null);
-          setSelectedFurniture(null);
-          break;
-        case "g":
-          setShowSnapGrid((prev) => !prev);
-          break;
-        case "f":
-          setShowFloorGrid((prev) => !prev);
-          break;
-        case "s":
-          setEnableSnap((prev) => !prev);
-          break;
-        case "delete":
-        case "backspace":
-          if (selectedFurniture) {
-            handleDeleteFurniture(selectedFurniture);
-          }
-          break;
-        case "m":
-          setMeasurementMode((prev) => !prev);
-          setMeasurePoints([null, null]);
-          break;
-        // 키보드 단축키들
+      if (
+        event.key.toLowerCase() === "delete" ||
+        event.key.toLowerCase() === "backspace"
+      ) {
+        if (selectedFurniture) handleDeleteFurniture(selectedFurniture);
       }
     };
-
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [selectedFurniture, handleDeleteFurniture]);
@@ -2150,50 +1819,22 @@ export default function RoomBox({
         isFullscreen ? "h-screen rounded-none" : "h-[700px] rounded-xl"
       }`}
     >
-      {/* 충돌 알림 (Canvas 외부) */}
-      <CollisionAlert
-        collisions={collisionAlert.collisions}
-        visible={collisionAlert.visible}
-        onDismiss={() => setCollisionAlert({ visible: false, collisions: [] })}
-      />
-
-      {/* 전체화면 모드에서 ESC 안내 */}
-      {isFullscreen && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
-          <p className="text-sm">ESC 키를 눌러 전체화면에서 나가기</p>
-        </div>
-      )}
-
-      {/* 왼쪽 컨트롤 패널 */}
-      <div
-        className={`absolute top-4 left-4 z-10 space-y-3 max-w-xs ${
-          isFullscreen ? "top-16" : ""
-        }`}
-      >
-        {/* 가구 추가 */}
-        <div
-          className={`backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
-        >
+      {/* UI Panels */}
+      <div className="absolute top-4 left-4 z-10 space-y-3 max-w-xs">
+        {/* Furniture Addition Panel */}
+        <div className="backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
           <h3 className="text-sm font-semibold mb-2 text-gray-700">
             {placementMode
               ? `${FURNITURE_PRESETS[placementMode].name} 배치 중...`
               : "가구 추가"}
           </h3>
-
           {placementMode ? (
-            <div className="space-y-2">
-              <p className="text-xs text-gray-600">
-                바닥을 클릭해서 배치하세요
-              </p>
-              <button
-                onClick={() => setPlacementMode(null)}
-                className="w-full px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
-              >
-                취소
-              </button>
-            </div>
+            <button
+              onClick={() => setPlacementMode(null)}
+              className="w-full px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+            >
+              취소
+            </button>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(FURNITURE_PRESETS).map(([type, preset]) => (
@@ -2202,6 +1843,7 @@ export default function RoomBox({
                   onClick={() => handleAddFurniture(type)}
                   className="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded hover:bg-blue-100 transition-colors text-xs"
                 >
+                  <span>{preset.icon}</span>
                   <span>{preset.name}</span>
                 </button>
               ))}
@@ -2209,21 +1851,16 @@ export default function RoomBox({
           )}
         </div>
 
-        {/* 옵션 */}
-        <div
-          className={`backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
-        >
-          <h3 className="text-sm font-semibold mb-2 text-gray-700">
-            시각 옵션
-          </h3>
+        {/* Visual Options Panel */}
+        <div className="backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
+          <h4 className="font-semibold text-sm mb-2">시각 옵션</h4>
           <div className="space-y-2">
             <label className="flex items-center gap-2 text-xs">
               <input
                 type="checkbox"
                 checked={enableSnap}
                 onChange={(e) => setEnableSnap(e.target.checked)}
+                className="rounded"
               />
               스냅 기능
             </label>
@@ -2232,6 +1869,7 @@ export default function RoomBox({
                 type="checkbox"
                 checked={showSnapGrid}
                 onChange={(e) => setShowSnapGrid(e.target.checked)}
+                className="rounded"
               />
               스냅 그리드
             </label>
@@ -2240,14 +1878,16 @@ export default function RoomBox({
                 type="checkbox"
                 checked={showFloorGrid}
                 onChange={(e) => setShowFloorGrid(e.target.checked)}
+                className="rounded"
               />
-              바닥 격자
+              바닥 그리드
             </label>
             <label className="flex items-center gap-2 text-xs">
               <input
                 type="checkbox"
                 checked={showCollisions}
                 onChange={(e) => setShowCollisions(e.target.checked)}
+                className="rounded"
               />
               충돌 표시
             </label>
@@ -2256,460 +1896,324 @@ export default function RoomBox({
                 type="checkbox"
                 checked={showWindows}
                 onChange={(e) => setShowWindows(e.target.checked)}
+                className="rounded"
               />
               창문 표시
             </label>
           </div>
         </div>
 
-        {/* 창문 감지 도구 */}
-        <div
-          className={`backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
-        >
-          <h3 className="text-sm font-semibold mb-2 text-gray-700">
-            창문 감지
-          </h3>
-          <div className="space-y-2">
-            <button
-              onClick={handleDetectWindows}
-              disabled={isDetectingWindows}
-              className={`w-full px-3 py-1 rounded text-xs ${
-                isDetectingWindows
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-green-500 text-white hover:bg-green-600"
-              }`}
-            >
-              {isDetectingWindows
-                ? "감지 중..."
-                : uploadedImageFile
-                ? "업로드된 사진에서 창문 감지"
-                : "사진에서 창문 감지"}
-            </button>
-            {detectedWindows.length > 0 && (
-              <p className="text-xs text-green-600">
-                {detectedWindows.length}개 창문 감지됨
-              </p>
-            )}
+        {/* Window Detection Panel */}
+        {uploadedImageFile && (
+          <div className="backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
+            <h4 className="font-semibold text-sm mb-2">창문 감지</h4>
+            <div className="space-y-2">
+              <button
+                onClick={handleDetectWindows}
+                disabled={isDetectingWindows}
+                className="w-full px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+              >
+                {isDetectingWindows ? "감지 중..." : "AI 창문 감지"}
+              </button>
+              {detectedWindows.length > 0 && (
+                <p className="text-xs text-gray-600">
+                  {detectedWindows.length}개 창문 감지됨
+                </p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* 거리 측정 도구 */}
-        <div
-          className={`backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
-        >
-          <h3 className="text-sm font-semibold mb-2 text-gray-700">
-            거리 측정
-          </h3>
+        {/* Distance Measurement Panel */}
+        <div className="backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
+          <h4 className="font-semibold text-sm mb-2">거리 측정</h4>
           <div className="space-y-2">
             <button
               onClick={() => {
                 setMeasurementMode(!measurementMode);
                 setMeasurePoints([null, null]);
               }}
-              className={`w-full px-3 py-1 rounded text-xs ${
+              className={`w-full px-3 py-2 rounded text-sm ${
                 measurementMode
-                  ? "bg-pink-500 text-white hover:bg-pink-600"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-green-500 text-white hover:bg-green-600"
               }`}
             >
-              {measurementMode ? "측정 모드 종료" : "거리 측정 시작"}
+              {measurementMode ? "측정 종료" : "거리 측정"}
             </button>
             {measurementMode && (
-              <p className="text-xs text-pink-600">
-                바닥을 클릭해서 거리를 측정하세요
+              <p className="text-xs text-gray-600">
+                바닥을 클릭하여 두 점 사이의 거리를 측정하세요
               </p>
             )}
           </div>
         </div>
+      </div>
 
-        {/* 사람 모델 컨트롤 */}
-        <div
-          className={`backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
-        >
-          <h3 className="text-sm font-semibold mb-2 text-gray-700">
-            사람 조작
-          </h3>
-          <div className="space-y-2">
-            <p className="text-xs text-gray-600">
-              사람을 드래그해서 움직여보세요
-            </p>
-            <button
-              onClick={() => setHumanPosition([0, 0, 0])}
-              className="px-3 py-2 bg-pink-500 text-white rounded-lg text-sm font-medium hover:bg-pink-600 transition-colors"
-            >
-              사람 위치 초기화
-            </button>
-          </div>
-        </div>
+      {/* Right-side panels */}
+      <div className="absolute top-4 right-4 z-10 space-y-3 max-w-xs">
+        {/* View Controls */}
+        <ViewPresets onViewChange={handleViewChange} roomSize={roomSize} />
 
-        {/* 워크스루 모드 토글 */}
-        <div
-          className={`backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
-        >
-          <h3 className="text-sm font-semibold mb-2 text-gray-700">
-            워크스루 모드
-          </h3>
+        {/* Walkthrough Mode Toggle */}
+        <div className="backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
+          <h4 className="font-semibold text-sm mb-2">시점 모드</h4>
           <button
-            onClick={() => setWalkthroughMode((prev) => !prev)}
-            className={`w-full px-3 py-1 rounded text-sm ${
+            onClick={() => setWalkthroughMode(!walkthroughMode)}
+            className={`w-full px-3 py-2 rounded text-sm transition-colors ${
               walkthroughMode
-                ? "bg-pink-500 text-white hover:bg-pink-600"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-orange-500 text-white hover:bg-orange-600"
+                : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            {walkthroughMode ? "워크스루 종료" : "워크스루 시작"}
+            {walkthroughMode ? "조감도 모드" : "걸어다니기 모드"}
           </button>
+          {walkthroughMode && (
+            <p className="text-xs text-gray-600 mt-1">
+              WASD 키로 이동, 마우스로 시점 변경
+            </p>
+          )}
         </div>
+
+        {/* Space Analysis */}
+        <SizeComparisonPanel
+          currentArea={roomArea}
+          isFullscreen={isFullscreen}
+        />
+        <WalkingMetrics width={w} depth={d} isFullscreen={isFullscreen} />
+        <SpaceUtilization furniture={furniture} roomArea={roomArea} />
       </div>
 
-      {/* 오른쪽 정보 패널 */}
-      <div
-        className={`absolute top-1/2 transform -translate-y-1/2 right-4 z-10 space-y-3 max-w-sm ${
-          isFullscreen ? "top-16" : ""
-        }`}
-      >
-        {/* 방 정보 */}
-        <div
-          className={`backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
+      {/* 3D Canvas with Error Boundary */}
+      <div className="relative w-full h-full">
+        <Canvas
+          camera={{
+            position: [w, h, d],
+            fov: 50,
+            near: 1,
+            far: Math.max(w, h, d) * 5,
+          }}
+          shadows
+          gl={{
+            antialias: true,
+            alpha: true,
+            preserveDrawingBuffer: false,
+            powerPreference: "high-performance",
+            failIfMajorPerformanceCaveat: false,
+          }}
+          onCreated={({ gl }) => {
+            try {
+              const canvas = gl.domElement;
+              if (canvas && typeof canvas.addEventListener === "function") {
+                canvas.addEventListener("webglcontextlost", (event) => {
+                  console.log("WebGL context lost, preventing default");
+                  event.preventDefault();
+                });
+                canvas.addEventListener("webglcontextrestored", () => {
+                  console.log("WebGL context restored");
+                });
+              }
+            } catch (error) {
+              console.warn(
+                "Could not set up WebGL context event listeners:",
+                error
+              );
+            }
+          }}
+          fallback={
+            <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-600">
+              <div className="text-center">
+                <div className="text-2xl mb-2">⚠️</div>
+                <div>3D 뷰어를 로드할 수 없습니다</div>
+                <div className="text-sm">
+                  WebGL을 지원하지 않는 브라우저입니다
+                </div>
+              </div>
+            </div>
+          }
         >
-          <h3 className="text-sm font-semibold mb-2 text-gray-700">방 정보</h3>
-          <div className="text-xs space-y-1">
-            <p>
-              <strong>크기:</strong> {(width / 100).toFixed(1)} ×{" "}
-              {(depth / 100).toFixed(1)} × {(height / 100).toFixed(1)}m
-            </p>
-            <p>
-              <strong>면적:</strong> {roomArea.toFixed(1)}㎡
-            </p>
-            <p>
-              <strong>부피:</strong>{" "}
-              {((width * height * depth) / 1000000).toFixed(1)}㎥
-            </p>
-          </div>
+          <Suspense fallback={null}>
+            <EnhancedLighting roomSize={roomSize} />
+            <Environment preset="apartment" />
 
-          {/* 공간 활용도 */}
-          <div className="mt-2">
-            <SpaceUtilization furniture={furniture} roomArea={roomArea} />
-          </div>
-        </div>
+            {/* 바닥 - 원래 크기로 복원 */}
+            <mesh
+              position={[w / 2, 0, d / 2]}
+              rotation={[-Math.PI / 2, 0, 0]}
+              receiveShadow
+              onClick={handleFloorClick}
+            >
+              <planeGeometry args={[w, d]} /> {/* 원래 크기로 복원 */}
+              <meshStandardMaterial
+                color={placementMode ? "#e0f2fe" : "#f8f9fa"}
+              />
+            </mesh>
 
-        {/* 크기 비교 */}
-        <div className={`${isFullscreen ? "opacity-80" : ""}`}>
-          <SizeComparisonPanel
-            currentArea={roomArea}
-            isFullscreen={isFullscreen}
-          />
-        </div>
+            {/* 드래그 전용 투명 레이어 - Canvas 레벨에서 처리 */}
+            <mesh
+              position={[0, 0.01, 0]} // 바닥 바로 위
+              rotation={[-Math.PI / 2, 0, 0]}
+              visible={false}
+            >
+              <planeGeometry args={[10000, 10000]} />
+              <meshBasicMaterial transparent opacity={0} />
+            </mesh>
 
-        {/* 이동 거리 */}
-        <div className={`${isFullscreen ? "opacity-80" : ""}`}>
-          <WalkingMetrics
-            width={width}
-            depth={depth}
-            isFullscreen={isFullscreen}
-          />
-        </div>
+            {/* 앞쪽 벽 (front wall) - 삭제 */}
+            {/* <Wall width={w} height={h} position={[w / 2, h / 2, d]} rotation={[0, Math.PI, 0]} /> */}
 
-        {/* 시점 변경 */}
-        <div className={`${isFullscreen ? "opacity-80" : ""}`}>
-          <ViewPresets onViewChange={handleViewChange} />
-        </div>
-      </div>
-
-      <Canvas
-        camera={{ position: [800, 400, 800], fov: 50 }}
-        shadows
-        gl={{ antialias: true, alpha: true }}
-      >
-        <Suspense fallback={null}>
-          <Environment preset="apartment" />
-
-          {/* 향상된 조명 (cm 단위 조정) */}
-          <ambientLight intensity={0.6} />
-          <directionalLight
-            position={[w * 0.8, h * 1.5, d * 0.8]}
-            intensity={0.5}
-            castShadow
-            shadow-mapSize-width={1024}
-            shadow-mapSize-height={1024}
-            shadow-camera-far={h * 3}
-            shadow-camera-left={-w}
-            shadow-camera-right={w}
-            shadow-camera-top={d}
-            shadow-camera-bottom={-d}
-          />
-          <pointLight
-            position={[w / 2, h * 0.7, d / 2]}
-            intensity={0.2}
-            distance={w * 1.5}
-          />
-
-          {/* 바닥 */}
-          <mesh
-            position={[originOffset[0], 0, originOffset[2]]}
-            rotation={[-Math.PI / 2, 0, 0]}
-            receiveShadow
-            onClick={handleFloorClick}
-          >
-            <planeGeometry args={[w, d]} />
-            <meshStandardMaterial
-              color={placementMode ? "#e0f2fe" : "#f8f9fa"}
-              roughness={0.8}
-              metalness={0.1}
-            />
-          </mesh>
-
-          {/* 바닥 격자 */}
-          <group position={[originOffset[0], 0, originOffset[2]]}>
-            <FloorGrid roomSize={roomSize} visible={showFloorGrid} />
-          </group>
-
-          {/* 벽들 - 4개 벽 모두 렌더링 */}
-          {/* 뒷벽 */}
-          <Wall
-            width={w}
-            height={h}
-            position={[originOffset[0], h / 2, 0]}
-            rotation={[0, 0, 0]}
-          />
-          {/* 왼쪽벽 */}
-          <Wall
-            width={d}
-            height={h}
-            position={[0, h / 2, originOffset[2]]}
-            rotation={[0, Math.PI / 2, 0]}
-          />
-          {/* 오른쪽벽 */}
-          <Wall
-            width={d}
-            height={h}
-            position={[w, h / 2, originOffset[2]]}
-            rotation={[0, -Math.PI / 2, 0]}
-          />
-          {/* 앞벽 (일부만, 입구 고려) */}
-          <Wall
-            width={w * 0.3}
-            height={h}
-            position={[originOffset[0] - w * 0.35, h / 2, d]}
-            rotation={[0, Math.PI, 0]}
-          />
-          <Wall
-            width={w * 0.3}
-            height={h}
-            position={[originOffset[0] + w * 0.35, h / 2, d]}
-            rotation={[0, Math.PI, 0]}
-          />
-
-          {/* 스냅 그리드 */}
-          <SnapGrid
-            roomSize={roomSize}
-            gridSize={0.25}
-            visible={showSnapGrid}
-          />
-
-          {/* 배치 모드일 때 유효한 영역 표시 */}
-          {placementMode && (
-            <ValidPlacementArea
-              roomSize={roomSize}
-              furniture={furniture}
-              furniturePresets={FURNITURE_PRESETS}
-              selectedFurnitureSize={FURNITURE_PRESETS[placementMode].size}
-            />
-          )}
-
-          {/* 가구 렌더링 */}
-          {furniture.map((f, index) => (
-            <DraggableFurnitureWithCollision
-              key={`${f.id}-${index}`}
-              id={f.id}
-              type={f.type}
-              position={f.position}
-              rotation={f.rotation}
-              onMove={handleMoveFurniture}
-              onSelect={setSelectedFurniture}
-              selected={selectedFurniture === f.id}
-              furniture={furniture}
-              furniturePresets={FURNITURE_PRESETS}
-              roomSize={roomSize}
-              enableSnap={enableSnap}
-              showCollisions={showCollisions}
-              onCollisionAlert={handleCollisionAlert}
-              onDragStateChange={setIsDraggingFurniture}
-              customFurnitureData={f.original2D ? f : null}
-            />
-          ))}
-
-          {/* 창문 렌더링 */}
-          {showWindows && detectedWindows.length > 0 && (
-            <WindowsOnWalls windows={detectedWindows} roomSize={roomSize} />
-          )}
-
-          {/* 드래그 가능한 사람 모델 */}
-          <DraggableHuman
-            key="draggable-human-v2"
-            height={170}
-            position={humanPosition}
-            onPositionChange={setHumanPosition}
-            roomSize={roomSize}
-            onDragStateChange={setIsDraggingFurniture}
-          />
-
-          {/* 거리 측정 도구 */}
-          <DistanceMeasurer
-            point1={measurePoints[0]}
-            point2={measurePoints[1]}
-            visible={measurementMode && measurePoints[0] && measurePoints[1]}
-          />
-
-          {/* 방 치수 표시 */}
-          <group position={[0, 0.01, 0]}>
-            <DimensionArrow start={[0, 0, d + 10]} end={[w, 0, d + 10]} />
-            <DimensionLabel
-              position={[w / 2, 0, d + 15]}
-              text={`${width.toFixed(0)}cm`}
-              rotation={[0, 0, 0]}
-            />
-
-            <DimensionArrow start={[w + 10, 0, 0]} end={[w + 10, 0, d]} />
-            <DimensionLabel
-              position={[w + 15, 0, d / 2]}
-              text={`${depth.toFixed(0)}cm`}
+            {/* 왼쪽 벽 (left wall) - 유지 */}
+            <Wall
+              width={d}
+              height={h}
+              position={[0, h / 2, d / 2]}
               rotation={[0, Math.PI / 2, 0]}
             />
 
-            <DimensionArrow start={[w + 10, 0, 0]} end={[w + 10, h, 0]} />
-            <DimensionLabel
-              position={[w + 15, h / 2, 0]}
-              text={`${height.toFixed(0)}cm`}
-              rotation={[0, 0, Math.PI / 2]}
-            />
-          </group>
+            {/* 오른쪽 벽 (right wall) - 삭제 */}
+            {/* <Wall width={d} height={h} position={[w, h / 2, d / 2]} rotation={[0, -Math.PI / 2, 0]} /> */}
 
-          {walkthroughMode ? (
-            <Player roomSize={roomSize} />
-          ) : (
+            {/* 뒤쪽 벽 (back wall) - 침대 뒤쪽에 벽 추가 */}
+            <Wall
+              width={w}
+              height={h}
+              position={[w / 2, h / 2, 0]}
+              rotation={[0, 0, 0]}
+            />
+
+            <SnapGrid roomSize={roomSize} visible={showSnapGrid} />
+            <FloorGrid roomSize={roomSize} visible={showFloorGrid} />
+
+            {placementMode && (
+              <ValidPlacementArea
+                roomSize={roomSize}
+                furniture={furniture}
+                furniturePresets={FURNITURE_PRESETS}
+                selectedFurnitureSize={FURNITURE_PRESETS[placementMode].size}
+              />
+            )}
+
+            {furniture.map((f) => (
+              <DraggableFurnitureWithCollision
+                key={f.id}
+                {...f}
+                onMove={handleMoveFurniture}
+                onSelect={setSelectedFurniture}
+                selected={selectedFurniture === f.id}
+                furniture={furniture}
+                furniturePresets={FURNITURE_PRESETS}
+                roomSize={roomSize}
+                enableSnap={enableSnap}
+                showCollisions={showCollisions}
+                onDragStateChange={setIsDragging}
+                updatePlacedFurniturePosition={updatePlacedFurniturePosition}
+              />
+            ))}
+
+            {showWindows && (
+              <WindowsOnWalls windows={detectedWindows} roomSize={roomSize} />
+            )}
+
+            <DraggableHuman
+              height={170}
+              position={humanPosition}
+              onPositionChange={setHumanPosition}
+              roomSize={roomSize}
+              onDragStateChange={setIsDragging}
+            />
+
+            <DistanceMeasurer
+              point1={measurePoints[0]}
+              point2={measurePoints[1]}
+              visible={measurementMode && !!measurePoints[1]}
+            />
+
+            <group position={[0, 0.1, 0]}>
+              <DimensionArrow start={[0, 0, d + 10]} end={[w, 0, d + 10]} />
+              <DimensionLabel
+                position={[w / 2, 0, d + 15]}
+                text={`${(w / 100).toFixed(1)}m`}
+              />
+              <DimensionArrow start={[w + 10, 0, 0]} end={[w + 10, 0, d]} />
+              <DimensionLabel
+                position={[w + 15, 0, d / 2]}
+                text={`${(d / 100).toFixed(1)}m`}
+                rotation={[0, Math.PI / 2, 0]}
+              />
+              <DimensionArrow start={[w + 10, 0, 0]} end={[w + 10, h, 0]} />
+              <DimensionLabel
+                position={[w + 15, h / 2, 0]}
+                text={`${(h / 100).toFixed(1)}m`}
+              />
+            </group>
+
             <OrbitControls
               ref={controlsRef}
-              enablePan={!isDraggingFurniture}
-              enableZoom={!isDraggingFurniture}
-              enableRotate={!isDraggingFurniture}
-              minDistance={300}
-              maxDistance={2000}
+              enablePan={!isDragging}
+              enableZoom={!isDragging}
+              enableRotate={!isDragging}
+              minDistance={50}
+              maxDistance={Math.max(w, h, d) * 2}
               maxPolarAngle={Math.PI / 2.1}
-              target={[w / 2, 0, d / 2]}
+              target={[w / 2, h / 3, d / 2]}
+              enableDamping
+              dampingFactor={0.1}
             />
-          )}
-        </Suspense>
-      </Canvas>
-
-      {/* 선택된 가구 컨트롤 */}
-      {selectedFurnitureData && (
-        <div
-          className={`absolute bottom-4 left-4 z-10 backdrop-blur p-3 rounded-lg shadow-lg ${
-            isFullscreen ? "bg-white/70" : "bg-white/95"
-          }`}
-        >
-          <p className="text-sm font-semibold mb-2">
-            {selectedFurnitureData.original2D
-              ? selectedFurnitureData.name // FurniturePlacement에서 온 가구는 실제 이름 사용
-              : FURNITURE_PRESETS[selectedFurnitureData.type]?.name ||
-                "알 수 없는 가구"}
-          </p>
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleRotateFurniture(selectedFurniture)}
-                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
-              >
-                회전
-              </button>
-              <button
-                onClick={() => handleDeleteFurniture(selectedFurniture)}
-                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
-              >
-                삭제
-              </button>
-            </div>
-
-            {/* 위치 정보 */}
-            <div className="text-xs text-gray-600">
-              <p>
-                위치: ({selectedFurnitureData.position[0].toFixed(1)},{" "}
-                {selectedFurnitureData.position[2].toFixed(1)})
-              </p>
-              <p>
-                크기:{" "}
-                {selectedFurnitureData.original2D
-                  ? selectedFurnitureData.size
-                      .map((s) => s.toFixed(1))
-                      .join(" × ")
-                  : (
-                      FURNITURE_PRESETS[selectedFurnitureData.type]?.size || [
-                        1, 1, 1,
-                      ]
-                    )
-                      .map((s) => s.toFixed(1))
-                      .join(" × ")}
-                m
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 하단 상태 표시 */}
-      {!isFullscreen && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg">
-            <p className="text-sm font-medium">현재 시점: {activeView}</p>
-            <p className="text-xs text-gray-600">가구 {furniture.length}개</p>
-          </div>
-        </div>
-      )}
-
-      {/* 조작 가이드 */}
-      <div
-        className={`absolute bottom-4 right-4 z-10 text-xs text-gray-600 bg-white/80 backdrop-blur px-3 py-2 rounded-lg max-w-xs ${
-          isFullscreen ? "opacity-70" : ""
-        }`}
-      >
-        <div className="space-y-1">
-          <p className="font-semibold">조작 방법</p>
-          {!walkthroughMode && (
-            <>
-              <p>• 드래그: 시점 회전</p>
-              <p>• 휠: 확대/축소</p>
-            </>
-          )}
-          <p>• 가구 드래그: 이동</p>
-          <p>• 시점 버튼: 빠른 시점 변경</p>
-          <p>• G: 스냅 그리드 | F: 바닥 격자</p>
-          <p>• M: 거리 측정 | 드래그: 사람 이동</p>
-          {walkthroughMode && (
-            <p className="text-pink-600 font-semibold">
-              • W,A,S,D: 이동 | 마우스: 시점 변경
-            </p>
-          )}
-          {!walkthroughMode && placementMode && (
-            <p className="text-pink-600 font-semibold">바닥 클릭: 가구 배치</p>
-          )}
-          {measurementMode && (
-            <p className="text-pink-600 font-semibold">
-              바닥 클릭: 거리 측정 (2점)
-            </p>
-          )}
-        </div>
+          </Suspense>
+        </Canvas>
       </div>
+
+      {selectedFurnitureData && (
+        <div className="absolute bottom-4 left-4 z-10 backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
+          <p className="text-sm font-semibold mb-2">
+            {selectedFurnitureData.name}
+          </p>
+          {/* 2D 좌표 정보 표시 */}
+          {selectedFurnitureData.original2D && (
+            <div className="text-xs text-gray-600 mb-2 space-y-1">
+              <div>
+                크기: {selectedFurnitureData.size[0]} ×{" "}
+                {selectedFurnitureData.size[2]} cm
+              </div>
+              <div>
+                위치 (왼쪽아래): (
+                {Math.round(selectedFurnitureData.original2D.x)},{" "}
+                {Math.round(selectedFurnitureData.original2D.z)}) cm
+              </div>
+              <div>
+                위치 (오른쪽위): (
+                {Math.round(
+                  selectedFurnitureData.original2D.x +
+                    selectedFurnitureData.size[0]
+                )}
+                ,{" "}
+                {Math.round(
+                  selectedFurnitureData.original2D.z +
+                    selectedFurnitureData.size[2]
+                )}
+                ) cm
+              </div>
+              {selectedFurnitureData.original2D.rotation && (
+                <div>회전: {selectedFurnitureData.original2D.rotation}°</div>
+              )}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleRotateFurniture(selectedFurniture)}
+              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+            >
+              회전
+            </button>
+            <button
+              onClick={() => handleDeleteFurniture(selectedFurniture)}
+              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+            >
+              삭제
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
