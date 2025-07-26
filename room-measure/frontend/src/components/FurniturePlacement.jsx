@@ -155,14 +155,24 @@ const FurnitureItem = ({ furniture, onDragStart }) => (
 const FurniturePlacement = ({
   roomWidth, // Width(X축) - 가로, cm 단위
   roomDepth, // Depth(Z축) - 세로, cm 단위 (3D와 일치)
+  roomHeight = 240, // 방 높이, cm 단위
   placedFurniture = [],
   onFurnitureChange,
+  detectedWindows = [], // 창문 정보
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedFurnitureIndex, setSelectedFurnitureIndex] = useState(null);
   const [draggedFurniture, setDraggedFurniture] = useState(null);
   const [isDraggingPlaced, setIsDraggingPlaced] = useState(false);
   const canvasRef = useRef(null);
+  
+  // 커스텀 가구 상태
+  const [customFurnitureName, setCustomFurnitureName] = useState("");
+  const [customFurnitureSize, setCustomFurnitureSize] = useState({
+    width: "",
+    depth: "",
+    height: ""
+  });
 
   // placedFurniture 변경 감지 (디버깅용)
   useEffect(() => {
@@ -427,6 +437,58 @@ const FurniturePlacement = ({
     }
   }, [placedFurniture.length, onFurnitureChange]);
 
+  // 커스텀 가구 추가
+  const handleAddCustomFurniture = useCallback(() => {
+    if (!customFurnitureName || !customFurnitureSize.width || !customFurnitureSize.depth || !customFurnitureSize.height) {
+      alert("가구 이름과 크기(폭, 깊이, 높이)를 모두 입력해주세요.");
+      return;
+    }
+
+    const width = parseInt(customFurnitureSize.width);
+    const depth = parseInt(customFurnitureSize.depth);
+    const height = parseInt(customFurnitureSize.height);
+
+    if (width < 10 || width > 500 || depth < 10 || depth > 500) {
+      alert("가구 폭과 깊이는 10cm ~ 500cm 사이여야 합니다.");
+      return;
+    }
+
+    if (height < 10 || height > 300) {
+      alert("가구 높이는 10cm ~ 300cm 사이여야 합니다.");
+      return;
+    }
+
+    // 방 중앙에 배치
+    const x = Math.max(0, (validRoomWidth - width) / 2);
+    const z = Math.max(0, (validRoomDepth - depth) / 2);
+
+    // 충돌 체크
+    if (!checkCollision(x, z, width, depth, -1, 0)) {
+      const newFurniture = {
+        id: `custom_${Date.now()}`,
+        name: customFurnitureName,
+        width: width,
+        depth: depth,
+        height: height,
+        x: x,
+        z: z,
+        rotation: 0,
+        category: "custom",
+        color: "#DDA0DD",
+        icon: "📦",
+        isCustom: true
+      };
+
+      onFurnitureChange([...placedFurniture, newFurniture]);
+      
+      // 입력 필드 초기화
+      setCustomFurnitureName("");
+      setCustomFurnitureSize({ width: "", depth: "", height: "" });
+    } else {
+      alert("해당 위치에 가구를 배치할 수 없습니다. (충돌 발생)");
+    }
+  }, [customFurnitureName, customFurnitureSize, validRoomWidth, validRoomDepth, checkCollision, placedFurniture, onFurnitureChange]);
+
   // 공간 활용률 계산
   const calculateSpaceUtilization = useMemo(() => {
     const totalFurnitureArea = placedFurniture.reduce((sum, furniture) => {
@@ -443,8 +505,8 @@ const FurniturePlacement = ({
 
   // JSON 저장 기능
   const handleSaveAsJson = useCallback(() => {
-    if (placedFurniture.length === 0) {
-      alert("저장할 가구가 없습니다!");
+    if (placedFurniture.length === 0 && detectedWindows.length === 0) {
+      alert("저장할 가구나 창문이 없습니다!");
       return;
     }
 
@@ -452,7 +514,8 @@ const FurniturePlacement = ({
     const saveData = {
       roomInfo: {
         width: validRoomWidth,
-        height: validRoomDepth,
+        depth: validRoomDepth,
+        height: roomHeight,
         area: ((validRoomWidth * validRoomDepth) / 10000).toFixed(1) + "㎡",
         aspectRatio: (validRoomWidth / validRoomDepth).toFixed(2),
       },
@@ -490,8 +553,72 @@ const FurniturePlacement = ({
           icon: furniture.icon,
         };
       }),
+      windows: detectedWindows.map((window, index) => {
+        const widthCm = Math.round((window.width_meters || 1.2) * 100);
+        const heightCm = Math.round((window.height_meters || 1.5) * 100);
+        
+        // 3D 좌표 계산
+        const userYPosition = window.y_position !== undefined ? window.y_position : 0.8;
+        const calculatedYPos = userYPosition * roomHeight;
+        let x_3d, y_3d, z_3d;
+        
+        switch (window.wall_position) {
+          case "front":
+            x_3d = (window.x_position || 0.5) * validRoomWidth;
+            y_3d = calculatedYPos;
+            z_3d = validRoomDepth;
+            break;
+          case "back":
+            x_3d = (window.x_position || 0.5) * validRoomWidth;
+            y_3d = calculatedYPos;
+            z_3d = 0;
+            break;
+          case "left":
+            x_3d = 0;
+            y_3d = calculatedYPos;
+            z_3d = (window.x_position || 0.5) * validRoomDepth;
+            break;
+          case "right":
+            x_3d = validRoomWidth;
+            y_3d = calculatedYPos;
+            z_3d = (window.x_position || 0.5) * validRoomDepth;
+            break;
+          default:
+            x_3d = validRoomWidth / 2;
+            y_3d = calculatedYPos;
+            z_3d = 0;
+        }
+        
+        return {
+          id: `window_${index + 1}`,
+          wall_position: window.wall_position || "back",
+          size: {
+            width_cm: widthCm,
+            height_cm: heightCm,
+            width_meters: (window.width_meters || 1.2).toFixed(2),
+            height_meters: (window.height_meters || 1.5).toFixed(2),
+          },
+          position: {
+            relative: {
+              x_position: (window.x_position || 0.5).toFixed(3),
+              y_position: (window.y_position || 0.8).toFixed(3),
+            },
+            absolute_3d: {
+              x: Math.round(x_3d),
+              y: Math.round(y_3d),
+              z: Math.round(z_3d),
+            },
+            wall_coordinates: {
+              horizontal_percent: Math.round((window.x_position || 0.5) * 100),
+              vertical_percent: Math.round((window.y_position || 0.8) * 100),
+            }
+          },
+          confidence: window.confidence || 1.0,
+        };
+      }),
       statistics: {
         furnitureCount: placedFurniture.length,
+        windowCount: detectedWindows.length,
         spaceUtilization: calculateSpaceUtilization + "%",
         totalFurnitureArea:
           placedFurniture.reduce((sum, furniture) => {
@@ -502,6 +629,12 @@ const FurniturePlacement = ({
               rotation % 180 === 0 ? furniture.depth : furniture.width;
             return sum + actualWidth * actualDepth;
           }, 0) + " cm²",
+        totalWindowArea:
+          detectedWindows.reduce((sum, window) => {
+            const widthCm = (window.width_meters || 1.2) * 100;
+            const heightCm = (window.height_meters || 1.5) * 100;
+            return sum + widthCm * heightCm;
+          }, 0).toFixed(0) + " cm²",
       },
       metadata: {
         exportDate: new Date().toISOString(),
@@ -516,7 +649,7 @@ const FurniturePlacement = ({
     const url = URL.createObjectURL(blob);
 
     const currentDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    const filename = `furniture_layout_${validRoomWidth}x${validRoomDepth}_${currentDate}.json`;
+    const filename = `room_layout_${validRoomWidth}x${validRoomDepth}x${roomHeight}_${currentDate}.json`;
 
     const link = document.createElement("a");
     link.href = url;
@@ -621,6 +754,58 @@ const FurniturePlacement = ({
                 onDragStart={handleDragStart}
               />
             ))}
+          </div>
+
+          {/* 커스텀 가구 추가 */}
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-sm font-semibold mb-3 text-blue-800">커스텀 가구 추가</h4>
+            <div className="space-y-2">
+              <input
+                type="text"
+                placeholder="가구 이름"
+                value={customFurnitureName}
+                onChange={(e) => setCustomFurnitureName(e.target.value)}
+                className="w-full px-2 py-1 text-sm border rounded"
+              />
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="폭(cm)"
+                    value={customFurnitureSize.width}
+                    onChange={(e) => setCustomFurnitureSize(prev => ({...prev, width: parseInt(e.target.value) || 0}))}
+                    className="flex-1 px-2 py-1 text-sm border rounded"
+                    min="10"
+                    max="500"
+                  />
+                  <input
+                    type="number"
+                    placeholder="깊이(cm)"
+                    value={customFurnitureSize.depth}
+                    onChange={(e) => setCustomFurnitureSize(prev => ({...prev, depth: parseInt(e.target.value) || 0}))}
+                    className="flex-1 px-2 py-1 text-sm border rounded"
+                    min="10"
+                    max="500"
+                  />
+                </div>
+                <input
+                  type="number"
+                  placeholder="높이(cm)"
+                  value={customFurnitureSize.height}
+                  onChange={(e) => setCustomFurnitureSize(prev => ({...prev, height: parseInt(e.target.value) || 0}))}
+                  className="w-full px-2 py-1 text-sm border rounded"
+                  min="10"
+                  max="300"
+                />
+              </div>
+              <button
+                onClick={handleAddCustomFurniture}
+                disabled={!customFurnitureName || !customFurnitureSize.width || !customFurnitureSize.depth || !customFurnitureSize.height}
+                className="w-full px-3 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                커스텀 가구 추가
+              </button>
+            </div>
           </div>
 
           <div className="mt-4 p-3 bg-pink-50 border border-pink-200 rounded-lg">
@@ -972,7 +1157,10 @@ const FurniturePlacement = ({
                       180 ===
                     0
                       ? placedFurniture[selectedFurnitureIndex].depth
-                      : placedFurniture[selectedFurnitureIndex].width}{" "}
+                      : placedFurniture[selectedFurnitureIndex].width}
+                    {placedFurniture[selectedFurnitureIndex].height && (
+                      <> × {placedFurniture[selectedFurnitureIndex].height}</>
+                    )}{" "}
                     cm
                   </div>
                   <div>

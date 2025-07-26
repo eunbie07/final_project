@@ -19,6 +19,7 @@ import torchvision.transforms as transforms
 from torchvision.models import mobilenet_v3_large
 from ultralytics import YOLO
 import json
+from mongodb_service import mongodb_service, RoomLayoutData
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -100,6 +101,7 @@ class FurnitureCoordinateConversionResponse(BaseModel):
     position_2d: FurniturePosition2D
     success: bool
     message: str
+
     
 # YOLO 모델 로드 (글로벌 변수로 한 번만 로드)
 try:
@@ -110,13 +112,13 @@ except Exception as e:
     yolo_model = None
 
 # YOLO 기반 창문 감지 함수
-def detect_windows_with_yolo(image_array):
+def detect_windows_with_yolo(image_array, room_dimensions=None):
     """
     YOLO를 사용한 창문 감지
     """
     if yolo_model is None:
         logger.warning("YOLO 모델이 없어서 실제 이미지 분석 방법 사용")
-        return detect_windows_with_image_analysis(image_array)
+        return detect_windows_with_image_analysis(image_array, room_dimensions)
     
     logger.info("🎯 YOLO 기반 창문 감지 시작")
     windows = []
@@ -207,7 +209,7 @@ def detect_windows_with_yolo(image_array):
     
     return windows
 
-def detect_windows_with_image_analysis(image_array):
+def detect_windows_with_image_analysis(image_array, room_dimensions=None):
     """
     실제 이미지 분석을 통한 창문 감지 (밝은 영역, 엣지, 색상 분석 종합)
     """
@@ -233,9 +235,9 @@ def detect_windows_with_image_analysis(image_array):
     # 3. 중복 제거 및 최적 후보 선택
     filtered_candidates = filter_and_merge_candidates(all_candidates, width, height)
     
-    # 4. 창문 정보로 변환
+    # 4. 창문 정보로 변환 (실제 방 크기 사용)
     for candidate in filtered_candidates[:3]:  # 최대 3개
-        window_info = candidate_to_window_info(candidate, width, height, room_points=None)
+        window_info = candidate_to_window_info(candidate, width, height, room_points=None, room_dimensions=room_dimensions)
         if window_info:
             windows.append(window_info)
             logger.info(f"✅ 이미지 분석 창문: {window_info.wall_position} 벽, 위치=({window_info.x_position:.2f}, {window_info.y_position:.2f}), 크기=({window_info.width_meters:.2f}×{window_info.height_meters:.2f}m), 신뢰도={window_info.confidence:.2f}")
@@ -514,8 +516,8 @@ def detect_windows_with_room_dimensions(image_array, room_dimensions):
     """
     logger.info(f"📐 실제 방 크기 기준 창문 감지: {room_dimensions}")
     
-    # 기본 창문 감지 수행
-    detected_windows = detect_windows_in_image(image_array)
+    # 기본 창문 감지 수행 (실제 방 크기 정보 전달)
+    detected_windows = detect_windows_in_image(image_array, room_dimensions)
     
     if not detected_windows:
         return []
@@ -593,9 +595,9 @@ def adjust_window_with_room_size(window, room_dimensions):
         height_meters=window_height_meters
     )
 
-def calculate_window_real_size(bbox, img_width, img_height, room_points=None):
+def calculate_window_real_size(bbox, img_width, img_height, room_points=None, room_dimensions=None):
     """
-    창문의 실제 크기를 미터 단위로 계산
+    창문의 실제 크기를 미터 단위로 계산 (실제 측정된 방 크기 사용)
     """
     x, y, w, h = bbox
     
@@ -626,47 +628,66 @@ def calculate_window_real_size(bbox, img_width, img_height, room_points=None):
             
             logger.info(f"📏 계산된 창문 크기: {width_meters:.2f}m × {height_meters:.2f}m (포인트 기반)")
             
-        else:
-            # 방 측정 포인트가 없는 경우: 이미지 비율 기반 추정
-            logger.info("📐 이미지 비율 기반 창문 크기 계산")
+        elif room_dimensions:
+            # 실제 측정된 방 크기 기반 계산 (가장 정확함)
+            logger.info("🏠 실제 측정된 방 크기 기반 창문 크기 계산")
             
             # 이미지에서 창문이 차지하는 비율
             width_ratio = w / img_width
             height_ratio = h / img_height
             
-            # 원본 사진 기준: 창문이 벽의 상당 부분을 차지
-            # 일반적인 방 크기 대비 창문 크기 비율 (원본 사진 기준으로 증가)
+            # 실제 방 크기 사용 (cm → m 변환)
+            actual_room_width = room_dimensions.get('width_cm', 400) / 100  # m 단위
+            actual_room_height = room_dimensions.get('height_cm', 240) / 100  # m 단위
+            
+            logger.info(f"📏 실제 방 크기: {actual_room_width:.2f}m × {actual_room_height:.2f}m")
+            
+            # 실제 방 크기 기준으로 창문 크기 계산 (원본 사진 비율 반영)
+            width_meters = width_ratio * actual_room_width * 2.0  # 원본 사진의 큰 창문 반영
+            height_meters = height_ratio * actual_room_height * 1.5  # 높이도 실제 비율 반영
+            
+            logger.info(f"📐 이미지 비율: 너비={width_ratio:.3f}, 높이={height_ratio:.3f}")
+            
+        else:
+            # 방 정보가 없는 경우: 기본값 사용
+            logger.info("📐 기본값 기반 창문 크기 계산")
+            
+            # 이미지에서 창문이 차지하는 비율
+            width_ratio = w / img_width
+            height_ratio = h / img_height
+            
+            # 기본 방 크기 추정
             estimated_room_width = 4.0   # 일반적인 방 너비
             estimated_room_height = 2.4  # 일반적인 천장 높이
             
-            # 현실적인 창문 크기로 계산 (보정 계수 조정)
-            width_meters = width_ratio * estimated_room_width * 0.6  # 더 현실적인 비율
-            height_meters = height_ratio * estimated_room_height * 0.8  # 더 현실적인 비율
+            # 기본값 기반 창문 크기 계산
+            width_meters = width_ratio * estimated_room_width * 0.6
+            height_meters = height_ratio * estimated_room_height * 0.7
             
-            # 일반적인 창문 크기 범위로 제한
-            width_meters = max(0.8, min(2.0, width_meters))  # 0.8~2.0m
-            height_meters = max(1.0, min(1.8, height_meters))  # 1.0~1.8m
+            # 더 큰 창문 크기 범위로 조정 (원본 사진의 큰 창문 반영)
+            width_meters = max(1.5, min(3.5, width_meters))  # 1.5~3.5m
+            height_meters = max(1.0, min(2.5, height_meters))  # 1.0~2.5m
             
             logger.info(f"📏 계산된 창문 크기: {width_meters:.2f}m × {height_meters:.2f}m (비율 기반)")
             
-            # 큰 창문 감지 시 적절한 크기 조정
-            if width_ratio > 0.15 or height_ratio > 0.2:  # 비교적 큰 창문 감지
-                width_meters = min(width_meters * 1.2, 2.0)  # 20% 증가, 최대 2.0m
-                height_meters = min(height_meters * 1.2, 1.8)  # 20% 증가, 최대 1.8m
-                logger.info(f"🔍 큰 창문 감지 → 크기 20% 증가: {width_meters:.2f}m × {height_meters:.2f}m")
+            # 큰 창문 감지 시 더 큰 크기로 조정 (원본 사진 28% 비율 고려)
+            if width_ratio > 0.08 or height_ratio > 0.10:  # 낮은 임계값으로 대부분 창문 감지
+                width_meters = min(width_meters * 1.8, 3.5)  # 80% 증가, 최대 3.5m
+                height_meters = min(height_meters * 1.6, 2.5)  # 60% 증가, 최대 2.5m
+                logger.info(f"🔍 큰 창문 감지 (28% 비율) → 크기 대폭 증가: {width_meters:.2f}m × {height_meters:.2f}m")
             
     except Exception as e:
         logger.warning(f"창문 크기 계산 실패: {e}, 기본값 사용")
         width_meters = default_width_meters
         height_meters = default_height_meters
     
-    # 최종 크기 검증 및 조정
-    width_meters = max(0.6, min(2.5, width_meters))   # 최소 60cm, 최대 2.5m
-    height_meters = max(0.8, min(2.2, height_meters)) # 최소 80cm, 최대 2.2m
+    # 최종 크기 검증 및 조정 (원본 사진의 큰 창문 허용)
+    width_meters = max(1.5, min(4.0, width_meters))   # 최소 1.5m, 최대 4.0m
+    height_meters = max(1.0, min(3.0, height_meters)) # 최소 1.0m, 최대 3.0m
     
     return width_meters, height_meters
 
-def candidate_to_window_info(candidate, img_width, img_height, room_points=None):
+def candidate_to_window_info(candidate, img_width, img_height, room_points=None, room_dimensions=None):
     """
     감지된 창문 후보를 WindowInfo로 변환 (벽 위치 판단 개선 + 실제 크기 계산)
     """
@@ -675,9 +696,9 @@ def candidate_to_window_info(candidate, img_width, img_height, room_points=None)
     center_x, center_y = candidate['center']
     confidence = candidate['confidence']
     
-    # 실제 창문 크기 계산
+    # 실제 창문 크기 계산 (실제 방 크기 사용)
     width_meters, height_meters = calculate_window_real_size(
-        candidate['bbox'], img_width, img_height, room_points
+        candidate['bbox'], img_width, img_height, room_points, room_dimensions
     )
     
     # 개선된 벽 위치 판단
@@ -855,15 +876,15 @@ def detect_windows_in_image_hsv(image_array):
     return detect_windows_with_image_analysis(image_array)
 
 # 메인 창문 감지 함수 (YOLO 우선, 이미지 분석 백업)
-def detect_windows_in_image(image_array):
+def detect_windows_in_image(image_array, room_dimensions=None):
     """
     창문 감지 메인 함수 - YOLO 우선 사용, 실패시 실제 이미지 분석
     """
     try:
-        return detect_windows_with_yolo(image_array)
+        return detect_windows_with_yolo(image_array, room_dimensions)
     except Exception as e:
         logger.error(f"YOLO 창문 감지 실패: {e}, 실제 이미지 분석으로 대체")
-        return detect_windows_with_image_analysis(image_array)
+        return detect_windows_with_image_analysis(image_array, room_dimensions)
 
 def determine_wall_position(x, y, img_width, img_height):
     """
@@ -2244,7 +2265,7 @@ def detect_windows_in_image_with_points(image_array, measurement_points=None, ro
         return detect_windows_with_room_dimensions(image_array, room_dimensions)
     else:
         logger.info("📐 방 측정 포인트 없음, 기본 이미지 분석 사용")
-        return detect_windows_in_image(image_array)
+        return detect_windows_in_image(image_array, room_dimensions)
 
 def detect_windows_with_measurement_points(image_array, measurement_points):
     """
@@ -2282,7 +2303,7 @@ def detect_windows_with_measurement_points(image_array, measurement_points):
         return detect_windows_with_2points_legacy(image_array, measurement_points)
     else:
         logger.warning("측정 포인트가 부족합니다. 기본 이미지 분석 사용")
-        return detect_windows_with_image_analysis(image_array)
+        return detect_windows_with_image_analysis(image_array, room_dimensions)
 
 def detect_windows_with_4points(image_array, point1, point2, point3, point4):
     """
@@ -2595,10 +2616,34 @@ async def convert_furniture_coordinates(request: FurnitureCoordinateConversionRe
         )
 
 # ---------------------------
+# MongoDB 저장 API
+# ---------------------------
+
+@app.post("/save-room-layout")
+async def save_room_layout(layout_data: RoomLayoutData):
+    """방 레이아웃 데이터를 MongoDB에 저장"""
+    result = await mongodb_service.save_room_layout(layout_data)
+    return JSONResponse(status_code=200, content=result)
+
+@app.get("/room-layouts")
+async def get_room_layouts(limit: int = Query(10, description="조회할 레이아웃 수"), 
+                          skip: int = Query(0, description="건너뛸 레이아웃 수")):
+    """저장된 방 레이아웃 목록 조회"""
+    result = await mongodb_service.get_room_layouts(limit=limit, skip=skip)
+    return JSONResponse(status_code=200, content=result)
+
+@app.get("/room-layout/{layout_id}")
+async def get_room_layout(layout_id: str):
+    """특정 방 레이아웃 조회"""
+    result = await mongodb_service.get_room_layout_by_id(layout_id)
+    return JSONResponse(status_code=200, content=result)
+
+# ---------------------------
 @app.on_event("startup")
 async def startup_event():
     logger.info("개선된 서버 시작됨")
     logger.info("현재 작업 디렉토리: " + os.getcwd())
+    logger.info(f"MongoDB 연결 상태: {'연결됨' if mongodb_service.is_connected() else '연결 실패'}")
     logger.info("등록된 엔드포인트:")
     for route in app.routes:
         if hasattr(route, 'methods') and hasattr(route, 'path'):

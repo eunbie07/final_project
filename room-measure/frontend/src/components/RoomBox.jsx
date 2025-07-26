@@ -1237,9 +1237,16 @@ const DraggableFurnitureWithCollision = React.memo(
   }) {
     const mesh = useRef();
 
-    const preset = customFurnitureData || furniturePresets[type];
-    const size = preset?.size || [100, 100, 100];
-    const color = preset?.color || "#cccccc";
+    // 커스텀 가구인 경우 전달된 size를 직접 사용, 아니면 preset에서 가져오기
+    let size, color;
+    if (customFurnitureData && customFurnitureData.size) {
+      size = customFurnitureData.size;
+      color = customFurnitureData.color || "#cccccc";
+    } else {
+      const preset = furniturePresets[type];
+      size = preset?.size || [100, 100, 100];
+      color = preset?.color || "#cccccc";
+    }
 
     const [hovered, setHovered] = useState(false);
     const [dragging, setDragging] = useState(false);
@@ -1491,7 +1498,7 @@ const Window3D = React.memo(function Window3D({
 
   return (
     <group position={position} rotation={rotation}>
-      {/* 창문 프레임 */}
+      {/* 창문 프레임 - 더 진한 색상으로 */}
       <mesh castShadow receiveShadow>
         <boxGeometry
           args={[
@@ -1500,42 +1507,50 @@ const Window3D = React.memo(function Window3D({
             frameThickness,
           ]}
         />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.2} metalness={0.1} />
+        <meshStandardMaterial color="#8B4513" roughness={0.3} metalness={0.2} />
       </mesh>
 
-      {/* 유리창 */}
+      {/* 유리창 - 더 뚜렷한 청색으로 */}
       <mesh position={[0, 0, frameThickness / 2]} castShadow receiveShadow>
         <boxGeometry args={[width * 0.85, height * 0.85, glassThickness]} />
         <meshStandardMaterial
-          color="#B0E0E6"
+          color="#4169E1"
           transparent={true}
-          opacity={0.3}
+          opacity={0.6}
           roughness={0.05}
-          metalness={0.0}
+          metalness={0.1}
+          emissive="#1E90FF"
+          emissiveIntensity={0.2}
         />
       </mesh>
 
-      {/* 창문 채색 (4분할) */}
+      {/* 창문 채색 (4분할) - 더 뚜렷한 색상 */}
       <group position={[0, 0, frameThickness / 2 + 1]}>
         {/* 세로 채색 */}
         <mesh>
-          <boxGeometry args={[2, height * 0.8, 1]} />
-          <meshStandardMaterial color="#FFFFFF" />
+          <boxGeometry args={[3, height * 0.8, 1]} />
+          <meshStandardMaterial color="#2F4F4F" roughness={0.2} />
         </mesh>
         {/* 가로 채색 */}
         <mesh>
-          <boxGeometry args={[width * 0.8, 2, 1]} />
-          <meshStandardMaterial color="#FFFFFF" />
+          <boxGeometry args={[width * 0.8, 3, 1]} />
+          <meshStandardMaterial color="#2F4F4F" roughness={0.2} />
         </mesh>
       </group>
 
+      {/* 창문 테두리 강조 */}
+      <mesh position={[0, 0, frameThickness / 2 + 2]}>
+        <boxGeometry args={[width + frameThickness + 2, height + frameThickness + 2, 0.5]} />
+        <meshStandardMaterial color="#8B4513" transparent={true} opacity={0.8} />
+      </mesh>
+      
       {/* 그림자 */}
       <ContactShadows
         position={[0, 0, -frameThickness]}
-        opacity={0.3}
-        scale={Math.max(width, height) * 1.1}
-        blur={2}
-        far={10}
+        opacity={0.4}
+        scale={Math.max(width, height) * 1.2}
+        blur={1.5}
+        far={15}
       />
     </group>
   );
@@ -1561,52 +1576,51 @@ const WindowsOnWalls = React.memo(function WindowsOnWalls({
         let rotation = [0, 0, 0];
         const wallThickness = 5; // 벽 두께
 
+        // 위치 계산 개선 - 백분율 기반에서 실제 좌표 기반으로
+        let x_pos, y_pos, z_pos;
+        
+        // 창문 높이 계산 (사용자 y_position 슬라이더 값 반영)
+        const userYPosition = window.y_position !== undefined ? window.y_position : 0.8; // 기본값 80%
+        const calculatedYPos = userYPosition * roomHeight; // 사용자 설정 높이
+        
         switch (window.wall_position) {
           case "front":
             // 앞벽: Z 최대값
-            position = [
-              window.x_position * roomWidth,
-              window.y_position * roomHeight,
-              roomDepth - wallThickness,
-            ];
-            rotation = [0, 0, 0]; // 앞을 향해 있음
+            x_pos = window.x_position ? window.x_position * roomWidth : roomWidth / 2;
+            y_pos = calculatedYPos;
+            z_pos = roomDepth - wallThickness;
+            rotation = [0, 0, 0];
             break;
           case "back":
-            // 뒷벽: Z=0 - 더 정확한 위치 계산
-            position = [
-              window.x_position * roomWidth,
-              Math.max(windowHeight3D / 2 + 30, window.y_position * roomHeight), // 최소 높이 보장
-              wallThickness,
-            ];
-            rotation = [0, Math.PI, 0]; // 180도 회전
+            // 뒷벽: Z=0
+            x_pos = window.x_position ? window.x_position * roomWidth : roomWidth / 2;
+            y_pos = calculatedYPos;
+            z_pos = wallThickness;
+            rotation = [0, Math.PI, 0];
             break;
           case "left":
             // 왼쪽 벽: X=0
-            position = [
-              wallThickness,
-              Math.max(windowHeight3D / 2 + 30, window.y_position * roomHeight), // 최소 높이 보장
-              window.x_position * roomDepth,
-            ];
-            rotation = [0, Math.PI / 2, 0]; // 90도 회전
+            x_pos = wallThickness;
+            y_pos = calculatedYPos;
+            z_pos = window.x_position ? window.x_position * roomDepth : roomDepth / 2;
+            rotation = [0, Math.PI / 2, 0];
             break;
           case "right":
-            // 오른쪽 벽: X 최대값 - 더 정확한 위치 계산
-            position = [
-              roomWidth - wallThickness,
-              Math.max(windowHeight3D / 2 + 30, window.y_position * roomHeight), // 최소 높이 보장
-              window.x_position * roomDepth,
-            ];
-            rotation = [0, -Math.PI / 2, 0]; // -90도 회전
+            // 오른쪽 벽: X 최대값
+            x_pos = roomWidth - wallThickness;
+            y_pos = calculatedYPos;
+            z_pos = window.x_position ? window.x_position * roomDepth : roomDepth / 2;
+            rotation = [0, -Math.PI / 2, 0];
             break;
           default:
-            // 기본값: 뒷벽 중앙 - 더 현실적인 높이
-            position = [
-              roomWidth / 2,
-              Math.max(windowHeight3D / 2 + 30, roomHeight * 0.7),
-              wallThickness,
-            ];
+            // 기본값: 뒷벽 중앙
+            x_pos = roomWidth / 2;
+            y_pos = calculatedYPos;
+            z_pos = wallThickness;
             rotation = [0, Math.PI, 0];
         }
+        
+        position = [x_pos, y_pos, z_pos];
 
         // 범위 제한 (더 현실적인 범위로)
         const margin = 20; // 20cm 여백
@@ -1638,9 +1652,9 @@ const WindowsOnWalls = React.memo(function WindowsOnWalls({
           );
         }
 
-        // 특별 위치 조정 - 뒷벽 창문의 경우 더 높은 위치로
-        if (window.wall_position === "back") {
-          const targetHeight = roomHeight * 0.75; // 높이의 75% 위치
+        // 사용자가 수직 위치를 설정하지 않은 경우에만 기본 높이 적용
+        if (window.y_position === undefined && window.wall_position === "back") {
+          const targetHeight = roomHeight * 0.8; // 높이의 80% 위치 (기본값)
           position[1] = Math.max(position[1], targetHeight);
         }
 
@@ -1687,14 +1701,19 @@ const detectWindowsInImage = async (
     const formData = new FormData();
     formData.append("file", imageFile);
 
+    // 백엔드는 JSON 문자열을 기대하므로 문자열로 변환
     if (roomPoints && roomPoints.length >= 2) {
       formData.append("room_points", JSON.stringify(roomPoints));
     }
 
-    // 실제 방 크기 정보 추가
+    // 실제 방 크기 정보 추가 (JSON 문자열로)
     if (roomDimensions) {
       formData.append("room_dimensions", JSON.stringify(roomDimensions));
     }
+
+    console.log("🚀 백엔드로 전송하는 데이터:");
+    console.log("- roomPoints:", roomPoints);
+    console.log("- roomDimensions:", roomDimensions);
 
     const response = await fetch("http://localhost:3000/detect-windows", {
       method: "POST",
@@ -1708,7 +1727,10 @@ const detectWindowsInImage = async (
       );
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log("📥 백엔드에서 받은 응답:", result);
+    
+    return result;
   } catch (error) {
     console.error("창문 감지 오류:", error);
     throw error;
@@ -1765,12 +1787,26 @@ export default function RoomBox({
     }
 
     const converted = placedFurniture.map((item) => {
-      const baseId = item.id
-        ? item.id.split("_").slice(0, -1).join("_")
-        : "desk";
-      const mappedType = FURNITURE_ID_MAPPING[baseId] || "desk";
-      const presetData = FURNITURE_PRESETS[mappedType];
-      const furnitureSize = presetData.size;
+      let furnitureSize, mappedType, presetData;
+      
+      // 커스텀 가구인 경우
+      if (item.isCustom) {
+        furnitureSize = [item.width, item.height || 60, item.depth]; // 사용자 입력 높이 또는 기본값 60cm
+        mappedType = "custom";
+        presetData = {
+          name: item.name,
+          color: item.color || "#DDA0DD",
+          size: furnitureSize
+        };
+      } else {
+        // 기존 프리셋 가구인 경우
+        const baseId = item.id
+          ? item.id.split("_").slice(0, -1).join("_")
+          : "desk";
+        mappedType = FURNITURE_ID_MAPPING[baseId] || "desk";
+        presetData = FURNITURE_PRESETS[mappedType];
+        furnitureSize = presetData.size;
+      }
 
       // 2D -> 3D 좌표 변환 명확화
       // FurniturePlacement: 실제로는 (x, y) 좌표를 {x: x, z: y} 형태로 저장
@@ -1792,6 +1828,7 @@ export default function RoomBox({
         ],
         rotation: [0, (item.rotation || 0) * (Math.PI / 180), 0],
         original2D: item,
+        isCustom: item.isCustom || false,
       };
     });
     
@@ -2037,26 +2074,79 @@ export default function RoomBox({
     }
     setIsDetectingWindows(true);
     try {
-      // 실제 방 크기 정보 준비 (cm 단위)
+      // 실제 방 크기 정보 준비 (cm 단위) - 더 상세한 정보 포함
       const roomDimensions = {
         width_cm: w,
         height_cm: h,
         depth_cm: d,
+        area_sqm: (w * d) / 10000, // 제곱미터
+        wall_height_cm: h,
+        scale_factor: 1, // 스케일 팩터 (필요시 조정)
+      };
+
+      // 방의 벽 정보도 포함
+      const wallInfo = {
+        front_wall: { width: w, height: h, position: "front" },
+        back_wall: { width: w, height: h, position: "back" },
+        left_wall: { width: d, height: h, position: "left" },
+        right_wall: { width: d, height: h, position: "right" },
       };
 
       console.log("📜 창문 감지에 실제 방 크기 전달:", roomDimensions);
+      console.log("🏠 벽 정보:", wallInfo);
 
       const result = await detectWindowsInImage(
         uploadedImageFile,
-        null,
+        wallInfo,
         roomDimensions
       );
-      setDetectedWindows(result.windows);
-      setShowWindows(true);
-      alert(`${result.total_windows}개의 창문을 감지했습니다.`);
+      
+      if (result.windows && result.windows.length > 0) {
+        // 창문 크기와 위치 검증 및 조정
+        const validatedWindows = result.windows.map((window, index) => {
+          console.log(`🪟 원본 창문 ${index + 1}:`, window);
+          
+          // 기본 크기 설정 (너무 작거나 큰 경우 조정)
+          const minWidth = 60; // 최소 60cm
+          const maxWidth = Math.min(200, w * 0.8); // 최대 200cm 또는 벽 폭의 80%
+          const minHeight = 80; // 최소 80cm 
+          const maxHeight = Math.min(180, h * 0.8); // 최대 180cm 또는 벽 높이의 80%
+          
+          let adjustedWindow = { ...window };
+          
+          // 크기 검증 및 조정
+          if (window.width_meters) {
+            const widthCm = window.width_meters * 100;
+            adjustedWindow.width_meters = Math.max(minWidth, Math.min(maxWidth, widthCm)) / 100;
+          } else {
+            adjustedWindow.width_meters = 1.2; // 기본 120cm
+          }
+          
+          if (window.height_meters) {
+            const heightCm = window.height_meters * 100;
+            adjustedWindow.height_meters = Math.max(minHeight, Math.min(maxHeight, heightCm)) / 100;
+          } else {
+            adjustedWindow.height_meters = 1.5; // 기본 150cm
+          }
+          
+          // 위치 검증 (벽 중앙 근처로 조정)
+          if (!window.wall_position || !["front", "back", "left", "right"].includes(window.wall_position)) {
+            adjustedWindow.wall_position = "back"; // 기본값: 뒤쪽 벽
+          }
+          
+          console.log(`✅ 조정된 창문 ${index + 1}:`, adjustedWindow);
+          return adjustedWindow;
+        });
+        
+        setDetectedWindows(validatedWindows);
+        setShowWindows(true);
+        alert(`${validatedWindows.length}개의 창문을 감지하고 조정했습니다.`);
+      } else {
+        alert("창문을 감지하지 못했습니다.");
+      }
     } catch (error) {
       console.error("창문 감지 오류:", error);
-      alert("창문 감지에 실패했습니다.");
+      alert(`창문 감지에 실패했습니다: ${error.message}`);
     } finally {
       setIsDetectingWindows(false);
     }
@@ -2194,6 +2284,150 @@ export default function RoomBox({
           </div>
         </div>
 
+        {/* Coordinate Export Panel */}
+        <div className="backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
+          <h4 className="font-semibold text-sm mb-2">좌표 내보내기</h4>
+          <div className="space-y-2">
+            <button
+              onClick={async () => {
+                if (furniture.length === 0 && detectedWindows.length === 0) {
+                  alert("저장할 가구나 창문이 없습니다!");
+                  return;
+                }
+                
+                // 3D 표준 형식으로 데이터 생성 (mm 단위)
+                const wMm = Math.round(w * 10); // cm → mm
+                const dMm = Math.round(d * 10);
+                const hMm = Math.round(h * 10);
+                
+                const saveData = {
+                  scene: {
+                    description: `오른쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 ${(w/100).toFixed(1)}m × ${(d/100).toFixed(1)}m 방 공간.`,
+                    walls: {
+                      wall_1: { direction: "bottom", start: [0, 0], end: [wMm, 0] },
+                      wall_2: { direction: "right", start: [wMm, 0], end: [wMm, dMm] },
+                      wall_3: { direction: "top", start: [wMm, dMm], end: [0, dMm] },
+                      wall_4: { direction: "left", start: [0, dMm], end: [0, 0] }
+                    },
+                    room: {
+                      width: wMm,
+                      depth: dMm,
+                      height: hMm
+                    },
+                    objects: [
+                      // 창문들을 먼저 추가
+                      ...detectedWindows.map((window, index) => {
+                        const widthMm = Math.round((window.width_meters || 1.2) * 1000);
+                        const heightMm = Math.round((window.height_meters || 1.5) * 1000);
+                        const userYPosition = window.y_position !== undefined ? window.y_position : 0.8;
+                        
+                        let wallNum, xMm, yMm, zMm;
+                        
+                        switch (window.wall_position) {
+                          case "front": // wall_3 (top)
+                            wallNum = 3;
+                            xMm = Math.round((window.x_position || 0.5) * wMm);
+                            yMm = dMm;
+                            zMm = Math.round(userYPosition * hMm);
+                            break;
+                          case "back": // wall_1 (bottom)
+                            wallNum = 1;
+                            xMm = Math.round((window.x_position || 0.5) * wMm);
+                            yMm = 0;
+                            zMm = Math.round(userYPosition * hMm);
+                            break;
+                          case "left": // wall_4 (left)
+                            wallNum = 4;
+                            xMm = 0;
+                            yMm = Math.round((window.x_position || 0.5) * dMm);
+                            zMm = Math.round(userYPosition * hMm);
+                            break;
+                          case "right": // wall_2 (right)
+                            wallNum = 2;
+                            xMm = wMm;
+                            yMm = Math.round((window.x_position || 0.5) * dMm);
+                            zMm = Math.round(userYPosition * hMm);
+                            break;
+                          default:
+                            wallNum = 1;
+                            xMm = Math.round((window.x_position || 0.5) * wMm);
+                            yMm = 0;
+                            zMm = Math.round(userYPosition * hMm);
+                        }
+                        
+                        return {
+                          type: "window",
+                          name: `main_window_${index + 1}`,
+                          wall: wallNum,
+                          dimensions: { width: widthMm, depth: 50, height: heightMm },
+                          position: { x: xMm, y: yMm, z: zMm },
+                          rotation_z: 0,
+                          details: `wall_${wallNum} 벽에 위치`
+                        };
+                      }),
+                      // 가구들 추가
+                      ...furniture.map((item) => {
+                        const presetData = FURNITURE_PRESETS[item.type];
+                        const furnitureSize = presetData ? presetData.size : [100, 60, 100];
+                        
+                        // 좌표계 변환: 왼쪽 아래 → 오른쪽 아래 기준
+                        const centerXMm = Math.round((wMm - item.position[0] * 10)); // X축 반전
+                        const centerYMm = Math.round(item.position[2] * 10); // Z → Y
+                        
+                        // 회전 처리
+                        const rotation = Array.isArray(item.rotation) ? item.rotation[1] || 0 : item.rotation || 0;
+                        const rotationZ = -rotation; // 좌표계 반전으로 회전도 반전
+                        
+                        return {
+                          type: "furniture",
+                          name: presetData ? presetData.name.toLowerCase().replace(/\s+/g, '_') : "furniture",
+                          material: presetData ? presetData.color : "gray",
+                          shape: "rectangle",
+                          position: { x: centerXMm, y: centerYMm, z: 0 },
+                          width: Math.round(furnitureSize[0] * 10), // cm → mm
+                          depth: Math.round(furnitureSize[2] * 10),
+                          height: Math.round(furnitureSize[1] * 10),
+                          rotation_z: Math.round(rotationZ)
+                        };
+                      })
+                    ]
+                  }
+                };
+                
+                try {
+                  // MongoDB에 저장
+                  const response = await fetch('http://localhost:3000/save-room-layout', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(saveData)
+                  });
+                  
+                  const result = await response.json();
+                  
+                  if (result.success) {
+                    console.log("MongoDB 저장 완료:", saveData);
+                    alert(`MongoDB 저장 완료!\n가구: ${furniture.length}개\n창문: ${detectedWindows.length}개\nID: ${result.id}`);
+                  } else {
+                    throw new Error(result.message);
+                  }
+                } catch (error) {
+                  console.error('MongoDB 저장 실패:', error);
+                  alert(`MongoDB 저장 실패: ${error.message}`);
+                }
+              }}
+              disabled={furniture.length === 0 && detectedWindows.length === 0}
+              className="w-full px-3 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            >
+              💾 MongoDB에 저장
+            </button>
+            <div className="text-xs text-gray-600 text-center">
+              가구 {furniture.length}개 + 창문 {detectedWindows.length}개
+            </div>
+          </div>
+        </div>
+
         {/* Window Detection Panel */}
         {uploadedImageFile && (
           <div className="backdrop-blur p-3 rounded-lg shadow-lg bg-white/80">
@@ -2207,10 +2441,165 @@ export default function RoomBox({
                 {isDetectingWindows ? "감지 중..." : "AI 창문 감지"}
               </button>
               {detectedWindows.length > 0 && (
-                <p className="text-xs text-gray-600">
-                  {detectedWindows.length}개 창문 감지됨
-                </p>
+                <div className="text-xs text-gray-600 space-y-2">
+                  <p>{detectedWindows.length}개 창문 감지됨</p>
+                  {detectedWindows.map((window, index) => (
+                    <div key={index} className="bg-gray-50 p-2 rounded space-y-2">
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs">
+                          창문 {index + 1}: {Math.round((window.width_meters || window.width || 1.2) * 100)}×{Math.round((window.height_meters || window.height || 1.5) * 100)}cm ({window.wall_position}벽)
+                        </div>
+                        <button
+                          onClick={() => {
+                            const newWindows = detectedWindows.filter((_, i) => i !== index);
+                            setDetectedWindows(newWindows);
+                          }}
+                          className="px-1 py-0.5 bg-red-400 text-white rounded text-xs hover:bg-red-500"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {/* 벽 위치 선택 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">벽:</span>
+                          <select
+                            value={window.wall_position || "back"}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                wall_position: e.target.value
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 text-xs border rounded px-1"
+                          >
+                            <option value="front">앞벽</option>
+                            <option value="back">뒷벽</option>
+                            <option value="left">왼쪽벽</option>
+                            <option value="right">오른쪽벽</option>
+                          </select>
+                        </div>
+                        
+                        {/* 수평 위치 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">수평:</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={Math.round((window.x_position || 0.5) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                x_position: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.x_position || 0.5) * 100)}%</span>
+                        </div>
+                        
+                        {/* 수직 위치 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">수직:</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={Math.round((window.y_position || 0.8) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                y_position: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.y_position || 0.8) * 100)}%</span>
+                        </div>
+                        
+                        {/* 창문 크기 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">너비:</span>
+                          <input
+                            type="range"
+                            min="60"
+                            max="400"
+                            value={Math.round((window.width_meters || 1.2) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                width_meters: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.width_meters || 1.2) * 100)}cm</span>
+                        </div>
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">높이:</span>
+                          <input
+                            type="range"
+                            min="60"
+                            max="300"
+                            value={Math.round((window.height_meters || 1.5) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                height_meters: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.height_meters || 1.5) * 100)}cm</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
+              <div className="space-y-1">
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setShowWindows(!showWindows)}
+                    className="flex-1 px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600"
+                  >
+                    {showWindows ? "창문 숨기기" : "창문 보이기"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newWindow = {
+                        wall_position: "back",
+                        x_position: 0.5,
+                        y_position: 0.8,
+                        width_meters: 1.2,
+                        height_meters: 1.5,
+                        confidence: 1.0
+                      };
+                      setDetectedWindows([...detectedWindows, newWindow]);
+                    }}
+                    className="flex-1 px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
+                  >
+                    창문 추가
+                  </button>
+                </div>
+                <button
+                  onClick={() => setDetectedWindows([])}
+                  className="w-full px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                >
+                  모든 창문 삭제
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -2397,6 +2786,7 @@ export default function RoomBox({
                 enableSnap={enableSnap}
                 showCollisions={showCollisions}
                 onDragStateChange={setIsDragging}
+                customFurnitureData={f.isCustom ? f : null}
                 updatePlacedFurniturePosition={
                   updatePlacedFurniturePositionOnDragEnd
                 }
@@ -2461,36 +2851,33 @@ export default function RoomBox({
           <p className="text-sm font-semibold mb-2">
             {selectedFurnitureData.name}
           </p>
-          {/* 2D 좌표 정보 표시 */}
-          {selectedFurnitureData.original2D && (
-            <div className="text-xs text-gray-600 mb-2 space-y-1">
-              <div>
-                크기: {selectedFurnitureData.size[0]} ×{" "}
-                {selectedFurnitureData.size[2]} cm
-              </div>
-              <div>
-                위치 (왼쪽아래): (
-                {Math.round(selectedFurnitureData.original2D.x)},{" "}
-                {Math.round(selectedFurnitureData.original2D.z)}) cm
-              </div>
-              <div>
-                위치 (오른쪽위): (
-                {Math.round(
-                  selectedFurnitureData.original2D.x +
-                    selectedFurnitureData.size[0]
+          {/* 3D 좌표 정보 표시 */}
+          {(() => {
+            const [x3d, y3d, z3d] = selectedFurnitureData.position;
+            // 실제 가구 크기 사용 (커스텀 가구 포함)
+            const size = selectedFurnitureData.size || [100, 100, 100];
+            const [width, height, depth] = size;
+            
+            // 왼쪽아래 좌표 (3D 중심 좌표 → 2D 왼쪽아래 좌표)
+            const leftBottomX = Math.round(x3d - width / 2);
+            const leftBottomZ = Math.round(z3d - depth / 2);
+            
+            // 오른쪽위 좌표
+            const rightTopX = Math.round(x3d + width / 2);
+            const rightTopZ = Math.round(z3d + depth / 2);
+            
+            return (
+              <div className="text-xs text-gray-600 mb-2 space-y-1">
+                <div>크기: {width} × {depth} × {height} cm</div>
+                <div>위치 (왼쪽아래): ({leftBottomX}, {leftBottomZ}) cm</div>
+                <div>위치 (오른쪽위): ({rightTopX}, {rightTopZ}) cm</div>
+                <div>중심 좌표: ({Math.round(x3d)}, {Math.round(z3d)}) cm</div>
+                {selectedFurnitureData.rotation && selectedFurnitureData.rotation[1] !== 0 && (
+                  <div>회전: {Math.round((selectedFurnitureData.rotation[1] * 180) / Math.PI)}°</div>
                 )}
-                ,{" "}
-                {Math.round(
-                  selectedFurnitureData.original2D.z +
-                    selectedFurnitureData.size[2]
-                )}
-                ) cm
               </div>
-              {selectedFurnitureData.original2D.rotation && (
-                <div>회전: {selectedFurnitureData.original2D.rotation}°</div>
-              )}
-            </div>
-          )}
+            );
+          })()}
           <div className="flex gap-2">
             <button
               onClick={() => handleRotateFurniture(selectedFurniture)}
