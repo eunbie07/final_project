@@ -166,6 +166,18 @@ const FurniturePlacement = ({
   const [isDraggingPlaced, setIsDraggingPlaced] = useState(false);
   const canvasRef = useRef(null);
   
+  // 드래그 미리보기 상태
+  const [dragPreview, setDragPreview] = useState(null);
+  const [previewCollision, setPreviewCollision] = useState(false);
+  
+  // 실행취소/다시실행 상태
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isUndoRedoing, setIsUndoRedoing] = useState(false); // 실행취소/다시실행 중인지 확인
+  
+  // 복사/붙여넣기 상태
+  const [copiedFurniture, setCopiedFurniture] = useState(null);
+  
   // 커스텀 가구 상태
   const [customFurnitureName, setCustomFurnitureName] = useState("");
   const [customFurnitureSize, setCustomFurnitureSize] = useState({
@@ -174,14 +186,274 @@ const FurniturePlacement = ({
     height: ""
   });
 
-  // placedFurniture 변경 감지 (디버깅용)
-  useEffect(() => {
-    console.log('📐 FurniturePlacement - placedFurniture 업데이트됨:', placedFurniture);
-  }, [placedFurniture]);
-
-  // 유효성 검사 - Width(X), Depth(Y) 단위: cm
+  // 유효성 검사 - Width(X), Depth(Y) 단위: cm (먼저 선언)
   const validRoomWidth = isNaN(roomWidth) || roomWidth <= 0 ? 400 : roomWidth;
   const validRoomDepth = isNaN(roomDepth) || roomDepth <= 0 ? 300 : roomDepth;
+
+  // 충돌 체크 함수 (먼저 선언)
+  const checkCollision = useCallback(
+    (x, z, width, depth, excludeIndex = -1, rotation = 0) => {
+      const actualWidth = rotation % 180 === 0 ? width : depth;
+      const actualDepth = rotation % 180 === 0 ? depth : width;
+
+      for (let i = 0; i < placedFurniture.length; i++) {
+        if (i === excludeIndex) continue;
+
+        const item = placedFurniture[i];
+        const itemRotation = item.rotation || 0;
+        const itemActualWidth =
+          itemRotation % 180 === 0 ? item.width : item.depth;
+        const itemActualDepth =
+          itemRotation % 180 === 0 ? item.depth : item.width;
+
+        if (
+          x < item.x + itemActualWidth &&
+          x + actualWidth > item.x &&
+          z < item.z + itemActualDepth &&
+          z + actualDepth > item.z
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+    [placedFurniture]
+  );
+
+  // placedFurniture 변경 감지 및 히스토리 추가
+  useEffect(() => {
+    console.log('📐 FurniturePlacement - placedFurniture 업데이트됨:', placedFurniture);
+    // 실행취소/다시실행 중이 아닐 때만 히스토리에 추가
+    if (!isUndoRedoing) {
+      addToHistory(placedFurniture);
+    }
+  }, [placedFurniture, isUndoRedoing]);
+
+  // 히스토리 관리 함수들
+  const addToHistory = useCallback((newState) => {
+    setHistoryIndex(currentIndex => {
+      setHistory(prev => {
+        const newHistory = prev.slice(0, currentIndex + 1);
+        newHistory.push(JSON.parse(JSON.stringify(newState))); // 깊은 복사
+        console.log('📚 히스토리 추가:', { currentIndex, newLength: newHistory.length });
+        
+        if (newHistory.length > 50) { // 최대 50개까지 저장
+          newHistory.shift();
+          return newHistory;
+        }
+        return newHistory;
+      });
+      
+      return Math.min(currentIndex + 1, 49);
+    });
+  }, []);
+
+  const undo = useCallback(() => {
+    console.log('🔄 Undo 시도:', { historyIndex, historyLength: history.length });
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      const prevState = history[newIndex];
+      console.log('🔄 Undo 실행:', { newIndex, prevState });
+      
+      setIsUndoRedoing(true);
+      setHistoryIndex(newIndex);
+      onFurnitureChange(prevState);
+      
+      // 다음 렌더링 사이클에서 플래그 해제
+      setTimeout(() => setIsUndoRedoing(false), 0);
+    }
+  }, [history, historyIndex, onFurnitureChange]);
+
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setIsUndoRedoing(true);
+      setHistoryIndex(newIndex);
+      const nextState = history[newIndex];
+      onFurnitureChange(nextState);
+      
+      // 다음 렌더링 사이클에서 플래그 해제
+      setTimeout(() => setIsUndoRedoing(false), 0);
+    }
+  }, [history, historyIndex, onFurnitureChange]);
+
+  // 복사/붙여넣기 함수들
+  const copySeletedFurniture = useCallback(() => {
+    if (selectedFurnitureIndex !== null && placedFurniture[selectedFurnitureIndex]) {
+      const furniture = placedFurniture[selectedFurnitureIndex];
+      setCopiedFurniture(JSON.parse(JSON.stringify(furniture))); // 깊은 복사
+    }
+  }, [selectedFurnitureIndex, placedFurniture]);
+
+  const pasteFurniture = useCallback(() => {
+    if (!copiedFurniture) return;
+
+    // 빈 공간을 찾는 로직
+    const furnitureWidth = copiedFurniture.width;
+    const furnitureDepth = copiedFurniture.depth;
+    const stepSize = 25; // 25cm씩 이동하며 탐색
+    
+    // 여러 오프셋을 시도해보기
+    const offsets = [
+      { x: 20, z: 20 },   // 기본 오프셋
+      { x: 40, z: 20 },   // 더 오른쪽
+      { x: 20, z: 40 },   // 더 아래쪽
+      { x: 60, z: 20 },   // 훨씬 오른쪽
+      { x: 20, z: 60 },   // 훨씬 아래쪽
+      { x: 40, z: 40 },   // 대각선
+      { x: 80, z: 20 },   // 멀리 오른쪽
+      { x: 20, z: 80 },   // 멀리 아래쪽
+    ];
+    
+    // 각 오프셋을 시도
+    for (const offset of offsets) {
+      let newX = copiedFurniture.x + offset.x;
+      let newZ = copiedFurniture.z + offset.z;
+      
+      // 방 경계 확인
+      if (newX + furnitureWidth <= validRoomWidth && 
+          newZ + furnitureDepth <= validRoomDepth) {
+        
+        // 충돌 확인
+        if (!checkCollision(newX, newZ, furnitureWidth, furnitureDepth, -1, copiedFurniture.rotation || 0)) {
+          const newFurniture = {
+            ...copiedFurniture,
+            id: `${copiedFurniture.id.split('_')[0]}_${Date.now()}`,
+            x: newX,
+            z: newZ,
+          };
+          
+          onFurnitureChange([...placedFurniture, newFurniture]);
+          setSelectedFurnitureIndex(placedFurniture.length);
+          return; // 성공하면 즉시 종료
+        }
+      }
+    }
+    
+    // 기본 오프셋으로도 안되면 격자 탐색
+    for (let x = 0; x <= validRoomWidth - furnitureWidth; x += stepSize) {
+      for (let z = 0; z <= validRoomDepth - furnitureDepth; z += stepSize) {
+        if (!checkCollision(x, z, furnitureWidth, furnitureDepth, -1, copiedFurniture.rotation || 0)) {
+          const newFurniture = {
+            ...copiedFurniture,
+            id: `${copiedFurniture.id.split('_')[0]}_${Date.now()}`,
+            x: x,
+            z: z,
+          };
+          
+          onFurnitureChange([...placedFurniture, newFurniture]);
+          setSelectedFurnitureIndex(placedFurniture.length);
+          return; // 성공하면 즉시 종료
+        }
+      }
+    }
+    
+    // 모든 시도가 실패하면 알림
+    alert("방에 붙여넣을 빈 공간이 없습니다!");
+  }, [copiedFurniture, validRoomWidth, validRoomDepth, checkCollision, placedFurniture, onFurnitureChange, setSelectedFurnitureIndex]);
+
+  // 가구 삭제 함수
+  const handleDeleteFurniture = useCallback(
+    (index) => {
+      const newPlaced = [...placedFurniture];
+      newPlaced.splice(index, 1);
+      onFurnitureChange(newPlaced);
+      setSelectedFurnitureIndex(null);
+    },
+    [placedFurniture, onFurnitureChange, setSelectedFurnitureIndex]
+  );
+
+  // 키보드 단축키
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'z' && !e.shiftKey) {
+          e.preventDefault();
+          undo();
+        } else if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) {
+          e.preventDefault();
+          redo();
+        } else if (e.key === 'c' && selectedFurnitureIndex !== null) {
+          e.preventDefault();
+          copySeletedFurniture();
+        } else if (e.key === 'v' && copiedFurniture) {
+          e.preventDefault();
+          pasteFurniture();
+        }
+      }
+      if (e.key === 'Delete' && selectedFurnitureIndex !== null) {
+        e.preventDefault();
+        handleDeleteFurniture(selectedFurnitureIndex);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [undo, redo, selectedFurnitureIndex, copiedFurniture, copySeletedFurniture, pasteFurniture, handleDeleteFurniture]);
+
+  // 템플릿 저장/불러오기 함수들
+  const saveTemplate = useCallback((templateName) => {
+    if (!templateName || placedFurniture.length === 0) {
+      alert("템플릿 이름을 입력하고 배치된 가구가 있어야 합니다.");
+      return;
+    }
+
+    const templateData = {
+      name: templateName,
+      furniture: JSON.parse(JSON.stringify(placedFurniture)),
+      roomSize: { width: validRoomWidth, depth: validRoomDepth },
+      createdAt: new Date().toISOString(),
+    };
+
+    const savedTemplates = JSON.parse(localStorage.getItem('furnitureTemplates') || '[]');
+    const existingIndex = savedTemplates.findIndex(t => t.name === templateName);
+    
+    if (existingIndex >= 0) {
+      if (confirm(`"${templateName}" 템플릿이 이미 존재합니다. 덮어쓰시겠습니까?`)) {
+        savedTemplates[existingIndex] = templateData;
+      } else {
+        return;
+      }
+    } else {
+      savedTemplates.push(templateData);
+    }
+
+    localStorage.setItem('furnitureTemplates', JSON.stringify(savedTemplates));
+    alert(`"${templateName}" 템플릿이 저장되었습니다.`);
+  }, [placedFurniture, validRoomWidth, validRoomDepth]);
+
+  const loadTemplate = useCallback((templateName) => {
+    const savedTemplates = JSON.parse(localStorage.getItem('furnitureTemplates') || '[]');
+    const template = savedTemplates.find(t => t.name === templateName);
+    
+    if (!template) {
+      alert("템플릿을 찾을 수 없습니다.");
+      return;
+    }
+
+    if (placedFurniture.length > 0) {
+      if (!confirm("현재 배치된 가구들이 모두 삭제됩니다. 계속하시겠습니까?")) {
+        return;
+      }
+    }
+
+    onFurnitureChange(template.furniture);
+    setSelectedFurnitureIndex(null);
+    alert(`"${templateName}" 템플릿이 불러와졌습니다.`);
+  }, [placedFurniture.length, onFurnitureChange]);
+
+  const getSavedTemplates = useCallback(() => {
+    return JSON.parse(localStorage.getItem('furnitureTemplates') || '[]');
+  }, []);
+
+  const deleteTemplate = useCallback((templateName) => {
+    const savedTemplates = JSON.parse(localStorage.getItem('furnitureTemplates') || '[]');
+    const filteredTemplates = savedTemplates.filter(t => t.name !== templateName);
+    
+    localStorage.setItem('furnitureTemplates', JSON.stringify(filteredTemplates));
+    alert(`"${templateName}" 템플릿이 삭제되었습니다.`);
+  }, []);
 
   // SVG 크기 계산
   const svgDimensions = useMemo(() => {
@@ -227,36 +499,6 @@ const FurniturePlacement = ({
     [validRoomWidth, validRoomDepth, svgDimensions]
   );
 
-  // 충돌 체크 함수
-  const checkCollision = useCallback(
-    (x, z, width, depth, excludeIndex = -1, rotation = 0) => {
-      const actualWidth = rotation % 180 === 0 ? width : depth;
-      const actualDepth = rotation % 180 === 0 ? depth : width;
-
-      for (let i = 0; i < placedFurniture.length; i++) {
-        if (i === excludeIndex) continue;
-
-        const item = placedFurniture[i];
-        const itemRotation = item.rotation || 0;
-        const itemActualWidth =
-          itemRotation % 180 === 0 ? item.width : item.depth;
-        const itemActualDepth =
-          itemRotation % 180 === 0 ? item.depth : item.width;
-
-        if (
-          x < item.x + itemActualWidth &&
-          x + actualWidth > item.x &&
-          z < item.z + itemActualDepth &&
-          z + actualDepth > item.z
-        ) {
-          return true;
-        }
-      }
-
-      return false;
-    },
-    [placedFurniture]
-  );
 
   // 드래그 시작
   const handleDragStart = useCallback((e, item) => {
@@ -268,7 +510,33 @@ const FurniturePlacement = ({
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "copy";
-  }, []);
+    
+    if (draggedFurniture && !isDraggingPlaced) {
+      const coords = convertToRealCoordinates(e.clientX, e.clientY);
+      
+      // 경계 체크
+      const maxX = validRoomWidth - draggedFurniture.width;
+      const maxZ = validRoomDepth - draggedFurniture.depth;
+      
+      coords.x = Math.max(0, Math.min(coords.x, maxX));
+      coords.z = Math.max(0, Math.min(coords.z, maxZ));
+      
+      // 충돌 체크
+      const hasCollision = checkCollision(
+        coords.x,
+        coords.z,
+        draggedFurniture.width,
+        draggedFurniture.depth
+      );
+      
+      setDragPreview({
+        x: coords.x,
+        z: coords.z,
+        furniture: draggedFurniture
+      });
+      setPreviewCollision(hasCollision);
+    }
+  }, [draggedFurniture, isDraggingPlaced, convertToRealCoordinates, validRoomWidth, validRoomDepth, checkCollision]);
 
   // 드롭
   const handleDrop = useCallback(
@@ -308,6 +576,8 @@ const FurniturePlacement = ({
       }
 
       setDraggedFurniture(null);
+      setDragPreview(null);
+      setPreviewCollision(false);
     },
     [
       draggedFurniture,
@@ -418,15 +688,6 @@ const FurniturePlacement = ({
   );
 
   // 가구 삭제
-  const handleDeleteFurniture = useCallback(
-    (index) => {
-      const newPlaced = [...placedFurniture];
-      newPlaced.splice(index, 1);
-      onFurnitureChange(newPlaced);
-      setSelectedFurnitureIndex(null);
-    },
-    [placedFurniture, onFurnitureChange]
-  );
 
   // 전체 초기화
   const handleClearAll = useCallback(() => {
@@ -674,7 +935,47 @@ const FurniturePlacement = ({
         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
           <strong>가구 배치 시뮬레이션</strong>
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {/* 실행취소/다시실행 */}
+          <div className="flex gap-1">
+            <button
+              onClick={undo}
+              className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={historyIndex <= 0}
+              title="실행취소 (Ctrl+Z)"
+            >
+              ↶
+            </button>
+            <button
+              onClick={redo}
+              className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={historyIndex >= history.length - 1}
+              title="다시실행 (Ctrl+Y)"
+            >
+              ↷
+            </button>
+          </div>
+
+          {/* 복사/붙여넣기 */}
+          <div className="flex gap-1">
+            <button
+              onClick={copySeletedFurniture}
+              className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={selectedFurnitureIndex === null}
+              title="복사 (Ctrl+C)"
+            >
+              📋
+            </button>
+            <button
+              onClick={pasteFurniture}
+              className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!copiedFurniture}
+              title="붙여넣기 (Ctrl+V)"
+            >
+              📌
+            </button>
+          </div>
+
           <button
             onClick={handleSaveAsJson}
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -808,14 +1109,82 @@ const FurniturePlacement = ({
             </div>
           </div>
 
+          {/* 템플릿 관리 */}
+          <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+            <h4 className="text-sm font-semibold mb-3 text-purple-800">템플릿 관리</h4>
+            <div className="space-y-2">
+              <div className="flex gap-1">
+                <input
+                  type="text"
+                  placeholder="템플릿 이름"
+                  id="templateName"
+                  className="flex-1 px-2 py-1 text-sm border rounded"
+                />
+                <button
+                  onClick={() => {
+                    const templateName = document.getElementById('templateName').value.trim();
+                    if (templateName) {
+                      saveTemplate(templateName);
+                      document.getElementById('templateName').value = '';
+                    }
+                  }}
+                  disabled={placedFurniture.length === 0}
+                  className="px-3 py-1 bg-purple-500 text-white rounded text-sm font-medium hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  저장
+                </button>
+              </div>
+              
+              <div className="max-h-32 overflow-y-auto">
+                {getSavedTemplates().map((template, index) => (
+                  <div key={index} className="flex items-center justify-between py-1 px-2 bg-white rounded text-sm">
+                    <span className="truncate flex-1">{template.name}</span>
+                    <div className="flex gap-1 ml-2">
+                      <button
+                        onClick={() => loadTemplate(template.name)}
+                        className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+                      >
+                        불러오기
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm(`"${template.name}" 템플릿을 삭제하시겠습니까?`)) {
+                            deleteTemplate(template.name);
+                            // 강제 리렌더링을 위해 상태 업데이트
+                            setSelectedFurnitureIndex(selectedFurnitureIndex);
+                          }
+                        }}
+                        className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {getSavedTemplates().length === 0 && (
+                  <div className="text-xs text-gray-500 text-center py-2">저장된 템플릿이 없습니다</div>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="mt-4 p-3 bg-pink-50 border border-pink-200 rounded-lg">
             <p className="text-sm text-pink-800">
               <strong>사용법:</strong>
               <br />
-              • 가구를 드래그해서 방에 배치
+              • 가구를 드래그해서 방에 배치 (미리보기 제공)
               <br />
               • 배치된 항목 클릭 후 드래그로 이동
-              <br />• 녹색 버튼으로 회전, 빨간 버튼으로 삭제
+              <br />
+              • 녹색 버튼으로 회전, 빨간 버튼으로 삭제
+              <br />
+              <strong>단축키:</strong>
+              <br />
+              • Ctrl+Z: 실행취소, Ctrl+Y: 다시실행
+              <br />
+              • Ctrl+C: 복사, Ctrl+V: 붙여넣기
+              <br />
+              • Delete: 선택된 가구 삭제
             </p>
           </div>
         </div>
@@ -841,6 +1210,17 @@ const FurniturePlacement = ({
                 className="border border-gray-400 bg-white rounded-lg cursor-crosshair"
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
+                onDragLeave={(e) => {
+                  // SVG 영역을 완전히 벗어날 때만 미리보기 제거
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = e.clientX;
+                  const y = e.clientY;
+                  
+                  if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+                    setDragPreview(null);
+                    setPreviewCollision(false);
+                  }
+                }}
               >
                 {/* 방 윤곽 */}
                 <rect
@@ -886,6 +1266,115 @@ const FurniturePlacement = ({
                   stroke="#ffffff"
                   strokeWidth="1"
                 />
+
+                {/* 창문들 표시 */}
+                {detectedWindows.map((window, index) => {
+                  const windowWidth = (window.width_meters || 1.2) * 100; // m -> cm
+                  const windowHeight = (window.height_meters || 1.5) * 100; // m -> cm
+                  const wallThickness = 8; // 벽 두께 (SVG 단위)
+                  
+                  let windowX, windowY, windowW, windowH;
+                  
+                  switch (window.wall_position) {
+                    case "front": // 앞벽 (아래쪽)
+                      windowX = 20 + (window.x_position || 0.5) * svgDimensions.svgWidth - (windowWidth * svgDimensions.svgWidth / validRoomWidth) / 2;
+                      windowY = 20 + svgDimensions.svgHeight - wallThickness;
+                      windowW = windowWidth * svgDimensions.svgWidth / validRoomWidth;
+                      windowH = wallThickness;
+                      break;
+                    case "back": // 뒷벽 (위쪽)
+                      windowX = 20 + (window.x_position || 0.5) * svgDimensions.svgWidth - (windowWidth * svgDimensions.svgWidth / validRoomWidth) / 2;
+                      windowY = 20;
+                      windowW = windowWidth * svgDimensions.svgWidth / validRoomWidth;
+                      windowH = wallThickness;
+                      break;
+                    case "left": // 왼쪽 벽
+                      windowX = 20;
+                      windowY = 20 + (window.x_position || 0.5) * svgDimensions.svgHeight - (windowWidth * svgDimensions.svgHeight / validRoomDepth) / 2;
+                      windowW = wallThickness;
+                      windowH = windowWidth * svgDimensions.svgHeight / validRoomDepth;
+                      break;
+                    case "right": // 오른쪽 벽
+                      windowX = 20 + svgDimensions.svgWidth - wallThickness;
+                      windowY = 20 + (window.x_position || 0.5) * svgDimensions.svgHeight - (windowWidth * svgDimensions.svgHeight / validRoomDepth) / 2;
+                      windowW = wallThickness;
+                      windowH = windowWidth * svgDimensions.svgHeight / validRoomDepth;
+                      break;
+                    default:
+                      return null;
+                  }
+                  
+                  return (
+                    <g key={`window-${index}`}>
+                      {/* 창문 배경 */}
+                      <rect
+                        x={windowX}
+                        y={windowY}
+                        width={windowW}
+                        height={windowH}
+                        fill="#87CEEB"
+                        stroke="#4682B4"
+                        strokeWidth="1"
+                        opacity="0.8"
+                      />
+                      {/* 창문 텍스트 */}
+                      <text
+                        x={windowX + windowW / 2}
+                        y={windowY + windowH / 2}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="8"
+                        fill="#2F4F4F"
+                        className="pointer-events-none select-none"
+                      >
+                        창문
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* 드래그 미리보기 */}
+                {dragPreview && (
+                  (() => {
+                    const scaleX = svgDimensions.svgWidth / validRoomWidth;
+                    const scaleZ = svgDimensions.svgHeight / validRoomDepth;
+                    const scaledWidth = dragPreview.furniture.width * scaleX;
+                    const scaledDepth = dragPreview.furniture.depth * scaleZ;
+                    const scaledX = 20 + dragPreview.x * scaleX;
+                    const scaledY = 20 + dragPreview.z * scaleZ;
+
+                    return (
+                      <g key="drag-preview">
+                        {/* 미리보기 가구 */}
+                        <rect
+                          x={scaledX}
+                          y={scaledY}
+                          width={scaledWidth}
+                          height={scaledDepth}
+                          fill={previewCollision ? "#ff9999" : dragPreview.furniture.color}
+                          stroke={previewCollision ? "#ff0000" : "#666666"}
+                          strokeWidth="2"
+                          opacity="0.6"
+                          strokeDasharray="5,5"
+                          className="pointer-events-none"
+                        />
+                        {/* 미리보기 아이콘 */}
+                        <text
+                          x={scaledX + scaledWidth / 2}
+                          y={scaledY + scaledDepth / 2}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fontSize="16"
+                          fill={previewCollision ? "#ff0000" : "#666666"}
+                          opacity="0.8"
+                          className="pointer-events-none select-none"
+                        >
+                          {dragPreview.furniture.icon}
+                        </text>
+                      </g>
+                    );
+                  })()
+                )}
 
                 {/* 배치된 가구들 */}
                 {placedFurniture.map((furniture, index) => {

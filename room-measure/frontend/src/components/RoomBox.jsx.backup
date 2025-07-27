@@ -6,47 +6,50 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
   Text,
   Line,
   Environment,
   ContactShadows,
+  useGLTF,
 } from "@react-three/drei";
 import * as THREE from "three";
-
-// 분리된 유틸리티들
 import CollisionDetector from "../utils/CollisionDetector";
 import PositionSnapper from "../utils/PositionSnapper";
-
-// 분리된 UI 컴포넌트들
 import ViewPresets from "./UI/ViewPresets";
 import SpaceUtilization from "./UI/SpaceUtilization";
+import EnhancedLighting from "./3D/EnhancedLighting";
+import FloorGrid from "./3D/FloorGrid";
 import ToastContainer from "./UI/Toast";
 import { LoadingButton } from "./UI/LoadingSpinner";
 import PlacementGuide from "./UI/PlacementGuide";
-
-// 분리된 3D 컴포넌트들
-import EnhancedLighting from "./3D/EnhancedLighting";
-import FloorGrid from "./3D/FloorGrid";
-import { DimensionArrow, DimensionLabel, DistanceMeasurer } from './3D/DimensionComponents';
-import { ValidPlacementArea } from './3D/CollisionComponents';
-import { WindowsOnWalls } from './3D/WindowComponents';
-import { DraggableFurnitureWithCollision } from './3D/DraggableFurniture';
-import { DraggableHuman } from './3D/DraggableHuman';
-
-// 분리된 훅들
 import { useRoomState } from "../hooks/useRoomState";
 import { useToast } from "../hooks/useToast";
 
-// 분리된 상수들
-import { FURNITURE_PRESETS, FURNITURE_ID_MAPPING } from '../constants/furniture';
+// 분리된 상수들과 유틸리티들
+import { FURNITURE_PRESETS, FURNITURE_ID_MAPPING } from '../constants/furniture.js';
+import { convertCoordinatesLocally, convertTo3DCoordinates, convertTo2DCoordinates } from '../utils/coordinateConversion.js';
+import { createRoomLayoutData } from '../utils/dataConversion.js';
+import { saveRoomLayoutToMongoDB, detectWindowsInImage } from '../utils/api.js';
 
-// 분리된 유틸리티들
-import { convertCoordinatesLocally } from '../utils/coordinateConversion';
-import { createRoomLayoutData } from '../utils/dataConversion';
-import { saveRoomLayoutToMongoDB, detectWindowsInImage } from '../utils/api';
+// 분리된 3D 컴포넌트들
+import { DimensionArrow, DimensionLabel, FurnitureDimensions, DistanceMeasurer } from './3D/DimensionComponents.jsx';
+import { CollisionIndicator, ValidPlacementArea, CollisionAlert } from './3D/CollisionComponents.jsx';
+import { Window3D, WindowsOnWalls } from './3D/WindowComponents.jsx';
+import { DraggableFurnitureWithCollision } from './3D/DraggableFurniture.jsx';
+import { DraggableHuman } from './3D/DraggableHuman.jsx';
+
+
+// 상수들과 유틸리티들은 별도 파일로 분리됨
+
+
+
+
+// 치수선 관련 컴포넌트들은 별도 파일로 분리됨
+
+// 충돌 관련 컴포넌트들은 별도 파일로 분리됨
 
 // 스냅 그리드 컴포넌트
 const SnapGrid = React.memo(function SnapGrid({
@@ -90,6 +93,13 @@ const SnapGrid = React.memo(function SnapGrid({
   return <group>{lines}</group>;
 });
 
+// 공간감 향상 컴포넌트들은 별도 파일로 분리됨
+
+
+// DraggableHuman 컴포넌트는 별도 파일로 분리됨
+
+// 거리 측정 컴포넌트는 별도 파일로 분리됨
+
 // 벽 컴포넌트
 const Wall = React.memo(function Wall({
   width,
@@ -108,11 +118,22 @@ const Wall = React.memo(function Wall({
         clearcoat={0.2}
         opacity={isWindow ? 0.3 : 1}
         transparent={isWindow}
-        side={THREE.DoubleSide}
+        side={THREE.DoubleSide} // Render both sides
       />
     </mesh>
   );
 });
+
+// 공간 활용도 컴포넌트
+
+// 향상된 가구 컴포넌트 (드래그 시스템 개선)
+// DraggableFurnitureWithCollision 컴포넌트는 별도 파일로 분리됨
+
+// Window3D 컴포넌트는 별도 파일로 분리됨
+
+// WindowsOnWalls 컴포넌트는 별도 파일로 분리됨
+
+// 데이터 변환 및 API 함수들은 별도 파일로 분리됨
 
 // 메인 컴포넌트
 export default function RoomBox({
@@ -128,10 +149,10 @@ export default function RoomBox({
   const h = height;
   const d = depth;
 
-  // 커스텀 훅으로 상태 관리
+  // Use custom hook for state management
   const roomState = useRoomState([w, h, d]);
   
-  // Toast 알림 시스템
+  // Toast notification system
   const { toasts, removeToast, showSuccess, showError, showWarning, showInfo } = useToast();
   const {
     furniture,
@@ -172,14 +193,16 @@ export default function RoomBox({
     setIsSaving,
   } = roomState;
 
-  // 방 계산 최적화
+  // Optimize room calculations with useMemo
   const roomSize = useMemo(() => [w, h, d], [w, h, d]);
   const roomArea = useMemo(() => (w * d) / 10000, [w, d]);
 
   const controlsRef = useRef();
+
+  // 드래그 중에는 업데이트하지 않는 ref
   const isUpdatingFromDragRef = useRef(false);
 
-  // 가구 변환 최적화
+  // Optimize furniture conversion with useMemo
   const convertedFurniture = useMemo(() => {
     if (!placedFurniture || placedFurniture.length === 0) {
       return [];
@@ -188,6 +211,7 @@ export default function RoomBox({
     return placedFurniture.map((item) => {
       let furnitureSize, mappedType, presetData;
       
+      // 커스텀 가구인 경우
       if (item.isCustom) {
         furnitureSize = [item.width, item.height || 60, item.depth];
         mappedType = "custom";
@@ -197,6 +221,7 @@ export default function RoomBox({
           size: furnitureSize
         };
       } else {
+        // 기존 프리셋 가구인 경우
         const baseId = item.id
           ? item.id.split("_").slice(0, -1).join("_")
           : "desk";
@@ -205,6 +230,7 @@ export default function RoomBox({
         furnitureSize = presetData.size;
       }
 
+      // 2D -> 3D 좌표 변환
       const x3d = item.x;
       const z3d = item.z;
 
@@ -227,6 +253,7 @@ export default function RoomBox({
   }, [placedFurniture]);
 
   useEffect(() => {
+    // 드래그 중이거나 드래그에서 업데이트 중일 때는 건너뛰기
     if (isDragging || isUpdatingFromDragRef.current) {
       return;
     }
@@ -272,6 +299,7 @@ export default function RoomBox({
         FURNITURE_PRESETS
       );
 
+      // 가구 충돌 체크
       const furnitureCollisions = CollisionDetector.checkFurnitureCollisions(
         furniture,
         newFurniture.id,
@@ -279,17 +307,19 @@ export default function RoomBox({
         FURNITURE_PRESETS
       );
 
+      // 충돌이 없을 때만 배치 허용
       if (furnitureCollisions.length === 0) {
         newFurniture.position = adjustedPosition;
         setFurniture((prev) => [...prev, newFurniture]);
         setSelectedFurniture(newFurniture.id);
         setPlacementMode(null);
 
-        // 2D와 동기화
+        // 2D와 동기화 - 3D → 2D 좌표 변환
         if (typeof onFurnitureChange === "function") {
           const { position: pos3D, size } = newFurniture;
           const [x3D, y3D, z3D] = pos3D;
           
+          // 3D 중심점을 2D 왼쪽 상단 모서리로 변환
           const x2D = x3D - size[0] / 2;
           const z2D = z3D - size[2] / 2;
           
@@ -299,7 +329,7 @@ export default function RoomBox({
             z: z2D,
             width: size[0],
             depth: size[2],
-            rotation: 0,
+            rotation: 0, // 라디안을 각도로 변환
             type: newFurniture.type,
             name: newFurniture.name,
             color: newFurniture.color
@@ -307,6 +337,8 @@ export default function RoomBox({
 
           onFurnitureChange((prev) => [...prev, newItem2D]);
         }
+      } else {
+        // 충돌 감지됨
       }
     },
     [placementMode, furniture, roomSize, onFurnitureChange]
@@ -344,23 +376,32 @@ export default function RoomBox({
     });
   }, []);
 
-  const updatePlacedFurniturePositionOnDragEnd = useCallback(
+  // 좌표 변환 함수들은 별도 파일로 분리됨
+
+  // 드래그 완료 시에만 2D 좌표 업데이트
+  const updatePlacedFurniturePosition = useCallback(
     (id, newPosition) => {
+      
       if (typeof onFurnitureChange === "function") {
         const furnitureItem = furniture.find((f) => f.id === id);
         
         if (furnitureItem) {
           const size = furnitureItem.size;
+
+          // 업데이트 중임을 표시
           isUpdatingFromDragRef.current = true;
+
+          // 로컬 좌표 변환
           const converted2D = convertCoordinatesLocally(id, newPosition, size, roomSize);
+
 
           onFurnitureChange((prev) => {
             const updated = prev.map((item) => {
               if (item.id === id) {
                 const newItem = {
                   ...item,
-                  x: converted2D.x,
-                  z: converted2D.z,
+                  x: converted2D.x, // 2D x 좌표
+                  z: converted2D.z, // 2D y 좌표 (z 필드에 저장)
                 };
                 return newItem;
               }
@@ -369,6 +410,50 @@ export default function RoomBox({
             return updated;
           });
 
+          // 짧은 지연 후 업데이트 플래그 해제
+          setTimeout(() => {
+            isUpdatingFromDragRef.current = false;
+          }, 100);
+        } else {
+        }
+      } else {
+      }
+    },
+    [furniture, onFurnitureChange, convertCoordinatesLocally, roomSize]
+  );
+
+  // 드래그 완료 시 2D 좌표 업데이트 (실제 사용되는 함수)
+  const updatePlacedFurniturePositionOnDragEnd = useCallback(
+    (id, newPosition) => {
+      if (typeof onFurnitureChange === "function") {
+        const furnitureItem = furniture.find((f) => f.id === id);
+        
+        if (furnitureItem) {
+          const size = furnitureItem.size;
+
+          // 업데이트 중임을 표시
+          isUpdatingFromDragRef.current = true;
+
+          // 로컬 좌표 변환
+          const converted2D = convertCoordinatesLocally(id, newPosition, size, roomSize);
+
+          onFurnitureChange((prev) => {
+            const updated = prev.map((item) => {
+              if (item.id === id) {
+                const newItem = {
+                  ...item,
+                  x: converted2D.x, // 2D x 좌표
+                  z: converted2D.z, // 2D y 좌표 (z 필드에 저장)
+                };
+                return newItem;
+              }
+              return item;
+            });
+            
+            return updated;
+          });
+
+          // 짧은 지연 후 업데이트 플래그 해제
           setTimeout(() => {
             isUpdatingFromDragRef.current = false;
           }, 100);
@@ -384,21 +469,24 @@ export default function RoomBox({
     }
     setIsDetectingWindows(true);
     try {
+      // 실제 방 크기 정보 준비 (cm 단위) - 더 상세한 정보 포함
       const roomDimensions = {
         width_cm: w,
         height_cm: h,
         depth_cm: d,
-        area_sqm: (w * d) / 10000,
+        area_sqm: (w * d) / 10000, // 제곱미터
         wall_height_cm: h,
-        scale_factor: 1,
+        scale_factor: 1, // 스케일 팩터 (필요시 조정)
       };
 
+      // 방의 벽 정보도 포함
       const wallInfo = {
         front_wall: { width: w, height: h, position: "front" },
         back_wall: { width: w, height: h, position: "back" },
         left_wall: { width: d, height: h, position: "left" },
         right_wall: { width: d, height: h, position: "right" },
       };
+
 
       const result = await detectWindowsInImage(
         uploadedImageFile,
@@ -407,30 +495,35 @@ export default function RoomBox({
       );
       
       if (result.windows && result.windows.length > 0) {
+        // 창문 크기와 위치 검증 및 조정
         const validatedWindows = result.windows.map((window, index) => {
-          const minWidth = 60;
-          const maxWidth = Math.min(200, w * 0.8);
-          const minHeight = 80;
-          const maxHeight = Math.min(180, h * 0.8);
+          
+          // 기본 크기 설정 (너무 작거나 큰 경우 조정)
+          const minWidth = 60; // 최소 60cm
+          const maxWidth = Math.min(200, w * 0.8); // 최대 200cm 또는 벽 폭의 80%
+          const minHeight = 80; // 최소 80cm 
+          const maxHeight = Math.min(180, h * 0.8); // 최대 180cm 또는 벽 높이의 80%
           
           let adjustedWindow = { ...window };
           
+          // 크기 검증 및 조정
           if (window.width_meters) {
             const widthCm = window.width_meters * 100;
             adjustedWindow.width_meters = Math.max(minWidth, Math.min(maxWidth, widthCm)) / 100;
           } else {
-            adjustedWindow.width_meters = 1.2;
+            adjustedWindow.width_meters = 1.2; // 기본 120cm
           }
           
           if (window.height_meters) {
             const heightCm = window.height_meters * 100;
             adjustedWindow.height_meters = Math.max(minHeight, Math.min(maxHeight, heightCm)) / 100;
           } else {
-            adjustedWindow.height_meters = 1.5;
+            adjustedWindow.height_meters = 1.5; // 기본 150cm
           }
           
+          // 위치 검증 (벽 중앙 근처로 조정)
           if (!window.wall_position || !["front", "back", "left", "right"].includes(window.wall_position)) {
-            adjustedWindow.wall_position = "back";
+            adjustedWindow.wall_position = "back"; // 기본값: 뒤쪽 벽
           }
           
           return adjustedWindow;
@@ -466,6 +559,7 @@ export default function RoomBox({
         setSelectedFurniture(null);
       }
       
+      // 2D와 동기화 - 가구 삭제
       if (typeof onFurnitureChange === "function") {
         onFurnitureChange((prev) => prev.filter((item) => item.id !== id));
       }
@@ -484,22 +578,26 @@ export default function RoomBox({
 
   useEffect(() => {
     const handleKeyPress = (event) => {
+      // Prevent shortcuts when typing in input fields
       if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.contentEditable === 'true') {
         return;
       }
       
       const key = event.key.toLowerCase();
       
+      // Delete/Backspace - Delete selected furniture
       if ((key === "delete" || key === "backspace") && selectedFurniture) {
         event.preventDefault();
         handleDeleteFurniture(selectedFurniture);
       }
       
+      // R - Rotate selected furniture
       if (key === "r" && selectedFurniture) {
         event.preventDefault();
         handleRotateFurniture(selectedFurniture);
       }
       
+      // Escape - Cancel placement mode or deselect furniture
       if (key === "escape") {
         event.preventDefault();
         if (placementMode) {
@@ -509,22 +607,26 @@ export default function RoomBox({
         }
       }
       
+      // M - Toggle measurement mode
       if (key === "m") {
         event.preventDefault();
         setMeasurementMode(!measurementMode);
         setMeasurePoints([null, null]);
       }
       
+      // G - Toggle grid
       if (key === "g") {
         event.preventDefault();
         setShowFloorGrid(!showFloorGrid);
       }
       
+      // S - Toggle snap
       if (key === "s") {
         event.preventDefault();
         setEnableSnap(!enableSnap);
       }
       
+      // W - Toggle walkthrough mode
       if (key === "w" && !event.ctrlKey) {
         event.preventDefault();
         setWalkthroughMode(!walkthroughMode);
@@ -541,7 +643,7 @@ export default function RoomBox({
         isFullscreen ? "h-screen rounded-none" : "h-[700px] rounded-xl"
       }`}
     >
-      {/* 키보드 단축키 도움말 */}
+      {/* Keyboard Shortcuts Help */}
       <div className="absolute top-4 right-4 z-20">
         <div className="relative group">
           <button
@@ -554,6 +656,7 @@ export default function RoomBox({
             </svg>
           </button>
           
+          {/* Tooltip with keyboard shortcuts */}
           <div className="absolute top-full right-0 mt-2 w-64 p-4 bg-white/95 backdrop-blur-lg rounded-xl shadow-xl border border-white/50 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
             <h4 className="font-bold text-sm text-slate-800 mb-3">키보드 단축키</h4>
             <div className="space-y-2 text-xs text-slate-600">
@@ -589,10 +692,9 @@ export default function RoomBox({
           </div>
         </div>
       </div>
-
-      {/* 왼쪽 UI 패널들 - 주요 기능 */}
+      {/* Left UI Panels - Primary Actions */}
       <div className="absolute top-4 left-4 z-10 space-y-4 w-80 max-w-sm">
-        {/* 가구 추가 패널 */}
+        {/* Primary Panel - Furniture Addition */}
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-xl bg-white/90 border border-white/50 hover:bg-white/95 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 rounded-lg bg-blue-100">
@@ -634,7 +736,7 @@ export default function RoomBox({
           )}
         </div>
 
-        {/* 거리 측정 패널 */}
+        {/* Distance Measurement Panel - Moved to left */}
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 rounded-lg bg-yellow-100">
@@ -683,8 +785,8 @@ export default function RoomBox({
         </div>
       </div>
 
-      {/* 왼쪽 하단 - 시각 옵션 패널 */}
-      <div className="absolute bottom-4 left-4 z-10 w-80 max-w-sm">
+      {/* Bottom Left - Visual Options Panel */}
+      <div className="absolute bottom-20 left-4 z-10 w-80 max-w-sm">
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 rounded-lg bg-purple-100">
@@ -755,10 +857,176 @@ export default function RoomBox({
         </div>
       </div>
 
-      {/* 오른쪽 UI 패널들 */}
+              {detectedWindows.length > 0 && (
+                <div className="text-xs text-gray-600 space-y-2">
+                  <p>{detectedWindows.length}개 창문 감지됨</p>
+                  {detectedWindows.map((window, index) => (
+                    <div key={index} className="bg-gray-50 p-2 rounded space-y-2">
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs">
+                          창문 {index + 1}: {Math.round((window.width_meters || window.width || 1.2) * 100)}×{Math.round((window.height_meters || window.height || 1.5) * 100)}cm ({window.wall_position}벽)
+                        </div>
+                        <button
+                          onClick={() => {
+                            const newWindows = detectedWindows.filter((_, i) => i !== index);
+                            setDetectedWindows(newWindows);
+                          }}
+                          className="px-1 py-0.5 bg-red-400 text-white rounded text-xs hover:bg-red-500"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {/* 벽 위치 선택 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">벽:</span>
+                          <select
+                            value={window.wall_position || "back"}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                wall_position: e.target.value
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 text-xs border rounded px-1"
+                          >
+                            <option value="front">앞벽</option>
+                            <option value="back">뒷벽</option>
+                            <option value="left">왼쪽벽</option>
+                            <option value="right">오른쪽벽</option>
+                          </select>
+                        </div>
+                        
+                        {/* 수평 위치 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">수평:</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={Math.round((window.x_position || 0.5) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                x_position: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.x_position || 0.5) * 100)}%</span>
+                        </div>
+                        
+                        {/* 수직 위치 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">수직:</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={Math.round((window.y_position || 0.8) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                y_position: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.y_position || 0.8) * 100)}%</span>
+                        </div>
+                        
+                        {/* 창문 크기 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">너비:</span>
+                          <input
+                            type="range"
+                            min="60"
+                            max="400"
+                            value={Math.round((window.width_meters || 1.2) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                width_meters: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.width_meters || 1.2) * 100)}cm</span>
+                        </div>
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">높이:</span>
+                          <input
+                            type="range"
+                            min="60"
+                            max="300"
+                            value={Math.round((window.height_meters || 1.5) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                height_meters: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.height_meters || 1.5) * 100)}cm</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="space-y-1">
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setShowWindows(!showWindows)}
+                    className="flex-1 px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600"
+                  >
+                    {showWindows ? "창문 숨기기" : "창문 보이기"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newWindow = {
+                        wall_position: "back",
+                        x_position: 0.5,
+                        y_position: 0.8,
+                        width_meters: 1.2,
+                        height_meters: 1.5,
+                        confidence: 1.0
+                      };
+                      setDetectedWindows([...detectedWindows, newWindow]);
+                    }}
+                    className="flex-1 px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
+                  >
+                    창문 추가
+                  </button>
+                </div>
+                <button
+                  onClick={() => setDetectedWindows([])}
+                  className="w-full px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                >
+                  모든 창문 삭제
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Right-side panels - Responsive */}
       <div className="absolute top-4 right-4 z-10 space-y-4 w-80 max-w-sm">
         
-        {/* 데이터 저장 패널 */}
+        {/* Data Export Panel - Moved to right */}
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 rounded-lg bg-green-100">
@@ -812,7 +1080,7 @@ export default function RoomBox({
           </div>
         </div>
 
-        {/* 창문 감지 패널 */}
+        {/* Window Detection Panel - Moved to right */}
         {uploadedImageFile && (
           <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
             <div className="flex items-center gap-2 mb-3">
@@ -837,160 +1105,174 @@ export default function RoomBox({
                   AI 창문 감지
                 </span>
               </LoadingButton>
-            </div>
-          </div>
-        )}
-
-        {/* 창문 조정 패널 */}
-        {detectedWindows.length > 0 && (
-          <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 rounded-lg bg-green-100">
-                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
-                </svg>
-              </div>
-              <h4 className="font-bold text-sm text-slate-800">창문 조정</h4>
-            </div>
-            <div className="space-y-3 max-h-64 overflow-y-auto">
-              {detectedWindows.map((window, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-lg space-y-2">
-                  <div className="flex justify-between items-center">
-                    <div className="text-xs font-medium">
-                      창문 {index + 1}: {Math.round((window.width_meters || 1.2) * 100)}×{Math.round((window.height_meters || 1.5) * 100)}cm ({window.wall_position}벽)
+              {detectedWindows.length > 0 && (
+                <div className="text-xs text-gray-600 space-y-2">
+                  <p>{detectedWindows.length}개 창문 감지됨</p>
+                  {detectedWindows.map((window, index) => (
+                    <div key={index} className="bg-gray-50 p-2 rounded space-y-2">
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs">
+                          창문 {index + 1}: {Math.round((window.width_meters || window.width || 1.2) * 100)}×{Math.round((window.height_meters || window.height || 1.5) * 100)}cm ({window.wall_position}벽)
+                        </div>
+                        <button
+                          onClick={() => {
+                            const newWindows = detectedWindows.filter((_, i) => i !== index);
+                            setDetectedWindows(newWindows);
+                          }}
+                          className="px-1 py-0.5 bg-red-400 text-white rounded text-xs hover:bg-red-500"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {/* 벽 위치 선택 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">벽:</span>
+                          <select
+                            value={window.wall_position || "back"}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                wall_position: e.target.value
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 text-xs border rounded px-1"
+                          >
+                            <option value="front">앞벽</option>
+                            <option value="back">뒷벽</option>
+                            <option value="left">왼쪽벽</option>
+                            <option value="right">오른쪽벽</option>
+                          </select>
+                        </div>
+                        
+                        {/* 수평 위치 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">수평:</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={Math.round((window.x_position || 0.5) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                x_position: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.x_position || 0.5) * 100)}%</span>
+                        </div>
+                        
+                        {/* 수직 위치 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">수직:</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={Math.round((window.y_position || 0.8) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                y_position: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.y_position || 0.8) * 100)}%</span>
+                        </div>
+                        
+                        {/* 창문 크기 조정 */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">너비:</span>
+                          <input
+                            type="range"
+                            min="60"
+                            max="400"
+                            value={Math.round((window.width_meters || 1.2) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                width_meters: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.width_meters || 1.2) * 100)}cm</span>
+                        </div>
+                        <div className="flex gap-1 items-center">
+                          <span className="text-xs w-8">높이:</span>
+                          <input
+                            type="range"
+                            min="60"
+                            max="300"
+                            value={Math.round((window.height_meters || 1.5) * 100)}
+                            onChange={(e) => {
+                              const newWindows = [...detectedWindows];
+                              newWindows[index] = {
+                                ...window,
+                                height_meters: parseInt(e.target.value) / 100
+                              };
+                              setDetectedWindows(newWindows);
+                            }}
+                            className="flex-1 h-1"
+                          />
+                          <span className="text-xs w-8">{Math.round((window.height_meters || 1.5) * 100)}cm</span>
+                        </div>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => {
-                        const newWindows = detectedWindows.filter((_, i) => i !== index);
-                        setDetectedWindows(newWindows);
-                      }}
-                      className="text-red-500 hover:text-red-700 p-1"
-                      title="창문 삭제"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  {/* 수평 위치 조정 */}
-                  <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">수평:</span>
-                    <input
-                      type="range"
-                      min="0.1"
-                      max="0.9"
-                      step="0.05"
-                      value={window.x_position || 0.5}
-                      onChange={(e) => {
-                        const newWindows = [...detectedWindows];
-                        newWindows[index] = {
-                          ...window,
-                          x_position: parseFloat(e.target.value)
-                        };
-                        setDetectedWindows(newWindows);
-                      }}
-                      className="flex-1 h-1"
-                    />
-                    <span className="text-xs w-8">{Math.round((window.x_position || 0.5) * 100)}%</span>
-                  </div>
-                  
-                  {/* 수직 위치 조정 */}
-                  <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">수직:</span>
-                    <input
-                      type="range"
-                      min="0.3"
-                      max="1.0"
-                      step="0.05"
-                      value={window.y_position || 0.8}
-                      onChange={(e) => {
-                        const newWindows = [...detectedWindows];
-                        newWindows[index] = {
-                          ...window,
-                          y_position: parseFloat(e.target.value)
-                        };
-                        setDetectedWindows(newWindows);
-                      }}
-                      className="flex-1 h-1"
-                    />
-                    <span className="text-xs w-8">{Math.round((window.y_position || 0.8) * 100)}%</span>
-                  </div>
-                  
-                  {/* 창문 너비 조정 */}
-                  <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">너비:</span>
-                    <input
-                      type="range"
-                      min="60"
-                      max="400"
-                      value={Math.round((window.width_meters || 1.2) * 100)}
-                      onChange={(e) => {
-                        const newWindows = [...detectedWindows];
-                        newWindows[index] = {
-                          ...window,
-                          width_meters: parseInt(e.target.value) / 100
-                        };
-                        setDetectedWindows(newWindows);
-                      }}
-                      className="flex-1 h-1"
-                    />
-                    <span className="text-xs w-12">{Math.round((window.width_meters || 1.2) * 100)}cm</span>
-                  </div>
-                  
-                  {/* 창문 높이 조정 */}
-                  <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">높이:</span>
-                    <input
-                      type="range"
-                      min="60"
-                      max="300"
-                      value={Math.round((window.height_meters || 1.5) * 100)}
-                      onChange={(e) => {
-                        const newWindows = [...detectedWindows];
-                        newWindows[index] = {
-                          ...window,
-                          height_meters: parseInt(e.target.value) / 100
-                        };
-                        setDetectedWindows(newWindows);
-                      }}
-                      className="flex-1 h-1"
-                    />
-                    <span className="text-xs w-12">{Math.round((window.height_meters || 1.5) * 100)}cm</span>
-                  </div>
+                  ))}
                 </div>
-              ))}
-              
-              {/* 새 창문 추가 버튼 */}
-              <button
-                onClick={() => {
-                  const newWindow = {
-                    wall_position: "back",
-                    x_position: 0.5,
-                    y_position: 0.8,
-                    width_meters: 1.2,
-                    height_meters: 1.5,
-                    confidence: 1.0
-                  };
-                  setDetectedWindows([...detectedWindows, newWindow]);
-                }}
-                className="w-full px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg text-xs font-medium hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
-              >
-                <span className="flex items-center justify-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  새 창문 추가
-                </span>
-              </button>
+              )}
+              <div className="space-y-1">
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setShowWindows(!showWindows)}
+                    className="flex-1 px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600"
+                  >
+                    {showWindows ? "창문 숨기기" : "창문 보이기"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newWindow = {
+                        wall_position: "back",
+                        x_position: 0.5,
+                        y_position: 0.8,
+                        width_meters: 1.2,
+                        height_meters: 1.5,
+                        confidence: 1.0
+                      };
+                      setDetectedWindows([...detectedWindows, newWindow]);
+                    }}
+                    className="flex-1 px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
+                  >
+                    창문 추가
+                  </button>
+                </div>
+                <button
+                  onClick={() => setDetectedWindows([])}
+                  className="w-full px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                >
+                  모든 창문 삭제
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* 뷰 컨트롤 */}
+        {/* View Controls */}
         <ViewPresets onViewChange={handleViewChange} roomSize={roomSize} />
 
-        {/* 시점 모드 토글 */}
+        {/* Walkthrough Mode Toggle */}
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 rounded-lg bg-orange-100">
@@ -1034,11 +1316,11 @@ export default function RoomBox({
           )}
         </div>
 
-        {/* 공간 분석 */}
+        {/* Space Analysis */}
         <SpaceUtilization furniture={furniture} roomArea={roomArea} furniturePresets={FURNITURE_PRESETS} />
       </div>
 
-      {/* 3D Canvas */}
+      {/* 3D Canvas with Error Boundary */}
       <div className="relative w-full h-full">
         <Canvas
           camera={{
@@ -1055,25 +1337,59 @@ export default function RoomBox({
             powerPreference: "high-performance",
             failIfMajorPerformanceCaveat: false,
           }}
+          onCreated={({ gl }) => {
+            try {
+              const canvas = gl.domElement;
+              if (canvas && typeof canvas.addEventListener === "function") {
+                canvas.addEventListener("webglcontextlost", (event) => {
+                  event.preventDefault();
+                });
+                canvas.addEventListener("webglcontextrestored", () => {
+                });
+              }
+            } catch (error) {
+            }
+          }}
+          fallback={
+            <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-600">
+              <div className="text-center">
+                <div className="text-2xl mb-2">⚠️</div>
+                <div>3D 뷰어를 로드할 수 없습니다</div>
+                <div className="text-sm">
+                  WebGL을 지원하지 않는 브라우저입니다
+                </div>
+              </div>
+            </div>
+          }
         >
           <Suspense fallback={null}>
             <EnhancedLighting roomSize={roomSize} />
             <Environment preset="apartment" />
 
-            {/* 바닥 */}
+            {/* 바닥 - 원래 크기로 복원 */}
             <mesh
               position={[w / 2, 0, d / 2]}
               rotation={[-Math.PI / 2, 0, 0]}
               receiveShadow
               onClick={handleFloorClick}
             >
-              <planeGeometry args={[w, d]} />
+              <planeGeometry args={[w, d]} /> {/* 원래 크기로 복원 */}
               <meshStandardMaterial
                 color={placementMode ? "#e0f2fe" : "#f8f9fa"}
               />
             </mesh>
 
-            {/* 왼쪽 벽 */}
+            {/* 드래그 전용 투명 레이어 - Canvas 레벨에서 처리 */}
+            <mesh
+              position={[0, 0.01, 0]} // 바닥 바로 위
+              rotation={[-Math.PI / 2, 0, 0]}
+              visible={false}
+            >
+              <planeGeometry args={[10000, 10000]} />
+              <meshBasicMaterial transparent opacity={0} />
+            </mesh>
+
+            {/* 왼쪽 벽 (left wall) */}
             <Wall
               width={d}
               height={h}
@@ -1081,7 +1397,7 @@ export default function RoomBox({
               rotation={[0, Math.PI / 2, 0]}
             />
 
-            {/* 뒤쪽 벽 */}
+            {/* 뒤쪽 벽 (back wall) */}
             <Wall
               width={w}
               height={h}
@@ -1174,9 +1490,8 @@ export default function RoomBox({
         </Canvas>
       </div>
 
-      {/* 선택된 가구 정보 */}
       {selectedFurnitureData && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 backdrop-blur-lg p-4 rounded-xl shadow-xl bg-white/90 border border-white/50 max-w-sm">
+        <div className="absolute bottom-4 left-4 z-10 backdrop-blur-lg p-4 rounded-xl shadow-xl bg-white/90 border border-white/50 max-w-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 rounded-lg bg-blue-100">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1192,13 +1507,18 @@ export default function RoomBox({
               </p>
             </div>
           </div>
+          {/* 3D 좌표 정보 표시 */}
           {(() => {
             const [x3d, y3d, z3d] = selectedFurnitureData.position;
+            // 실제 가구 크기 사용 (커스텀 가구 포함)
             const size = selectedFurnitureData.size || [100, 100, 100];
             const [width, height, depth] = size;
             
+            // 왼쪽아래 좌표 (3D 중심 좌표 → 2D 왼쪽아래 좌표)
             const leftBottomX = Math.round(x3d - width / 2);
             const leftBottomZ = Math.round(z3d - depth / 2);
+            
+            // 오른쪽위 좌표
             const rightTopX = Math.round(x3d + width / 2);
             const rightTopZ = Math.round(z3d + depth / 2);
             
@@ -1264,7 +1584,7 @@ export default function RoomBox({
         </div>
       )}
       
-      {/* 배치 가이드 */}
+      {/* Enhanced Placement Guide with Animation */}
       {placementMode && (
         <div className="absolute inset-0 z-30 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -1291,7 +1611,7 @@ export default function RoomBox({
         onClose={() => setPlacementMode(null)}
       />
       
-      {/* Toast 알림 */}
+      {/* Toast Notifications */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
