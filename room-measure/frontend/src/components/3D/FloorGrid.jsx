@@ -17,7 +17,7 @@ const FloorGrid = React.memo(function FloorGrid({ roomSize, visible = true }) {
           [x, 0.3, 0],
           [x, 0.3, roomDepth],
         ]}
-        color="#cccccc"
+        color="#E2E8F0"
         lineWidth={1}
       />
     );
@@ -31,7 +31,7 @@ const FloorGrid = React.memo(function FloorGrid({ roomSize, visible = true }) {
           [0, 0.3, z],
           [roomWidth, 0.3, z],
         ]}
-        color="#cccccc"
+        color="#E2E8F0"
         lineWidth={1}
       />
     );

@@ -69,19 +69,19 @@ const PlacementGuide = ({ placementMode, onClose }) => {
 
   return (
     <div className="fixed bottom-4 left-4 z-40 max-w-sm">
-      <div className="bg-white/95 backdrop-blur rounded-lg shadow-lg border border-gray-200">
-        <div className="flex items-center justify-between p-3 border-b border-gray-200">
-          <h4 className="font-semibold text-sm text-gray-800">{title}</h4>
+      <div className="bg-surface/95 backdrop-blur rounded-lg shadow-lg border border-border">
+        <div className="flex items-center justify-between p-3 border-b border-border">
+          <h4 className="font-semibold text-sm text-text-primary">{title}</h4>
           <div className="flex gap-1">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-text-secondary hover:text-primary transition-colors"
             >
               {isExpanded ? '▼' : '▶'}
             </button>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 transition-colors ml-1"
+              className="text-text-secondary hover:text-primary transition-colors ml-1"
             >
               ✕
             </button>
@@ -91,13 +91,13 @@ const PlacementGuide = ({ placementMode, onClose }) => {
         {isExpanded && (
           <div className="p-3 space-y-2">
             {tips.map((tip, index) => (
-              <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
+              <div key={index} className="flex items-start gap-2 text-xs text-text-secondary">
                 <span className="flex-shrink-0">{tip.split(' ')[0]}</span>
                 <span>{tip.substring(tip.indexOf(' ') + 1)}</span>
               </div>
             ))}
-            <div className="mt-3 pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-500 italic">
+            <div className="mt-3 pt-2 border-t border-border">
+              <p className="text-xs text-text-secondary italic">
                 💫 마우스로 클릭해서 가구를 배치하세요!
               </p>
             </div>

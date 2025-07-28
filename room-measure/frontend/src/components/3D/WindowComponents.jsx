@@ -25,19 +25,19 @@ export const Window3D = React.memo(function Window3D({
             frameThickness,
           ]}
         />
-        <meshStandardMaterial color="#8B4513" roughness={0.3} metalness={0.2} />
+        <meshStandardMaterial color="#334155" roughness={0.3} metalness={0.2} />
       </mesh>
 
       {/* 유리창 - 더 뚜렷한 청색으로 */}
       <mesh position={[0, 0, frameThickness / 2]} castShadow receiveShadow>
         <boxGeometry args={[width * 0.85, height * 0.85, glassThickness]} />
         <meshStandardMaterial
-          color="#4169E1"
+          color="var(--window-fill)"
           transparent={true}
           opacity={0.6}
           roughness={0.05}
           metalness={0.1}
-          emissive="#1E90FF"
+          emissive="var(--window-stroke)"
           emissiveIntensity={0.2}
         />
       </mesh>
@@ -47,19 +47,19 @@ export const Window3D = React.memo(function Window3D({
         {/* 세로 채색 */}
         <mesh>
           <boxGeometry args={[3, height * 0.8, 1]} />
-          <meshStandardMaterial color="#2F4F4F" roughness={0.2} />
+          <meshStandardMaterial color="#1E293B" roughness={0.2} />
         </mesh>
         {/* 가로 채색 */}
         <mesh>
           <boxGeometry args={[width * 0.8, 3, 1]} />
-          <meshStandardMaterial color="#2F4F4F" roughness={0.2} />
+          <meshStandardMaterial color="#1E293B" roughness={0.2} />
         </mesh>
       </group>
 
       {/* 창문 테두리 강조 */}
       <mesh position={[0, 0, frameThickness / 2 + 2]}>
         <boxGeometry args={[width + frameThickness + 2, height + frameThickness + 2, 0.5]} />
-        <meshStandardMaterial color="#8B4513" transparent={true} opacity={0.8} />
+        <meshStandardMaterial color="#334155" transparent={true} opacity={0.8} />
       </mesh>
       
       {/* 그림자 */}
@@ -194,7 +194,7 @@ export const WindowsOnWalls = React.memo(function WindowsOnWalls({
                 position[2],
               ]}
               fontSize={8}
-              color="#666666"
+              color="#475569"
               anchorX="center"
               anchorY="middle"
             >

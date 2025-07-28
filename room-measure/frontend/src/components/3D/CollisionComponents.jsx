@@ -7,7 +7,7 @@ export const CollisionIndicator = React.memo(function CollisionIndicator({
   size,
   collisionType = "furniture",
 }) {
-  const color = collisionType === "wall" ? "#ff6b6b" : "#ffd93d";
+  const color = collisionType === "wall" ? "#EF4444" : "#FFD700";
 
   return (
     <mesh position={position}>
@@ -73,7 +73,7 @@ export const ValidPlacementArea = React.memo(function ValidPlacementArea({
       {validPositions.map((pos, index) => (
         <mesh key={index} position={[pos[0], 0.1, pos[2]]}>
           <circleGeometry args={[5]} />
-          <meshBasicMaterial color="#4ade80" transparent opacity={0.6} />
+          <meshBasicMaterial color="#10B981" transparent opacity={0.6} />
         </mesh>
       ))}
     </group>
@@ -89,10 +89,10 @@ export const CollisionAlert = React.memo(function CollisionAlert({
   if (!visible || !collisions || collisions.length === 0) return null;
 
   return (
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg max-w-sm">
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-danger border border-danger text-white px-4 py-3 rounded-lg shadow-lg max-w-sm">
       <div className="flex items-center justify-between mb-2">
         <h4 className="font-semibold">충돌 감지</h4>
-        <button onClick={onDismiss} className="text-red-500 hover:text-red-700">
+        <button onClick={onDismiss} className="text-white/80 hover:text-white">
           ×
         </button>
       </div>

@@ -22,11 +22,11 @@ const ImageUploader = ({ onUpload }) => {
       <button
         type="button"
         onClick={() => fileInputRef.current && fileInputRef.current.click()}
-        className="bg-white border border-pink-300 text-gray-800 font-semibold px-6 py-2 rounded-lg shadow-sm hover:bg-pink-50 focus:outline-none focus:ring-2 focus:ring-pink-400 transition mb-2"
+        className="bg-primary text-white font-semibold px-6 py-2 rounded-lg shadow-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition mb-2"
       >
         Upload
       </button>
-      <span className="text-xs text-gray-500 text-center mt-1">
+      <span className="text-xs text-text-secondary text-center mt-1">
         (JPG, PNG and other image files only)
       </span>
     </div>

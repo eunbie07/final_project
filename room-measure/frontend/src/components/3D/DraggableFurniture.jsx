@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useThree } from "@react-three/fiber";
-import { ContactShadows } from "@react-three/drei";
+import { ContactShadows, Text } from "@react-three/drei";
 import * as THREE from "three";
 import CollisionDetector from "../../utils/CollisionDetector";
 import PositionSnapper from "../../utils/PositionSnapper";
@@ -150,9 +150,9 @@ export const DraggableFurnitureWithCollision = React.memo(
           dragStart.current = null;
 
           if (isDraggingRef.current) {
-            // 드래그 완료 후 2D 좌표 업데이트 - 마지막 유효 위치 사용
+            // 드래그 완료 후 2D 좌표 업데이트 - 마지막 유효 위치와 회전 정보 사용
             if (updatePlacedFurniturePosition) {
-              updatePlacedFurniturePosition(id, lastValidPosition.current);
+              updatePlacedFurniturePosition(id, lastValidPosition.current, rotation);
             }
 
             // 상태 초기화
@@ -217,11 +217,37 @@ export const DraggableFurnitureWithCollision = React.memo(
             roughness={0.7}
             metalness={0.3}
             emissive={
-              selected ? "#ffffff" : hasCollision ? "#ff6666" : "#000000"
+              selected ? "white" : hasCollision ? "#EF4444" : "#000000"
             }
             emissiveIntensity={selected ? 0.1 : hasCollision ? 0.2 : 0}
           />
         </mesh>
+
+        {/* 가구 이름 텍스트 */}
+        <Text
+          position={[0, size[1] / 2 + 10, 0]} // 가구 위에 표시
+          rotation={[0, -rotation[1], 0]} // 가구 회전과 반대로 회전하여 항상 정면을 보도록
+          fontSize={15}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          depthTest={false} // 다른 오브젝트에 가려지지 않도록
+        >
+          {customFurnitureData?.name || furniturePresets[type]?.name}
+        </Text>
+
+        {/* 가구 치수 텍스트 */}
+        <Text
+          position={[0, size[1] / 2 - 5, 0]} // 가구 이름 아래에 표시
+          rotation={[0, -rotation[1], 0]} // 가구 회전과 반대로 회전하여 항상 정면을 보도록
+          fontSize={10}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          depthTest={false} // 다른 오브젝트에 가려지지 않도록
+        >
+          {`${size[0]}x${size[2]}x${size[1]}cm`}
+        </Text>
 
         <ContactShadows
           position={[0, -size[1] / 2 + 0.1, 0]}
@@ -235,7 +261,7 @@ export const DraggableFurnitureWithCollision = React.memo(
           <mesh rotation={rotation}>
             <boxGeometry args={size.map((s) => s + 5)} />
             <meshBasicMaterial
-              color="#4fc3f7"
+              color="#334155"
               transparent
               opacity={0.2}
               wireframe={true}

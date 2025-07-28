@@ -1,10 +1,11 @@
 // frontend/src/components/DepthMapViewer.jsx
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useRef } from "react";
+import { generateDepthMap, getDepthMapImage } from "../utils/api";
 
 const DepthMapViewer = () => {
   const [depthUrl, setDepthUrl] = useState(null);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleDepthUpload = async (e) => {
     const file = e.target.files[0];
@@ -15,11 +16,9 @@ const DepthMapViewer = () => {
     formData.append("file", file);
 
     try {
-      const res = await axios.post("http://localhost:3000/depth-map", formData, {
-        responseType: "blob", // 이미지 응답
-      });
-
-      const url = URL.createObjectURL(res.data);
+      await generateDepthMap();
+      const imageBlob = await getDepthMapImage();
+      const url = URL.createObjectURL(imageBlob);
       setDepthUrl(url);
     } catch (err) {
       console.error("깊이 추정 실패:", err);
@@ -29,13 +28,20 @@ const DepthMapViewer = () => {
   };
 
   return (
-    <div className="mt-6">
-      <h2 className="text-lg font-bold mb-2">Depth Map 보기</h2>
-      <input type="file" accept="image/*" onChange={handleDepthUpload} />
-      {loading && <p className="mt-2">분석 중입니다...</p>}
+    <div className="mt-6 p-6 bg-surface rounded-xl shadow-lg border border-border">
+      <h2 className="text-2xl font-bold mb-4 text-text-primary">Depth Map 보기</h2>
+      <input type="file" accept="image/*" onChange={handleDepthUpload} ref={fileInputRef} className="hidden" />
+      <button
+        type="button"
+        onClick={() => fileInputRef.current && fileInputRef.current.click()}
+        className="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg font-medium transition-colors mb-4"
+      >
+        깊이 맵 이미지 업로드
+      </button>
+      {loading && <p className="mt-2 text-text-secondary">분석 중입니다...</p>}
       {depthUrl && (
-        <div className="mt-4">
-          <img src={depthUrl} alt="depth map" style={{ maxWidth: "100%" }} />
+        <div className="mt-4 p-4 border border-border rounded-lg bg-background">
+          <img src={depthUrl} alt="depth map" className="max-w-full h-auto rounded-lg" />
         </div>
       )}
     </div>

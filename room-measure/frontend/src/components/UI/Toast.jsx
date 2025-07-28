@@ -17,13 +17,13 @@ const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
     
     switch (type) {
       case 'success':
-        return `${baseStyles} bg-green-500/90 text-white border border-green-400`;
+        return `${baseStyles} bg-accent/90 text-white border border-accent`;
       case 'error':
-        return `${baseStyles} bg-red-500/90 text-white border border-red-400`;
+        return `${baseStyles} bg-danger/90 text-white border border-danger`;
       case 'warning':
-        return `${baseStyles} bg-yellow-500/90 text-white border border-yellow-400`;
+        return `${baseStyles} bg-primary/90 text-white border border-primary`;
       default:
-        return `${baseStyles} bg-blue-500/90 text-white border border-blue-400`;
+        return `${baseStyles} bg-secondary/90 text-white border border-secondary`;
     }
   };
 

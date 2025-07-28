@@ -30,14 +30,14 @@ const ViewPresets = React.memo(function ViewPresets({
   ];
 
   return (
-    <div className="bg-white/90 backdrop-blur p-2 rounded-lg">
-      <h4 className="font-semibold text-xs mb-2">시점 변경</h4>
+    <div className="bg-surface/90 backdrop-blur p-2 rounded-lg border border-border">
+      <h4 className="font-semibold text-xs mb-2 text-text-primary">시점 변경</h4>
       <div className="grid grid-cols-2 gap-1">
         {presets.map((preset) => (
           <button
             key={preset.name}
             onClick={() => onViewChange(preset)}
-            className="flex flex-col items-center p-1 bg-gray-100 hover:bg-blue-100 rounded text-xs transition-colors"
+            className="flex flex-col items-center p-1 bg-background hover:bg-primary/10 rounded text-xs transition-colors text-text-secondary"
           >
             <span>{preset.name}</span>
           </button>

@@ -97,12 +97,12 @@ export const DraggableHuman = React.memo(function DraggableHuman({
           onPointerDown={handlePointerDown}
         >
           <cylinderGeometry args={[15, 20, height]} />
-          <meshStandardMaterial color="#666666" opacity={0.8} transparent />
+          <meshStandardMaterial color="#64748B" opacity={0.6} transparent />
         </mesh>
         <Text
           position={[30, height * 0.8, 0]}
           fontSize={15}
-          color="#333333"
+          color="#1E293B"
           anchorX="left"
           fontWeight="bold"
           backgroundColor="#FFFFFF"
@@ -138,7 +138,7 @@ export const DraggableHuman = React.memo(function DraggableHuman({
       <Text
         position={[30, height * 0.8, 0]}
         fontSize={15}
-        color="#333333"
+        color="#1E293B"
         anchorX="left"
         fontWeight="bold"
         backgroundColor="#FFFFFF"

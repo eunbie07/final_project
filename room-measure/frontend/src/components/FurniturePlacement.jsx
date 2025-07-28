@@ -1,129 +1,35 @@
 // frontend/src/components/FurniturePlacement.jsx
 import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBed,
+  faChair,
+  faCouch,
+  faTable,
+  faTv,
+  faBook,
+  faBox,
+} from '@fortawesome/free-solid-svg-icons';
 
-const FURNITURE_CATALOG = [
-  // 침실 가구
-  {
-    id: "single_bed",
-    name: "싱글 베드",
-    width: 100,
-    depth: 200,
-    category: "bedroom",
-    color: "#FFB6C1",
-    icon: "🛏️",
-  },
-  {
-    id: "double_bed",
-    name: "더블 베드",
-    width: 150,
-    depth: 200,
-    category: "bedroom",
-    color: "#FFD1DC",
-    icon: "🛏️",
-  },
-  {
-    id: "queen_bed",
-    name: "퀸 베드",
-    width: 160,
-    depth: 200,
-    category: "bedroom",
-    color: "#FFC0CB",
-    icon: "🛏️",
-  },
-  {
-    id: "king_bed",
-    name: "킹 베드",
-    width: 180,
-    depth: 200,
-    category: "bedroom",
-    color: "#FFB7C5",
-    icon: "🛏️",
-  },
-  // 책상/의자
-  {
-    id: "desk",
-    name: "책상",
-    width: 120,
-    depth: 60,
-    category: "office",
-    color: "#98FB98",
-    icon: "🪑",
-  },
-  {
-    id: "chair",
-    name: "의자",
-    width: 50,
-    depth: 50,
-    category: "office",
-    color: "#90EE90",
-    icon: "🪑",
-  },
-  // 거실 가구
-  {
-    id: "sofa_2",
-    name: "2인 소파",
-    width: 140,
-    depth: 80,
-    category: "living",
-    color: "#87CEEB",
-    icon: "🛋️",
-  },
-  {
-    id: "sofa_3",
-    name: "3인 소파",
-    width: 180,
-    depth: 80,
-    category: "living",
-    color: "#ADD8E6",
-    icon: "🛋️",
-  },
-  {
-    id: "coffee_table",
-    name: "커피 테이블",
-    width: 100,
-    depth: 50,
-    category: "living",
-    color: "#B0E0E6",
-    icon: "🪑",
-  },
-  {
-    id: "tv_stand",
-    name: "TV 스탠드",
-    width: 120,
-    depth: 40,
-    category: "living",
-    color: "#E0FFFF",
-    icon: "📺",
-  },
-  // 수납 가구
-  {
-    id: "wardrobe",
-    name: "옷장",
-    width: 80,
-    depth: 60,
-    category: "storage",
-    color: "#DDA0DD",
-    icon: "🚪",
-  },
-  {
-    id: "bookshelf",
-    name: "책장",
-    width: 80,
-    depth: 30,
-    category: "storage",
-    color: "#D8BFD8",
-    icon: "📚",
-  },
-  {
-    id: "dresser",
-    name: "화장대",
-    width: 100,
-    depth: 45,
-    category: "storage",
-    color: "#E6E6FA",
-    icon: "💄",
-  },
-];
+// Import furniture presets from constants
+import { FURNITURE_PRESETS } from '../constants/furniture';
+
+// Convert furniture presets to catalog format
+const FURNITURE_CATALOG = Object.entries(FURNITURE_PRESETS).map(([id, preset]) => ({
+  id: id,
+  name: preset.name,
+  width: preset.size[0], // width from size array
+  depth: preset.size[2], // depth from size array (index 2)
+  category: preset.category,
+  icon: preset.icon === "faBed" ? faBed :
+        preset.icon === "faChair" ? faChair :
+        preset.icon === "faCouch" ? faCouch :
+        preset.icon === "faTable" ? faTable :
+        preset.icon === "faTv" ? faTv :
+        preset.icon === "faBook" ? faBook :
+        preset.icon === "faBox" ? faBox :
+        faBox, // default icon
+}));
 
 const CATEGORIES = [
   { id: "all", name: "전체", icon: "" },
@@ -135,60 +41,48 @@ const CATEGORIES = [
 
 const FurnitureItem = ({ furniture, onDragStart }) => (
   <div
-    className="p-3 border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm rounded-lg cursor-grab active:cursor-grabbing transition-all"
+    className="relative p-4 border-2 border-border bg-surface hover:border-primary hover:shadow-lg rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200 flex flex-col items-center justify-center min-h-[100px]"
     draggable
     onDragStart={(e) => {
       e.dataTransfer.effectAllowed = "copy";
       onDragStart(e, furniture);
     }}
   >
-    <div className="text-center">
-      <div className="text-2xl mb-1">{furniture.icon}</div>
-      <div className="text-sm font-medium text-gray-700">{furniture.name}</div>
-      <div className="text-xs text-gray-500">
-        {furniture.width} × {furniture.depth} cm
-      </div>
+    <div className="text-4xl mb-2 text-primary">
+      <FontAwesomeIcon icon={furniture.icon} />
+    </div>
+    <div className="text-sm font-medium text-text-primary text-center">{furniture.name}</div>
+    <div className="text-xs text-text-secondary text-center mt-1">
+      {furniture.width} × {furniture.depth} cm
     </div>
   </div>
 );
 
-const FurniturePlacement = ({
-  roomWidth, // Width(X축) - 가로, cm 단위
-  roomDepth, // Depth(Z축) - 세로, cm 단위 (3D와 일치)
-  roomHeight = 240, // 방 높이, cm 단위
-  placedFurniture = [],
-  onFurnitureChange,
-  detectedWindows = [], // 창문 정보
-}) => {
+const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurnitureChange, detectedWindows = [], roomHeight = 250 }) => {
+  // 유효성 검사 - Width(X), Depth(Y) 단위: cm (먼저 선언)
+  const validRoomWidth = isNaN(roomWidth) || roomWidth <= 0 ? 400 : roomWidth;
+  const validRoomDepth = isNaN(roomDepth) || roomDepth <= 0 ? 300 : roomDepth;
+
+  // State 변수들
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedFurnitureIndex, setSelectedFurnitureIndex] = useState(null);
   const [draggedFurniture, setDraggedFurniture] = useState(null);
   const [isDraggingPlaced, setIsDraggingPlaced] = useState(false);
-  const canvasRef = useRef(null);
-  
-  // 드래그 미리보기 상태
   const [dragPreview, setDragPreview] = useState(null);
   const [previewCollision, setPreviewCollision] = useState(false);
-  
-  // 실행취소/다시실행 상태
-  const [history, setHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const [isUndoRedoing, setIsUndoRedoing] = useState(false); // 실행취소/다시실행 중인지 확인
-  
-  // 복사/붙여넣기 상태
   const [copiedFurniture, setCopiedFurniture] = useState(null);
-  
-  // 커스텀 가구 상태
   const [customFurnitureName, setCustomFurnitureName] = useState("");
   const [customFurnitureSize, setCustomFurnitureSize] = useState({
     width: "",
     depth: "",
     height: ""
   });
-
-  // 유효성 검사 - Width(X), Depth(Y) 단위: cm (먼저 선언)
-  const validRoomWidth = isNaN(roomWidth) || roomWidth <= 0 ? 400 : roomWidth;
-  const validRoomDepth = isNaN(roomDepth) || roomDepth <= 0 ? 300 : roomDepth;
+  
+  // Refs
+  const canvasRef = useRef(null);
+  const isUndoRedoing = useRef(false);
 
   // 충돌 체크 함수 (먼저 선언)
   const checkCollision = useCallback(
@@ -221,33 +115,28 @@ const FurniturePlacement = ({
     [placedFurniture]
   );
 
-  // placedFurniture 변경 감지 및 히스토리 추가
-  useEffect(() => {
-    console.log('📐 FurniturePlacement - placedFurniture 업데이트됨:', placedFurniture);
-    // 실행취소/다시실행 중이 아닐 때만 히스토리에 추가
-    if (!isUndoRedoing) {
-      addToHistory(placedFurniture);
-    }
-  }, [placedFurniture, isUndoRedoing]);
-
-  // 히스토리 관리 함수들
+  // addToHistory 함수 먼저 선언
   const addToHistory = useCallback((newState) => {
     setHistoryIndex(currentIndex => {
       setHistory(prev => {
         const newHistory = prev.slice(0, currentIndex + 1);
         newHistory.push(JSON.parse(JSON.stringify(newState))); // 깊은 복사
-        console.log('📚 히스토리 추가:', { currentIndex, newLength: newHistory.length });
-        
-        if (newHistory.length > 50) { // 최대 50개까지 저장
-          newHistory.shift();
-          return newHistory;
-        }
-        return newHistory;
+        return newHistory.slice(-50); // 최대 50개 히스토리 유지
       });
-      
       return Math.min(currentIndex + 1, 49);
     });
   }, []);
+
+  // placedFurniture 변경 감지 및 히스토리 추가
+  useEffect(() => {
+    console.log('📐 FurniturePlacement - placedFurniture 업데이트됨:', placedFurniture);
+    // 실행취소/다시실행 중이 아닐 때만 히스토리에 추가
+    if (!isUndoRedoing.current) {
+      addToHistory(placedFurniture);
+    }
+  }, [placedFurniture, addToHistory]);
+
+  // 히스토리 관리 함수들
 
   const undo = useCallback(() => {
     console.log('🔄 Undo 시도:', { historyIndex, historyLength: history.length });
@@ -256,25 +145,25 @@ const FurniturePlacement = ({
       const prevState = history[newIndex];
       console.log('🔄 Undo 실행:', { newIndex, prevState });
       
-      setIsUndoRedoing(true);
+      isUndoRedoing.current = true;
       setHistoryIndex(newIndex);
       onFurnitureChange(prevState);
       
       // 다음 렌더링 사이클에서 플래그 해제
-      setTimeout(() => setIsUndoRedoing(false), 0);
+      setTimeout(() => { isUndoRedoing.current = false; }, 0);
     }
   }, [history, historyIndex, onFurnitureChange]);
 
   const redo = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
-      setIsUndoRedoing(true);
+      isUndoRedoing.current = true;
       setHistoryIndex(newIndex);
       const nextState = history[newIndex];
       onFurnitureChange(nextState);
       
       // 다음 렌더링 사이클에서 플래그 해제
-      setTimeout(() => setIsUndoRedoing(false), 0);
+      setTimeout(() => { isUndoRedoing.current = false; }, 0);
     }
   }, [history, historyIndex, onFurnitureChange]);
 
@@ -734,9 +623,9 @@ const FurniturePlacement = ({
         x: x,
         z: z,
         rotation: 0,
-        category: "custom",
+        category: "storage", // Use existing category instead of "custom"
         color: "#DDA0DD",
-        icon: "📦",
+        icon: faBox,
         isCustom: true
       };
 
@@ -921,18 +810,23 @@ const FurniturePlacement = ({
 
     URL.revokeObjectURL(url);
 
+    // AI Design을 위해 localStorage에도 저장
+    localStorage.setItem('roomPlannerData', JSON.stringify(saveData));
+
     console.log("JSON 저장 완료:", saveData);
   }, [
     placedFurniture,
     validRoomWidth,
     validRoomDepth,
     calculateSpaceUtilization,
+    detectedWindows,
+    roomHeight,
   ]);
 
   return (
-    <div className="mt-8 p-6 bg-white rounded-xl shadow-lg border">
+    <div className="mt-8 p-6 bg-surface rounded-xl shadow-lg border border-border">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-text-primary flex items-center gap-2">
           <strong>가구 배치 시뮬레이션</strong>
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -940,7 +834,7 @@ const FurniturePlacement = ({
           <div className="flex gap-1">
             <button
               onClick={undo}
-              className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 bg-secondary hover:bg-primary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={historyIndex <= 0}
               title="실행취소 (Ctrl+Z)"
             >
@@ -948,7 +842,7 @@ const FurniturePlacement = ({
             </button>
             <button
               onClick={redo}
-              className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 bg-secondary hover:bg-primary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={historyIndex >= history.length - 1}
               title="다시실행 (Ctrl+Y)"
             >
@@ -960,7 +854,7 @@ const FurniturePlacement = ({
           <div className="flex gap-1">
             <button
               onClick={copySeletedFurniture}
-              className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 bg-secondary hover:bg-primary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={selectedFurnitureIndex === null}
               title="복사 (Ctrl+C)"
             >
@@ -968,7 +862,7 @@ const FurniturePlacement = ({
             </button>
             <button
               onClick={pasteFurniture}
-              className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 bg-secondary hover:bg-primary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!copiedFurniture}
               title="붙여넣기 (Ctrl+V)"
             >
@@ -978,14 +872,42 @@ const FurniturePlacement = ({
 
           <button
             onClick={handleSaveAsJson}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={placedFurniture.length === 0}
           >
             <strong>JSON 저장</strong>
           </button>
           <button
+            onClick={() => {
+              // 데이터 저장 후 AI Design 페이지로 이동
+              if (placedFurniture.length > 0) {
+                const saveData = {
+                  roomInfo: {
+                    width: validRoomWidth,
+                    depth: validRoomDepth,
+                    height: roomHeight,
+                    area: ((validRoomWidth * validRoomDepth) / 10000).toFixed(1) + "㎡",
+                  },
+                  furniture: placedFurniture,
+                  statistics: {
+                    furnitureCount: placedFurniture.length,
+                    spaceUtilization: calculateSpaceUtilization + "%",
+                  }
+                };
+                localStorage.setItem('roomPlannerData', JSON.stringify(saveData));
+                window.location.href = '/ai-design';
+              } else {
+                alert("AI 디자인을 생성하려면 먼저 가구를 배치해주세요!");
+              }
+            }}
+            className="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={placedFurniture.length === 0}
+          >
+            <strong>AI 디자인 생성</strong>
+          </button>
+          <button
             onClick={handleClearAll}
-            className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-danger hover:bg-red-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={placedFurniture.length === 0}
           >
             <strong>전체 삭제</strong>
@@ -995,28 +917,27 @@ const FurniturePlacement = ({
 
       {/* 통계 정보 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-rose-50 p-4 rounded-lg">
-          <div className="text-sm text-rose-600 font-medium">
-            {" "}
-            <strong>방 크기</strong>
+        <div className="bg-surface p-4 rounded-lg border border-border">
+          <div className="text-sm text-text-secondary font-medium">
+            방 크기
           </div>
-          <div className="text-lg font-bold text-rose-800">
+          <div className="text-lg font-bold text-text-primary">
             {validRoomWidth.toFixed(1)} × {validRoomDepth.toFixed(1)} cm
           </div>
         </div>
-        <div className="bg-pink-50 p-4 rounded-lg">
-          <div className="text-sm text-pink-600 font-medium">
-            <strong>배치된 가구</strong>
+        <div className="bg-surface p-4 rounded-lg border border-border">
+          <div className="text-sm text-text-secondary font-medium">
+            배치된 가구
           </div>
-          <div className="text-lg font-bold text-pink-800">
+          <div className="text-lg font-bold text-text-primary">
             {placedFurniture.length} 개
           </div>
         </div>
-        <div className="bg-rose-100 p-4 rounded-lg">
-          <div className="text-sm text-rose-700 font-medium">
-            <strong>공간 활용률</strong>
+        <div className="bg-surface p-4 rounded-lg border border-border">
+          <div className="text-sm text-text-secondary font-medium">
+            공간 활용률
           </div>
-          <div className="text-lg font-bold text-rose-800">
+          <div className="text-lg font-bold text-text-primary">
             {calculateSpaceUtilization}%
           </div>
         </div>
@@ -1025,20 +946,20 @@ const FurniturePlacement = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 가구 카탈로그 */}
         <div className="lg:col-span-1">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+          <h3 className="text-2xl font-bold mb-4 text-text-primary">
             <strong>가구 선택</strong>
           </h3>
 
           {/* 카테고리 탭 */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className={`flex flex-wrap gap-2 mb-4 ${draggedFurniture && !isDraggingPlaced ? 'opacity-50 pointer-events-none' : ''}`}>
             {CATEGORIES.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? "bg-pink-500 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-primary text-white"
+                    : "bg-background text-text-secondary hover:bg-border"
                 }`}
               >
                 {category.name}
@@ -1047,7 +968,7 @@ const FurniturePlacement = ({
           </div>
 
           {/* 가구 목록 */}
-          <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+          <div className={`grid grid-cols-2 gap-3 max-h-96 overflow-y-auto ${draggedFurniture && !isDraggingPlaced ? 'opacity-50' : ''}`}>
             {filteredItems.map((item) => (
               <FurnitureItem
                 key={item.id}
@@ -1058,8 +979,8 @@ const FurniturePlacement = ({
           </div>
 
           {/* 커스텀 가구 추가 */}
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-sm font-semibold mb-3 text-blue-800">커스텀 가구 추가</h4>
+          <div className="mt-4 p-3 bg-background border border-border rounded-lg">
+            <h4 className="text-lg font-semibold mb-3 text-text-primary">커스텀 가구 추가</h4>
             <div className="space-y-2">
               <input
                 type="text"
@@ -1102,7 +1023,7 @@ const FurniturePlacement = ({
               <button
                 onClick={handleAddCustomFurniture}
                 disabled={!customFurnitureName || !customFurnitureSize.width || !customFurnitureSize.depth || !customFurnitureSize.height}
-                className="w-full px-3 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 bg-primary text-white rounded text-sm font-medium hover:bg-secondary disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 커스텀 가구 추가
               </button>
@@ -1110,8 +1031,8 @@ const FurniturePlacement = ({
           </div>
 
           {/* 템플릿 관리 */}
-          <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-            <h4 className="text-sm font-semibold mb-3 text-purple-800">템플릿 관리</h4>
+          <div className="mt-4 p-3 bg-background border border-border rounded-lg">
+            <h4 className="text-lg font-semibold mb-3 text-text-primary">템플릿 관리</h4>
             <div className="space-y-2">
               <div className="flex gap-1">
                 <input
@@ -1129,7 +1050,7 @@ const FurniturePlacement = ({
                     }
                   }}
                   disabled={placedFurniture.length === 0}
-                  className="px-3 py-1 bg-purple-500 text-white rounded text-sm font-medium hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="px-3 py-1 bg-primary text-white rounded text-sm font-medium hover:bg-secondary disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   저장
                 </button>
@@ -1142,7 +1063,7 @@ const FurniturePlacement = ({
                     <div className="flex gap-1 ml-2">
                       <button
                         onClick={() => loadTemplate(template.name)}
-                        className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+                        className="px-2 py-1 bg-primary text-white rounded text-xs hover:bg-secondary"
                       >
                         불러오기
                       </button>
@@ -1154,7 +1075,7 @@ const FurniturePlacement = ({
                             setSelectedFurnitureIndex(selectedFurnitureIndex);
                           }
                         }}
-                        className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                        className="px-2 py-1 bg-danger text-white rounded text-xs hover:bg-red-600"
                       >
                         삭제
                       </button>
@@ -1168,8 +1089,8 @@ const FurniturePlacement = ({
             </div>
           </div>
 
-          <div className="mt-4 p-3 bg-pink-50 border border-pink-200 rounded-lg">
-            <p className="text-sm text-pink-800">
+          <div className="mt-4 p-3 bg-background border border-border rounded-lg">
+            <p className="text-sm text-text-secondary">
               <strong>사용법:</strong>
               <br />
               • 가구를 드래그해서 방에 배치 (미리보기 제공)
@@ -1191,12 +1112,12 @@ const FurniturePlacement = ({
 
         {/* 방 평면도 */}
         <div className="lg:col-span-2">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+          <h3 className="text-2xl font-bold mb-4 text-text-primary">
             <strong>방 평면도</strong>
           </h3>
 
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
-            <div className="mb-2 text-sm text-gray-600 text-center">
+          <div className="border-2 border-dashed border-border rounded-lg p-4 bg-white">
+            <div className="mb-2 text-sm text-text-secondary text-center">
               실제 비율: {validRoomWidth} × {validRoomDepth} cm (
               {(validRoomWidth / validRoomDepth).toFixed(2)}:1) - 좌표: 왼쪽 위
               (0,0)
@@ -1207,7 +1128,7 @@ const FurniturePlacement = ({
                 ref={canvasRef}
                 width={svgDimensions.svgWidth + 40}
                 height={svgDimensions.svgHeight + 40}
-                className="border border-gray-400 bg-white rounded-lg cursor-crosshair"
+                className="border border-border bg-white rounded-lg cursor-crosshair"
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 onDragLeave={(e) => {
@@ -1228,9 +1149,9 @@ const FurniturePlacement = ({
                   y="20"
                   width={svgDimensions.svgWidth}
                   height={svgDimensions.svgHeight}
-                  fill="#f8f9fa"
-                  stroke="#343a40"
-                  strokeWidth="2"
+                  fill="none"
+                  stroke="#4A4A4A"
+                  strokeWidth="3"
                 />
 
                 {/* 그리드 */}
@@ -1244,8 +1165,7 @@ const FurniturePlacement = ({
                     <path
                       d="M 20 0 L 0 0 0 20"
                       fill="none"
-                      stroke="#e9ecef"
-                      strokeWidth="1"
+                      stroke="#D3D3D3" strokeWidth="1.5"
                     />
                   </pattern>
                 </defs>
@@ -1262,8 +1182,8 @@ const FurniturePlacement = ({
                   cx="20"
                   cy="20"
                   r="3"
-                  fill="#ef4444"
-                  stroke="#ffffff"
+                  fill="var(--danger)"
+                  stroke="var(--text-primary)"
                   strokeWidth="1"
                 />
 
@@ -1312,8 +1232,8 @@ const FurniturePlacement = ({
                         y={windowY}
                         width={windowW}
                         height={windowH}
-                        fill="#87CEEB"
-                        stroke="#4682B4"
+                        fill="var(--window-fill)"
+                        stroke="var(--window-stroke)"
                         strokeWidth="1"
                         opacity="0.8"
                       />
@@ -1324,7 +1244,7 @@ const FurniturePlacement = ({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fontSize="8"
-                        fill="#2F4F4F"
+                        fill="var(--text-primary)"
                         className="pointer-events-none select-none"
                       >
                         창문
@@ -1351,26 +1271,30 @@ const FurniturePlacement = ({
                           y={scaledY}
                           width={scaledWidth}
                           height={scaledDepth}
-                          fill={previewCollision ? "#ff9999" : dragPreview.furniture.color}
-                          stroke={previewCollision ? "#ff0000" : "#666666"}
+                          fill={previewCollision ? "var(--danger)" : "var(--surface)"}
+                          stroke={previewCollision ? "var(--danger-dark)" : "var(--text-secondary)"}
                           strokeWidth="2"
                           opacity="0.6"
                           strokeDasharray="5,5"
                           className="pointer-events-none"
                         />
                         {/* 미리보기 아이콘 */}
-                        <text
-                          x={scaledX + scaledWidth / 2}
-                          y={scaledY + scaledDepth / 2}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fontSize="16"
-                          fill={previewCollision ? "#ff0000" : "#666666"}
-                          opacity="0.8"
-                          className="pointer-events-none select-none"
+                        <foreignObject
+                          x={scaledX + scaledWidth / 2 - 8}
+                          y={scaledY + scaledDepth / 2 - 8}
+                          width="16"
+                          height="16"
+                          className="pointer-events-none"
                         >
-                          {dragPreview.furniture.icon}
-                        </text>
+                          <FontAwesomeIcon 
+                            icon={dragPreview.furniture.icon} 
+                            style={{ 
+                              color: previewCollision ? "var(--danger)" : "var(--text-secondary)",
+                              opacity: 0.8,
+                              fontSize: "16px"
+                            }} 
+                          />
+                        </foreignObject>
                       </g>
                     );
                   })()
@@ -1403,7 +1327,7 @@ const FurniturePlacement = ({
                           width={scaledWidth + 10}
                           height={scaledDepth + 10}
                           fill="none"
-                          stroke="#FbbF24"
+                          stroke="var(--accent)"
                           strokeWidth="2"
                           strokeDasharray="5,5"
                           opacity="0.7"
@@ -1416,13 +1340,13 @@ const FurniturePlacement = ({
                         y={scaledY}
                         width={scaledWidth}
                         height={scaledDepth}
-                        fill={furniture.color}
+                        fill="#B0C4DE"
                         stroke={
                           selectedFurnitureIndex === index
-                            ? "#3B82F6"
-                            : "#374151"
+                            ? "none"
+                            : "var(--text-secondary)"
                         }
-                        strokeWidth={selectedFurnitureIndex === index ? 3 : 1}
+                        strokeWidth={selectedFurnitureIndex === index ? 0 : 1}
                         className="cursor-pointer hover:opacity-80 transition-opacity"
                         onMouseDown={(e) => {
                           e.preventDefault();
@@ -1471,70 +1395,71 @@ const FurniturePlacement = ({
                         }}
                       />
 
-                      {/* 가구 아이콘 */}
+                      {/* 가구 텍스트 정보 */}
                       <text
                         x={scaledX + scaledWidth / 2}
-                        y={scaledY + scaledDepth / 2}
+                        y={scaledY + scaledDepth / 2 - 8}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        fontSize="16"
+                        fontSize="12"
+                        fill="white"
+                        className="pointer-events-none select-none font-bold"
+                      >
+                        {furniture.name}
+                      </text>
+                      <text
+                        x={scaledX + scaledWidth / 2}
+                        y={scaledY + scaledDepth / 2 + 8}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="10"
                         fill="white"
                         className="pointer-events-none select-none"
-                        style={{ userSelect: "none" }}
                       >
-                        {furniture.icon}
+                        {actualWidth}x{actualDepth}cm
                       </text>
 
-                      {/* 선택된 가구 정보 표시 */}
+                      {/* 가로 치수 (가구 상단) */}
                       {selectedFurnitureIndex === index && (
+                        <text
+                          x={scaledX + scaledWidth / 2}
+                          y={scaledY - 5}
+                          textAnchor="middle"
+                          fontSize="9"
+                          fill="var(--text-primary)"
+                          className="pointer-events-none select-none"
+                        >
+                          {actualWidth}cm
+                        </text>
+                      )}
+
+                      {/* 세로 치수 (가구 왼쪽) */}
+                      {selectedFurnitureIndex === index && (
+                        <text
+                          x={scaledX - 10}
+                          y={scaledY + scaledDepth / 2}
+                          textAnchor="middle"
+                          fontSize="9"
+                          fill="var(--text-primary)"
+                          className="pointer-events-none select-none"
+                          transform={`rotate(-90, ${scaledX - 10}, ${
+                            scaledY + scaledDepth / 2
+                          })`}
+                        >
+                          {actualDepth}cm
+                        </text>
+                      )}
+
+                      {/* 선택된 가구 정보 표시 - 드래그 중이 아닐 때만 버튼 표시 */}
+                      {selectedFurnitureIndex === index && !draggedFurniture && (
                         <g>
-                          {/* 가구 이름 */}
-                          <text
-                            x={scaledX + scaledWidth / 2}
-                            y={scaledY - 25}
-                            textAnchor="middle"
-                            fontSize="12"
-                            fill="#1F2937"
-                            className="pointer-events-none select-none font-medium"
-                          >
-                            {furniture.name}
-                            {rotation !== 0 && ` (${rotation}°)`}
-                          </text>
-
-                          {/* 가로 치수 */}
-                          <text
-                            x={scaledX + scaledWidth / 2}
-                            y={scaledY - 10}
-                            textAnchor="middle"
-                            fontSize="11"
-                            fill="#4B5563"
-                            className="pointer-events-none select-none"
-                          >
-                            {actualWidth}cm
-                          </text>
-
-                          {/* 세로 치수 */}
-                          <text
-                            x={scaledX - 10}
-                            y={scaledY + scaledDepth / 2}
-                            textAnchor="middle"
-                            fontSize="11"
-                            fill="#4B5563"
-                            className="pointer-events-none select-none"
-                            transform={`rotate(-90, ${scaledX - 10}, ${
-                              scaledY + scaledDepth / 2
-                            })`}
-                          >
-                            {actualDepth}cm
-                          </text>
-
                           {/* 회전 버튼 */}
                           <circle
                             cx={scaledX + scaledWidth - 10}
                             cy={scaledY + scaledDepth - 10}
                             r="10"
-                            fill="#10B981"
-                            className="cursor-pointer hover:fill-green-600"
+                            fill="var(--accent)"
+                            className="cursor-pointer hover:fill-accent-dark"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleRotateFurniture(index);
@@ -1557,8 +1482,8 @@ const FurniturePlacement = ({
                             cx={scaledX + scaledWidth - 10}
                             cy={scaledY + 10}
                             r="10"
-                            fill="#EF4444"
-                            className="cursor-pointer hover:fill-red-600"
+                            fill="var(--danger)"
+                            className="cursor-pointer hover:fill-danger-dark"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteFurniture(index);
@@ -1587,7 +1512,7 @@ const FurniturePlacement = ({
                   y={15}
                   textAnchor="middle"
                   fontSize="12"
-                  fill="#666"
+                  fill="var(--text-secondary)"
                 >
                   {validRoomWidth.toFixed(0)} cm
                 </text>
@@ -1596,7 +1521,7 @@ const FurniturePlacement = ({
                   y={20 + svgDimensions.svgHeight / 2}
                   textAnchor="middle"
                   fontSize="12"
-                  fill="#666"
+                  fill="var(--text-secondary)"
                   transform={`rotate(-90, 10, ${
                     20 + svgDimensions.svgHeight / 2
                   })`}
@@ -1609,7 +1534,7 @@ const FurniturePlacement = ({
                   x="20"
                   y="15"
                   textAnchor="middle"
-                  style={{ fontSize: 10, fill: "#ef4444", fontWeight: 600 }}
+                  style={{ fontSize: 10, fill: "var(--danger)", fontWeight: 600 }}
                 >
                   (0,0)
                 </text>
@@ -1620,7 +1545,7 @@ const FurniturePlacement = ({
           {/* 드롭 영역 안내 */}
           {draggedFurniture && (
             <div className="mt-2 text-center">
-              <p className="text-sm text-pink-600 font-medium animate-pulse">
+              <p className="text-sm text-text-secondary font-medium animate-pulse">
                 위 회색 영역에 {draggedFurniture.name}을(를) 드래그해서 놓으세요
               </p>
             </div>
@@ -1629,11 +1554,11 @@ const FurniturePlacement = ({
           {/* 선택된 가구 정보 */}
           {selectedFurnitureIndex !== null &&
             placedFurniture[selectedFurnitureIndex] && (
-              <div className="mt-4 p-4 bg-pink-50 border border-pink-200 rounded-lg">
-                <h4 className="font-medium text-pink-800 mb-2">
+              <div className="mt-4 p-4 bg-background border border-border rounded-lg">
+                <h4 className="font-medium text-text-primary mb-2">
                   선택된 가구: {placedFurniture[selectedFurnitureIndex].name}
                 </h4>
-                <div className="text-sm text-pink-700 space-y-1">
+                <div className="text-sm text-text-secondary space-y-1">
                   <div>
                     크기:{" "}
                     {(placedFurniture[selectedFurnitureIndex].rotation || 0) %
@@ -1684,19 +1609,19 @@ const FurniturePlacement = ({
                     {placedFurniture[selectedFurnitureIndex].rotation || 0}°
                   </div>
                 </div>
-                <div className="mt-3 text-xs text-pink-600">
+                <div className="mt-3 text-xs text-text-secondary">
                   가구를 드래그하여 이동하거나, 녹색 버튼으로 회전할 수 있습니다
                 </div>
               </div>
             )}
 
           {/* 사용 가이드 */}
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium text-gray-700 mb-2">
+          <div className="mt-4 p-4 bg-background rounded-lg">
+            <h4 className="font-medium text-text-primary mb-2">
               <strong>사용 가이드</strong>
             </h4>
-            <div className="text-sm text-gray-600">
-              <strong className="text-gray-700">가구 배치</strong>
+            <div className="text-sm text-text-secondary">
+              <strong className="text-text-primary">가구 배치</strong>
               <ul className="mt-1 space-y-1 ml-4">
                 <li>• 왼쪽 목록에서 드래그하여 배치</li>
                 <li>• 클릭으로 선택, 드래그로 이동</li>
@@ -1704,7 +1629,7 @@ const FurniturePlacement = ({
                 <li>• 빨간 버튼으로 삭제</li>
               </ul>
             </div>
-            <div className="mt-3 text-xs text-gray-500">
+            <div className="mt-3 text-xs text-text-secondary">
               가구가 겹치거나 방 밖으로 나가지 않도록 자동으로 제한됩니다
             </div>
           </div>

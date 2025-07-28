@@ -42,19 +42,19 @@ const RoomCanvas = ({ x, y }) => {
   const dimFont = {
     fontSize: 16,
     fontWeight: 700,
-    fill: "#1F2937",
+    fill: "#1E293B",
     fontFamily: "inherit",
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-white py-8 rounded-lg shadow-sm border border-gray-200">
+    <div className="flex flex-col items-center justify-center bg-white py-8 rounded-lg shadow-sm border border-border">
       {/* Room layout 제목 */}
-      <div className="mb-4 text-xl font-bold text-gray-800 text-center">
+      <div className="mb-4 text-xl font-bold text-text-primary text-center">
         <strong>Room Layout</strong>
       </div>
 
       {/* 실제 크기 정보 */}
-      <div className="mb-4 text-sm text-gray-600 text-center">
+      <div className="mb-4 text-sm text-text-secondary text-center">
         실제 크기: {validX.toFixed(0)} × {validY.toFixed(0)} cm | 비율:{" "}
         {aspectRatio.toFixed(2)}:1 |{((validX * validY) / 10000).toFixed(1)}㎡
       </div>
@@ -73,8 +73,8 @@ const RoomCanvas = ({ x, y }) => {
             y={50}
             width={canvasWidth}
             height={canvasHeight}
-            fill="#f8fafc"
-            stroke="#1F2937"
+            fill="#F1F5F9"
+            stroke="#334155"
             strokeWidth={3}
           />
 
@@ -89,7 +89,7 @@ const RoomCanvas = ({ x, y }) => {
               <path
                 d="M 20 0 L 0 0 0 20"
                 fill="none"
-                stroke="#e2e8f0"
+                stroke="#E2E8F0"
                 strokeWidth="0.5"
               />
             </pattern>
@@ -107,8 +107,8 @@ const RoomCanvas = ({ x, y }) => {
             cx={50}
             cy={50}
             r={3}
-            fill="#ef4444"
-            stroke="#ffffff"
+            fill="#EF4444"
+            stroke="white"
             strokeWidth={1}
           />
 
@@ -118,7 +118,7 @@ const RoomCanvas = ({ x, y }) => {
               x={50 + canvasWidth / 2}
               y={0}
               textAnchor="middle"
-              style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
+              style={{ fontSize: 12, fill: "#475569", fontWeight: 500 }}
             >
               Width × Depth
             </text>
@@ -126,7 +126,7 @@ const RoomCanvas = ({ x, y }) => {
               x={50 + canvasWidth / 2}
               y={15}
               textAnchor="middle"
-              style={{ fontSize: 12, fill: "#6B7280", fontWeight: 500 }}
+              style={{ fontSize: 12, fill: "#475569", fontWeight: 500 }}
             >
               {validX} × {validY}
             </text>
@@ -161,7 +161,7 @@ const RoomCanvas = ({ x, y }) => {
           y1={canvasHeight + 45}
           x2={50 + canvasWidth}
           y2={canvasHeight + 45}
-          stroke="#374151"
+          stroke="#334155"
           strokeWidth={2}
         />
         <line
@@ -169,7 +169,7 @@ const RoomCanvas = ({ x, y }) => {
           y1={canvasHeight + 40}
           x2={50}
           y2={canvasHeight + 50}
-          stroke="#374151"
+          stroke="#334155"
           strokeWidth={2}
         />
         <line
@@ -177,7 +177,7 @@ const RoomCanvas = ({ x, y }) => {
           y1={canvasHeight + 40}
           x2={50 + canvasWidth}
           y2={canvasHeight + 50}
-          stroke="#374151"
+          stroke="#334155"
           strokeWidth={2}
         />
 
@@ -187,7 +187,7 @@ const RoomCanvas = ({ x, y }) => {
           y1={30}
           x2={35}
           y2={30 + canvasHeight}
-          stroke="#374151"
+          stroke="#334155"
           strokeWidth={2}
         />
         <line
@@ -195,7 +195,7 @@ const RoomCanvas = ({ x, y }) => {
           y1={30}
           x2={40}
           y2={30}
-          stroke="#374151"
+          stroke="#334155"
           strokeWidth={2}
         />
         <line
@@ -203,7 +203,7 @@ const RoomCanvas = ({ x, y }) => {
           y1={30 + canvasHeight}
           x2={40}
           y2={30 + canvasHeight}
-          stroke="#374151"
+          stroke="#334155"
           strokeWidth={2}
         />
 
@@ -212,7 +212,7 @@ const RoomCanvas = ({ x, y }) => {
           x={50}
           y={canvasHeight + 75}
           textAnchor="middle"
-          style={{ fontSize: 10, fill: "#ef4444", fontWeight: 600 }}
+          style={{ fontSize: 10, fill: "#EF4444", fontWeight: 600 }}
         >
           (0,0)
         </text>

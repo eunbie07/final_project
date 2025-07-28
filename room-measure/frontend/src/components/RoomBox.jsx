@@ -9,7 +9,7 @@ import React, {
 import { Canvas } from "@react-three/fiber";
 import {
   OrbitControls,
-  Text,
+  Text as DreiText,
   Line,
   Environment,
   ContactShadows,
@@ -30,23 +30,50 @@ import PlacementGuide from "./UI/PlacementGuide";
 // 분리된 3D 컴포넌트들
 import EnhancedLighting from "./3D/EnhancedLighting";
 import FloorGrid from "./3D/FloorGrid";
-import { DimensionArrow, DimensionLabel, DistanceMeasurer } from './3D/DimensionComponents';
-import { ValidPlacementArea } from './3D/CollisionComponents';
-import { WindowsOnWalls } from './3D/WindowComponents';
-import { DraggableFurnitureWithCollision } from './3D/DraggableFurniture';
-import { DraggableHuman } from './3D/DraggableHuman';
+import {
+  DimensionArrow,
+  DimensionLabel,
+  DistanceMeasurer,
+} from "./3D/DimensionComponents";
+import { ValidPlacementArea } from "./3D/CollisionComponents";
+import { WindowsOnWalls } from "./3D/WindowComponents";
+import { DraggableFurnitureWithCollision } from "./3D/DraggableFurniture";
+import { DraggableHuman } from "./3D/DraggableHuman";
 
 // 분리된 훅들
 import { useRoomState } from "../hooks/useRoomState";
 import { useToast } from "../hooks/useToast";
 
 // 분리된 상수들
-import { FURNITURE_PRESETS, FURNITURE_ID_MAPPING } from '../constants/furniture';
+import {
+  FURNITURE_PRESETS,
+  FURNITURE_ID_MAPPING,
+} from "../constants/furniture";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBed,
+  faChair,
+  faCouch,
+  faTable,
+  faTv,
+  faBook,
+  faBox,
+} from "@fortawesome/free-solid-svg-icons";
+
+const iconMapping = {
+  faBed: faBed,
+  faChair: faChair,
+  faCouch: faCouch,
+  faTable: faTable,
+  faTv: faTv,
+  faBook: faBook,
+  faBox: faBox,
+};
 
 // 분리된 유틸리티들
-import { convertCoordinatesLocally } from '../utils/coordinateConversion';
-import { createRoomLayoutData } from '../utils/dataConversion';
-import { saveRoomLayoutToMongoDB, detectWindowsInImage } from '../utils/api';
+import { convertCoordinatesLocally } from "../utils/coordinateConversion";
+import { createRoomLayoutData } from "../utils/dataConversion";
+import { saveRoomLayoutToMongoDB, detectWindowsInImage } from "../utils/api";
 
 // 스냅 그리드 컴포넌트
 const SnapGrid = React.memo(function SnapGrid({
@@ -130,9 +157,10 @@ export default function RoomBox({
 
   // 커스텀 훅으로 상태 관리
   const roomState = useRoomState([w, h, d]);
-  
+
   // Toast 알림 시스템
-  const { toasts, removeToast, showSuccess, showError, showWarning, showInfo } = useToast();
+  const { toasts, removeToast, showSuccess, showError, showWarning, showInfo } =
+    useToast();
   const {
     furniture,
     setFurniture,
@@ -187,14 +215,15 @@ export default function RoomBox({
 
     return placedFurniture.map((item) => {
       let furnitureSize, mappedType, presetData;
-      
+
       if (item.isCustom) {
         furnitureSize = [item.width, item.height || 60, item.depth];
         mappedType = "custom";
         presetData = {
           name: item.name,
           color: item.color || "#DDA0DD",
-          size: furnitureSize
+          size: furnitureSize,
+          icon: "faBox", // Default icon for custom furniture
         };
       } else {
         const baseId = item.id
@@ -237,14 +266,17 @@ export default function RoomBox({
     setHumanPosition([w / 2, 0, d / 2]);
   }, [w, d]);
 
-  const handleViewChange = useCallback((preset) => {
-    if (controlsRef.current) {
-      controlsRef.current.object.position.set(...preset.position);
-      controlsRef.current.target.set(...preset.target);
-      controlsRef.current.update();
-      setActiveView(preset.name);
-    }
-  }, [setActiveView]);
+  const handleViewChange = useCallback(
+    (preset) => {
+      if (controlsRef.current) {
+        controlsRef.current.object.position.set(...preset.position);
+        controlsRef.current.target.set(...preset.target);
+        controlsRef.current.update();
+        setActiveView(preset.name);
+      }
+    },
+    [setActiveView]
+  );
 
   const handlePlaceFurniture = useCallback(
     (position) => {
@@ -289,10 +321,10 @@ export default function RoomBox({
         if (typeof onFurnitureChange === "function") {
           const { position: pos3D, size } = newFurniture;
           const [x3D, y3D, z3D] = pos3D;
-          
+
           const x2D = x3D - size[0] / 2;
           const z2D = z3D - size[2] / 2;
-          
+
           const newItem2D = {
             id: newFurniture.id,
             x: x2D,
@@ -302,7 +334,7 @@ export default function RoomBox({
             rotation: 0,
             type: newFurniture.type,
             name: newFurniture.name,
-            color: newFurniture.color
+            color: newFurniture.color,
           };
 
           onFurnitureChange((prev) => [...prev, newItem2D]);
@@ -345,14 +377,24 @@ export default function RoomBox({
   }, []);
 
   const updatePlacedFurniturePositionOnDragEnd = useCallback(
-    (id, newPosition) => {
+    (id, newPosition, newRotation) => {
       if (typeof onFurnitureChange === "function") {
         const furnitureItem = furniture.find((f) => f.id === id);
-        
+
         if (furnitureItem) {
           const size = furnitureItem.size;
           isUpdatingFromDragRef.current = true;
-          const converted2D = convertCoordinatesLocally(id, newPosition, size, roomSize);
+          const converted2D = convertCoordinatesLocally(
+            id,
+            newPosition,
+            size,
+            roomSize
+          );
+
+          // 3D 회전을 2D 회전으로 변환 (Y축 회전만 사용)
+          const rotation2D = newRotation
+            ? Math.round((newRotation[1] * 180) / Math.PI)
+            : 0;
 
           onFurnitureChange((prev) => {
             const updated = prev.map((item) => {
@@ -361,7 +403,15 @@ export default function RoomBox({
                   ...item,
                   x: converted2D.x,
                   z: converted2D.z,
+                  rotation: rotation2D,
                 };
+                console.log("3D → 2D 업데이트:", {
+                  id,
+                  "3D position": newPosition,
+                  "2D position": { x: converted2D.x, z: converted2D.z },
+                  "3D rotation": newRotation,
+                  "2D rotation": rotation2D,
+                });
                 return newItem;
               }
               return item;
@@ -405,37 +455,42 @@ export default function RoomBox({
         wallInfo,
         roomDimensions
       );
-      
+
       if (result.windows && result.windows.length > 0) {
         const validatedWindows = result.windows.map((window, index) => {
           const minWidth = 60;
           const maxWidth = Math.min(200, w * 0.8);
           const minHeight = 80;
           const maxHeight = Math.min(180, h * 0.8);
-          
+
           let adjustedWindow = { ...window };
-          
+
           if (window.width_meters) {
             const widthCm = window.width_meters * 100;
-            adjustedWindow.width_meters = Math.max(minWidth, Math.min(maxWidth, widthCm)) / 100;
+            adjustedWindow.width_meters =
+              Math.max(minWidth, Math.min(maxWidth, widthCm)) / 100;
           } else {
             adjustedWindow.width_meters = 1.2;
           }
-          
+
           if (window.height_meters) {
             const heightCm = window.height_meters * 100;
-            adjustedWindow.height_meters = Math.max(minHeight, Math.min(maxHeight, heightCm)) / 100;
+            adjustedWindow.height_meters =
+              Math.max(minHeight, Math.min(maxHeight, heightCm)) / 100;
           } else {
             adjustedWindow.height_meters = 1.5;
           }
-          
-          if (!window.wall_position || !["front", "back", "left", "right"].includes(window.wall_position)) {
+
+          if (
+            !window.wall_position ||
+            !["front", "back", "left", "right"].includes(window.wall_position)
+          ) {
             adjustedWindow.wall_position = "back";
           }
-          
+
           return adjustedWindow;
         });
-        
+
         setDetectedWindows(validatedWindows);
         setShowWindows(true);
         showSuccess(`${validatedWindows.length}개의 창문을 감지했습니다`);
@@ -449,15 +504,31 @@ export default function RoomBox({
     }
   }, [uploadedImageFile, w, h, d, showSuccess, showWarning, showError]);
 
-  const handleRotateFurniture = useCallback((id) => {
-    setFurniture((prev) =>
-      prev.map((f) =>
-        f.id === id
-          ? { ...f, rotation: [0, f.rotation[1] + Math.PI / 2, 0] }
-          : f
-      )
-    );
-  }, []);
+  const handleRotateFurniture = useCallback(
+    (id) => {
+      setFurniture((prev) =>
+        prev.map((f) => {
+          if (f.id === id) {
+            const newRotation = [0, f.rotation[1] + Math.PI / 2, 0];
+            const updatedFurniture = { ...f, rotation: newRotation };
+
+            // 회전 후 2D 좌표도 업데이트
+            if (updatePlacedFurniturePositionOnDragEnd) {
+              updatePlacedFurniturePositionOnDragEnd(
+                id,
+                f.position,
+                newRotation
+              );
+            }
+
+            return updatedFurniture;
+          }
+          return f;
+        })
+      );
+    },
+    [updatePlacedFurniturePositionOnDragEnd]
+  );
 
   const handleDeleteFurniture = useCallback(
     (id) => {
@@ -465,7 +536,7 @@ export default function RoomBox({
       if (selectedFurniture === id) {
         setSelectedFurniture(null);
       }
-      
+
       if (typeof onFurnitureChange === "function") {
         onFurnitureChange((prev) => prev.filter((item) => item.id !== id));
       }
@@ -484,22 +555,26 @@ export default function RoomBox({
 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.contentEditable === 'true') {
+      if (
+        event.target.tagName === "INPUT" ||
+        event.target.tagName === "TEXTAREA" ||
+        event.target.contentEditable === "true"
+      ) {
         return;
       }
-      
+
       const key = event.key.toLowerCase();
-      
+
       if ((key === "delete" || key === "backspace") && selectedFurniture) {
         event.preventDefault();
         handleDeleteFurniture(selectedFurniture);
       }
-      
+
       if (key === "r" && selectedFurniture) {
         event.preventDefault();
         handleRotateFurniture(selectedFurniture);
       }
-      
+
       if (key === "escape") {
         event.preventDefault();
         if (placementMode) {
@@ -508,81 +583,125 @@ export default function RoomBox({
           setSelectedFurniture(null);
         }
       }
-      
+
       if (key === "m") {
         event.preventDefault();
         setMeasurementMode(!measurementMode);
         setMeasurePoints([null, null]);
       }
-      
+
       if (key === "g") {
         event.preventDefault();
         setShowFloorGrid(!showFloorGrid);
       }
-      
+
       if (key === "s") {
         event.preventDefault();
         setEnableSnap(!enableSnap);
       }
-      
+
       if (key === "w" && !event.ctrlKey) {
         event.preventDefault();
         setWalkthroughMode(!walkthroughMode);
       }
     };
-    
+
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [selectedFurniture, handleDeleteFurniture, handleRotateFurniture, placementMode, setPlacementMode, setSelectedFurniture, measurementMode, setMeasurementMode, setMeasurePoints, showFloorGrid, setShowFloorGrid, enableSnap, setEnableSnap, walkthroughMode, setWalkthroughMode]);
+  }, [
+    selectedFurniture,
+    handleDeleteFurniture,
+    handleRotateFurniture,
+    placementMode,
+    setPlacementMode,
+    setSelectedFurniture,
+    measurementMode,
+    setMeasurementMode,
+    setMeasurePoints,
+    showFloorGrid,
+    setShowFloorGrid,
+    enableSnap,
+    setEnableSnap,
+    walkthroughMode,
+    setWalkthroughMode,
+  ]);
 
   return (
     <div
-      className={`room-3d-viewer relative w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden shadow-2xl transition-all duration-300 ${
-        isFullscreen ? "h-screen rounded-none" : "h-[700px] rounded-xl"
+      className={`room-3d-viewer relative w-full bg-background overflow-hidden shadow-lg transition-all duration-300 ${
+        isFullscreen
+          ? "h-screen rounded-none"
+          : "h-[700px] rounded-xl border border-border"
       }`}
     >
       {/* 키보드 단축키 도움말 */}
       <div className="absolute top-4 right-4 z-20">
         <div className="relative group">
           <button
-            className="p-2 rounded-lg backdrop-blur-sm bg-white/20 hover:bg-white/30 transition-all duration-200 shadow-lg"
+            className="p-2 rounded-lg backdrop-blur-sm bg-surface/20 hover:bg-surface/30 transition-all duration-200 shadow-lg"
             title="키보드 단축키 도움말"
             aria-label="키보드 단축키 도움말"
           >
-            <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5 text-text-secondary"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </button>
-          
-          <div className="absolute top-full right-0 mt-2 w-64 p-4 bg-white/95 backdrop-blur-lg rounded-xl shadow-xl border border-white/50 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
-            <h4 className="font-bold text-sm text-slate-800 mb-3">키보드 단축키</h4>
-            <div className="space-y-2 text-xs text-slate-600">
+
+          <div className="absolute top-full right-0 mt-2 w-64 p-4 bg-surface/95 backdrop-blur-lg rounded-xl shadow-xl border border-border/50 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
+            <h4 className="font-bold text-sm text-text-primary mb-3">
+              키보드 단축키
+            </h4>
+            <div className="space-y-2 text-xs text-text-secondary">
               <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">Del/Backspace</span>
+                <span className="font-mono bg-background px-2 py-1 rounded">
+                  Del/Backspace
+                </span>
                 <span>가구 삭제</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">R</span>
+                <span className="font-mono bg-slate-100 px-2 py-1 rounded">
+                  R
+                </span>
                 <span>가구 회전</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">Esc</span>
+                <span className="font-mono bg-slate-100 px-2 py-1 rounded">
+                  Esc
+                </span>
                 <span>취소/선택 해제</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">M</span>
+                <span className="font-mono bg-slate-100 px-2 py-1 rounded">
+                  M
+                </span>
                 <span>거리 측정</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">G</span>
+                <span className="font-mono bg-slate-100 px-2 py-1 rounded">
+                  G
+                </span>
                 <span>그리드 토글</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">S</span>
+                <span className="font-mono bg-slate-100 px-2 py-1 rounded">
+                  S
+                </span>
                 <span>스냅 토글</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">W</span>
+                <span className="font-mono bg-slate-100 px-2 py-1 rounded">
+                  W
+                </span>
                 <span>시점 모드 토글</span>
               </div>
             </div>
@@ -593,14 +712,24 @@ export default function RoomBox({
       {/* 왼쪽 UI 패널들 - 주요 기능 */}
       <div className="absolute top-4 left-4 z-10 space-y-4 w-80 max-w-sm">
         {/* 가구 추가 패널 */}
-        <div className="backdrop-blur-lg p-4 rounded-xl shadow-xl bg-white/90 border border-white/50 hover:bg-white/95 transition-all duration-200">
+        <div className="backdrop-blur-lg p-4 rounded-xl shadow-xl bg-surface/90 border border-border/50 hover:bg-surface/95 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-blue-100">
-              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <svg
+                className="w-4 h-4 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
             </div>
-            <h3 className="text-base font-bold text-slate-800">
+            <h3 className="text-base font-bold text-text-primary">
               {placementMode
                 ? `${FURNITURE_PRESETS[placementMode].name} 배치 중`
                 : "가구 추가"}
@@ -609,11 +738,21 @@ export default function RoomBox({
           {placementMode ? (
             <button
               onClick={() => setPlacementMode(null)}
-              className="w-full px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className="w-full px-4 py-2.5 bg-danger text-white rounded-lg text-sm font-medium hover:bg-danger-dark transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
             >
               <span className="flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
                 배치 취소
               </span>
@@ -624,10 +763,15 @@ export default function RoomBox({
                 <button
                   key={type}
                   onClick={() => handleAddFurniture(type)}
-                  className="group flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg hover:from-blue-50 hover:to-blue-100 transition-all duration-200 text-sm font-medium border border-slate-200 hover:border-blue-300 shadow-sm hover:shadow-md transform hover:scale-[1.02]"
+                  className="group flex items-center gap-2 px-3 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02]"
                 >
-                  <span className="text-lg group-hover:scale-110 transition-transform duration-200">{preset.icon}</span>
-                  <span className="text-slate-700 group-hover:text-blue-700">{preset.name}</span>
+                  <FontAwesomeIcon
+                    icon={iconMapping[preset.icon]}
+                    className="text-lg group-hover:scale-110 transition-transform duration-200 text-gray-700"
+                  />
+                  <span className="text-gray-700 group-hover:text-primary">
+                    {preset.name}
+                  </span>
                 </button>
               ))}
             </div>
@@ -635,14 +779,24 @@ export default function RoomBox({
         </div>
 
         {/* 거리 측정 패널 */}
-        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
+        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-yellow-100">
-              <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21l3-3 9.5-9.5a2.12 2.12 0 000-3l-1-1a2.12 2.12 0 00-3 0L6 14l-3 3v4h4z" />
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <svg
+                className="w-4 h-4 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21l3-3 9.5-9.5a2.12 2.12 0 000-3l-1-1a2.12 2.12 0 00-3 0L6 14l-3 3v4h4z"
+                />
               </svg>
             </div>
-            <h4 className="font-bold text-sm text-slate-800">거리 측정</h4>
+            <h4 className="font-bold text-sm text-text-primary">거리 측정</h4>
           </div>
           <div className="space-y-3">
             <button
@@ -652,29 +806,49 @@ export default function RoomBox({
               }}
               className={`w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
                 measurementMode
-                  ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
-                  : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
+                  ? "bg-blue-500 text-white hover:bg-blue-600"
+                  : "bg-white text-primary border border-primary hover:bg-gray-100"
               }`}
             >
               <span className="flex items-center justify-center gap-2">
                 {measurementMode ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21l3-3 9.5-9.5a2.12 2.12 0 000-3l-1-1a2.12 2.12 0 00-3 0L6 14l-3 3v4h4z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 21l3-3 9.5-9.5a2.12 2.12 0 000-3l-1-1a2.12 2.12 0 00-3 0L6 14l-3 3v4h4z"
+                    />
                   </svg>
                 )}
                 {measurementMode ? "측정 종료" : "거리 측정"}
               </span>
             </button>
             {measurementMode && (
-              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <p className="text-xs text-yellow-700 font-medium">
+              <div className="p-3 bg-background rounded-lg border border-border">
+                <p className="text-xs text-text-secondary font-medium">
                   측정 방법:
                 </p>
-                <p className="text-xs text-yellow-600 mt-1">
+                <p className="text-xs text-text-secondary mt-1">
                   바닥을 클릭하여 두 점 사이의 거리를 측정하세요
                 </p>
               </div>
@@ -685,15 +859,30 @@ export default function RoomBox({
 
       {/* 왼쪽 하단 - 시각 옵션 패널 */}
       <div className="absolute bottom-4 left-4 z-10 w-80 max-w-sm">
-        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
+        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-purple-100">
-              <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <svg
+                className="w-4 h-4 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
               </svg>
             </div>
-            <h4 className="font-bold text-sm text-slate-800">시각 옵션</h4>
+            <h4 className="font-bold text-sm text-text-primary">시각 옵션</h4>
           </div>
           <div className="grid grid-cols-2 gap-3 text-xs">
             <label className="flex items-center gap-2 group cursor-pointer">
@@ -701,9 +890,9 @@ export default function RoomBox({
                 type="checkbox"
                 checked={enableSnap}
                 onChange={(e) => setEnableSnap(e.target.checked)}
-                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-1"
+                className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="group-hover:text-blue-700 transition-colors duration-200">
+              <span className="text-white group-hover:text-primary transition-colors duration-200">
                 스냅 기능
               </span>
             </label>
@@ -712,9 +901,9 @@ export default function RoomBox({
                 type="checkbox"
                 checked={showSnapGrid}
                 onChange={(e) => setShowSnapGrid(e.target.checked)}
-                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-1"
+                className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="group-hover:text-blue-700 transition-colors duration-200">
+              <span className="text-white group-hover:text-primary transition-colors duration-200">
                 스냅 그리드
               </span>
             </label>
@@ -723,9 +912,9 @@ export default function RoomBox({
                 type="checkbox"
                 checked={showFloorGrid}
                 onChange={(e) => setShowFloorGrid(e.target.checked)}
-                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-1"
+                className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="group-hover:text-blue-700 transition-colors duration-200">
+              <span className="text-white group-hover:text-primary transition-colors duration-200">
                 바닥 그리드
               </span>
             </label>
@@ -734,9 +923,9 @@ export default function RoomBox({
                 type="checkbox"
                 checked={showCollisions}
                 onChange={(e) => setShowCollisions(e.target.checked)}
-                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-1"
+                className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="group-hover:text-blue-700 transition-colors duration-200">
+              <span className="text-white group-hover:text-primary transition-colors duration-200">
                 충돌 표시
               </span>
             </label>
@@ -745,9 +934,9 @@ export default function RoomBox({
                 type="checkbox"
                 checked={showWindows}
                 onChange={(e) => setShowWindows(e.target.checked)}
-                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-1"
+                className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="group-hover:text-blue-700 transition-colors duration-200">
+              <span className="text-white group-hover:text-primary transition-colors duration-200">
                 창문 표시
               </span>
             </label>
@@ -757,16 +946,25 @@ export default function RoomBox({
 
       {/* 오른쪽 UI 패널들 */}
       <div className="absolute top-4 right-4 z-10 space-y-4 w-80 max-w-sm">
-        
         {/* 데이터 저장 패널 */}
-        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
+        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-green-100">
-              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <svg
+                className="w-4 h-4 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </div>
-            <h4 className="font-bold text-sm text-slate-800">데이터 저장</h4>
+            <h4 className="font-bold text-sm text-text-primary">데이터 저장</h4>
           </div>
           <div className="space-y-3">
             <LoadingButton
@@ -774,12 +972,20 @@ export default function RoomBox({
                 if (furniture.length === 0 && detectedWindows.length === 0) {
                   return;
                 }
-                
+
                 try {
                   setIsSaving(true);
-                  const saveData = createRoomLayoutData(w, d, h, furniture, detectedWindows);
+                  const saveData = createRoomLayoutData(
+                    w,
+                    d,
+                    h,
+                    furniture,
+                    detectedWindows
+                  );
                   await saveRoomLayoutToMongoDB(saveData);
-                  showSuccess(`MongoDB 저장 완료! 가구 ${furniture.length}개, 창문 ${detectedWindows.length}개`);
+                  showSuccess(
+                    `저장 완료! 가구 ${furniture.length}개, 창문 ${detectedWindows.length}개`
+                  );
                 } catch (error) {
                   showError(`MongoDB 저장 실패: ${error.message}`);
                 } finally {
@@ -789,23 +995,33 @@ export default function RoomBox({
               loading={isSaving}
               loadingText="저장 중..."
               disabled={furniture.length === 0 && detectedWindows.length === 0}
-              className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg text-sm font-semibold hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+              className="w-full px-4 py-3 bg-white text-primary border border-primary rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
             >
               <span className="flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
+                  />
                 </svg>
-                MongoDB에 저장
+                Save Layout
               </span>
             </LoadingButton>
-            <div className="flex items-center justify-center gap-3 text-xs text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
+            <div className="flex items-center justify-center gap-3 text-xs text-text-secondary bg-background px-3 py-2 rounded-lg">
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <span>가구 {furniture.length}개</span>
               </div>
-              <div className="w-px h-3 bg-slate-300"></div>
+              <div className="w-px h-3 bg-border"></div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <span>창문 {detectedWindows.length}개</span>
               </div>
             </div>
@@ -814,25 +1030,45 @@ export default function RoomBox({
 
         {/* 창문 감지 패널 */}
         {uploadedImageFile && (
-          <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
+          <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
             <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 rounded-lg bg-blue-100">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <svg
+                  className="w-4 h-4 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"
+                  />
                 </svg>
               </div>
-              <h4 className="font-bold text-sm text-slate-800">창문 감지</h4>
+              <h4 className="font-bold text-sm text-text-primary">창문 감지</h4>
             </div>
             <div className="space-y-3">
               <LoadingButton
                 onClick={handleDetectWindows}
                 loading={isDetectingWindows}
                 loadingText="창문 감지 중..."
-                className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-semibold hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                className="w-full px-4 py-3 bg-white text-primary border border-primary rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
               >
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
                   </svg>
                   AI 창문 감지
                 </span>
@@ -843,39 +1079,69 @@ export default function RoomBox({
 
         {/* 창문 조정 패널 */}
         {detectedWindows.length > 0 && (
-          <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
+          <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
             <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 rounded-lg bg-green-100">
-                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <svg
+                  className="w-4 h-4 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
+                  />
                 </svg>
               </div>
-              <h4 className="font-bold text-sm text-slate-800">창문 조정</h4>
+              <h4 className="font-bold text-sm text-text-primary">창문 조정</h4>
             </div>
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {detectedWindows.map((window, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-lg space-y-2">
+                <div
+                  key={index}
+                  className="bg-background p-3 rounded-lg space-y-2"
+                >
                   <div className="flex justify-between items-center">
-                    <div className="text-xs font-medium">
-                      창문 {index + 1}: {Math.round((window.width_meters || 1.2) * 100)}×{Math.round((window.height_meters || 1.5) * 100)}cm ({window.wall_position}벽)
+                    <div className="text-xs font-medium text-text-secondary">
+                      창문 {index + 1}:{" "}
+                      {Math.round((window.width_meters || 1.2) * 100)}×
+                      {Math.round((window.height_meters || 1.5) * 100)}cm (
+                      {window.wall_position}벽)
                     </div>
                     <button
                       onClick={() => {
-                        const newWindows = detectedWindows.filter((_, i) => i !== index);
+                        const newWindows = detectedWindows.filter(
+                          (_, i) => i !== index
+                        );
                         setDetectedWindows(newWindows);
                       }}
-                      className="text-red-500 hover:text-red-700 p-1"
+                      className="text-danger hover:text-danger-dark p-1"
                       title="창문 삭제"
                     >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
                       </svg>
                     </button>
                   </div>
-                  
+
                   {/* 수평 위치 조정 */}
                   <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">수평:</span>
+                    <span className="text-xs w-12 text-text-secondary">
+                      수평:
+                    </span>
                     <input
                       type="range"
                       min="0.1"
@@ -886,18 +1152,22 @@ export default function RoomBox({
                         const newWindows = [...detectedWindows];
                         newWindows[index] = {
                           ...window,
-                          x_position: parseFloat(e.target.value)
+                          x_position: parseFloat(e.target.value),
                         };
                         setDetectedWindows(newWindows);
                       }}
                       className="flex-1 h-1"
                     />
-                    <span className="text-xs w-8">{Math.round((window.x_position || 0.5) * 100)}%</span>
+                    <span className="text-xs w-8">
+                      {Math.round((window.x_position || 0.5) * 100)}%
+                    </span>
                   </div>
-                  
+
                   {/* 수직 위치 조정 */}
                   <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">수직:</span>
+                    <span className="text-xs w-12 text-text-secondary">
+                      수직:
+                    </span>
                     <input
                       type="range"
                       min="0.3"
@@ -908,18 +1178,22 @@ export default function RoomBox({
                         const newWindows = [...detectedWindows];
                         newWindows[index] = {
                           ...window,
-                          y_position: parseFloat(e.target.value)
+                          y_position: parseFloat(e.target.value),
                         };
                         setDetectedWindows(newWindows);
                       }}
                       className="flex-1 h-1"
                     />
-                    <span className="text-xs w-8">{Math.round((window.y_position || 0.8) * 100)}%</span>
+                    <span className="text-xs w-8">
+                      {Math.round((window.y_position || 0.8) * 100)}%
+                    </span>
                   </div>
-                  
+
                   {/* 창문 너비 조정 */}
                   <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">너비:</span>
+                    <span className="text-xs w-12 text-text-secondary">
+                      너비:
+                    </span>
                     <input
                       type="range"
                       min="60"
@@ -929,18 +1203,22 @@ export default function RoomBox({
                         const newWindows = [...detectedWindows];
                         newWindows[index] = {
                           ...window,
-                          width_meters: parseInt(e.target.value) / 100
+                          width_meters: parseInt(e.target.value) / 100,
                         };
                         setDetectedWindows(newWindows);
                       }}
                       className="flex-1 h-1"
                     />
-                    <span className="text-xs w-12">{Math.round((window.width_meters || 1.2) * 100)}cm</span>
+                    <span className="text-xs w-12">
+                      {Math.round((window.width_meters || 1.2) * 100)}cm
+                    </span>
                   </div>
-                  
+
                   {/* 창문 높이 조정 */}
                   <div className="flex gap-1 items-center">
-                    <span className="text-xs w-12">높이:</span>
+                    <span className="text-xs w-12 text-text-secondary">
+                      높이:
+                    </span>
                     <input
                       type="range"
                       min="60"
@@ -950,17 +1228,19 @@ export default function RoomBox({
                         const newWindows = [...detectedWindows];
                         newWindows[index] = {
                           ...window,
-                          height_meters: parseInt(e.target.value) / 100
+                          height_meters: parseInt(e.target.value) / 100,
                         };
                         setDetectedWindows(newWindows);
                       }}
                       className="flex-1 h-1"
                     />
-                    <span className="text-xs w-12">{Math.round((window.height_meters || 1.5) * 100)}cm</span>
+                    <span className="text-xs w-12">
+                      {Math.round((window.height_meters || 1.5) * 100)}cm
+                    </span>
                   </div>
                 </div>
               ))}
-              
+
               {/* 새 창문 추가 버튼 */}
               <button
                 onClick={() => {
@@ -970,15 +1250,25 @@ export default function RoomBox({
                     y_position: 0.8,
                     width_meters: 1.2,
                     height_meters: 1.5,
-                    confidence: 1.0
+                    confidence: 1.0,
                   };
                   setDetectedWindows([...detectedWindows, newWindow]);
                 }}
-                className="w-full px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg text-xs font-medium hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                className="w-full px-3 py-2 bg-white text-primary border border-primary rounded-lg text-xs font-medium hover:bg-gray-100 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
               >
                 <span className="flex items-center justify-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
                   </svg>
                   새 창문 추가
                 </span>
@@ -991,43 +1281,78 @@ export default function RoomBox({
         <ViewPresets onViewChange={handleViewChange} roomSize={roomSize} />
 
         {/* 시점 모드 토글 */}
-        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-white/85 border border-white/50 hover:bg-white/90 transition-all duration-200">
+        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-orange-100">
-              <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <svg
+                className="w-4 h-4 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
             </div>
-            <h4 className="font-bold text-sm text-slate-800">시점 모드</h4>
+            <h4 className="font-bold text-sm text-text-primary">시점 모드</h4>
           </div>
           <button
             onClick={() => setWalkthroughMode(!walkthroughMode)}
             className={`w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
               walkthroughMode
-                ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700"
-                : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700"
+                ? "bg-white text-primary border border-primary hover:bg-gray-100"
+                : "bg-white text-primary border border-primary hover:bg-gray-100"
             }`}
           >
             <span className="flex items-center justify-center gap-2">
               {walkthroughMode ? (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
                 </svg>
               ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
                 </svg>
               )}
               {walkthroughMode ? "조감도 모드" : "걸어다니기 모드"}
             </span>
           </button>
           {walkthroughMode && (
-            <div className="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
-              <p className="text-xs text-orange-700 font-medium">
+            <div className="mt-3 p-3 bg-background rounded-lg border border-border">
+              <p className="text-xs text-text-secondary font-medium">
                 키보드 조작:
               </p>
-              <p className="text-xs text-orange-600 mt-1">
+              <p className="text-xs text-text-secondary mt-1">
                 WASD - 이동 / 마우스 - 시점 변경
               </p>
             </div>
@@ -1035,7 +1360,11 @@ export default function RoomBox({
         </div>
 
         {/* 공간 분석 */}
-        <SpaceUtilization furniture={furniture} roomArea={roomArea} furniturePresets={FURNITURE_PRESETS} />
+        <SpaceUtilization
+          furniture={furniture}
+          roomArea={roomArea}
+          furniturePresets={FURNITURE_PRESETS}
+        />
       </div>
 
       {/* 3D Canvas */}
@@ -1136,7 +1465,7 @@ export default function RoomBox({
             <DistanceMeasurer
               point1={measurePoints[0]}
               point2={measurePoints[1]}
-              visible={measurementMode && !!measurePoints[1]}
+              visible={measurementMode && !!measurePoints[0]}
             />
 
             <group position={[0, 0.1, 0]}>
@@ -1179,91 +1508,188 @@ export default function RoomBox({
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 backdrop-blur-lg p-4 rounded-xl shadow-xl bg-white/90 border border-white/50 max-w-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 rounded-lg bg-blue-100">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              <svg
+                className="w-5 h-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
               </svg>
             </div>
             <div>
               <p className="text-base font-bold text-slate-800">
                 {selectedFurnitureData.name}
               </p>
-              <p className="text-xs text-slate-500">
-                선택된 가구
-              </p>
+              <p className="text-xs text-slate-500">선택된 가구</p>
             </div>
           </div>
           {(() => {
             const [x3d, y3d, z3d] = selectedFurnitureData.position;
             const size = selectedFurnitureData.size || [100, 100, 100];
             const [width, height, depth] = size;
-            
+
             const leftBottomX = Math.round(x3d - width / 2);
             const leftBottomZ = Math.round(z3d - depth / 2);
             const rightTopX = Math.round(x3d + width / 2);
             const rightTopZ = Math.round(z3d + depth / 2);
-            
+
             return (
               <div className="text-xs text-slate-600 mb-3 space-y-2 bg-slate-50 p-3 rounded-lg border">
                 <div className="flex items-center gap-2">
-                  <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  <svg
+                    className="w-3 h-3 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                    />
                   </svg>
-                  <span className="font-medium">크기:</span> {width} × {depth} × {height} cm
+                  <span className="font-medium">크기:</span> {width} × {depth} ×{" "}
+                  {height} cm
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <svg
+                    className="w-3 h-3 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
-                  <span className="font-medium">왼쪽아래:</span> ({leftBottomX}, {leftBottomZ}) cm
+                  <span className="font-medium">왼쪽아래:</span> ({leftBottomX},{" "}
+                  {leftBottomZ}) cm
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <svg
+                    className="w-3 h-3 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
-                  <span className="font-medium">오른쪽위:</span> ({rightTopX}, {rightTopZ}) cm
+                  <span className="font-medium">오른쪽위:</span> ({rightTopX},{" "}
+                  {rightTopZ}) cm
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 12v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  <svg
+                    className="w-3 h-3 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 3v1m0 12v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
                   </svg>
-                  <span className="font-medium">중심 좌표:</span> ({Math.round(x3d)}, {Math.round(z3d)}) cm
+                  <span className="font-medium">중심 좌표:</span> (
+                  {Math.round(x3d)}, {Math.round(z3d)}) cm
                 </div>
-                {selectedFurnitureData.rotation && selectedFurnitureData.rotation[1] !== 0 && (
-                  <div className="flex items-center gap-2">
-                    <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span className="font-medium">회전:</span> {Math.round((selectedFurnitureData.rotation[1] * 180) / Math.PI)}°
-                  </div>
-                )}
+                {selectedFurnitureData.rotation &&
+                  selectedFurnitureData.rotation[1] !== 0 && (
+                    <div className="flex items-center gap-2">
+                      <svg
+                        className="w-3 h-3 text-slate-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                      </svg>
+                      <span className="font-medium">회전:</span>{" "}
+                      {Math.round(
+                        (selectedFurnitureData.rotation[1] * 180) / Math.PI
+                      )}
+                      °
+                    </div>
+                  )}
               </div>
             );
           })()}
           <div className="flex gap-2">
             <button
               onClick={() => handleRotateFurniture(selectedFurniture)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
               </svg>
               회전
             </button>
             <button
               onClick={() => handleDeleteFurniture(selectedFurniture)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white text-red-600 border border-red-600 rounded-lg hover:bg-red-50 text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
               삭제
             </button>
           </div>
         </div>
       )}
-      
+
       {/* 배치 가이드 */}
       {placementMode && (
         <div className="absolute inset-0 z-30 pointer-events-none">
@@ -1271,8 +1697,18 @@ export default function RoomBox({
             <div className="animate-pulse bg-blue-500/20 rounded-full p-8">
               <div className="bg-blue-600/30 rounded-full p-6">
                 <div className="bg-blue-700/40 rounded-full p-4 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
                   </svg>
                 </div>
               </div>
@@ -1280,17 +1716,18 @@ export default function RoomBox({
           </div>
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
             <div className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
-              바닥을 클릭하여 {FURNITURE_PRESETS[placementMode]?.name}를 배치하세요
+              바닥을 클릭하여 {FURNITURE_PRESETS[placementMode]?.name}를
+              배치하세요
             </div>
           </div>
         </div>
       )}
-      
-      <PlacementGuide 
+
+      <PlacementGuide
         placementMode={placementMode}
         onClose={() => setPlacementMode(null)}
       />
-      
+
       {/* Toast 알림 */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>

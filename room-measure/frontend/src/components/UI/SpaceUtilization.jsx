@@ -15,10 +15,10 @@ const SpaceUtilization = React.memo(function SpaceUtilization({
   const utilization = (furnitureArea / roomArea) * 100;
 
   const getUtilizationColor = (util) => {
-    if (util < 30) return "bg-green-500";
-    if (util < 60) return "bg-yellow-500";
-    if (util < 80) return "bg-orange-500";
-    return "bg-red-500";
+    if (util < 30) return "bg-accent";
+    if (util < 60) return "bg-primary";
+    if (util < 80) return "bg-secondary";
+    return "bg-danger";
   };
 
   const getUtilizationText = (util) => {
@@ -29,8 +29,8 @@ const SpaceUtilization = React.memo(function SpaceUtilization({
   };
 
   return (
-    <div className="bg-gray-50 p-2 rounded">
-      <h4 className="font-semibold text-xs mb-1">공간 활용도</h4>
+    <div className="bg-background p-2 rounded">
+      <h4 className="font-semibold text-xs mb-1 text-text-primary">공간 활용도</h4>
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div
           className={`h-2 rounded-full transition-all duration-300 ${getUtilizationColor(
@@ -40,8 +40,8 @@ const SpaceUtilization = React.memo(function SpaceUtilization({
         />
       </div>
       <div className="flex justify-between items-center mt-1">
-        <span className="text-xs">{utilization.toFixed(1)}%</span>
-        <span className="text-xs font-medium">
+        <span className="text-xs text-text-secondary">{utilization.toFixed(1)}%</span>
+        <span className="text-xs font-medium text-text-secondary">
           {getUtilizationText(utilization)}
         </span>
       </div>

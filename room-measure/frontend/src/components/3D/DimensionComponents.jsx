@@ -3,7 +3,7 @@ import { Line, Text } from "@react-three/drei";
 import * as THREE from "three";
 
 // 치수선 관련 컴포넌트들
-const DIMENSION_COLOR = "#666666";
+const DIMENSION_COLOR = "#475569";
 
 export const DimensionArrow = React.memo(function DimensionArrow({ start, end }) {
   const points = useMemo(() => {
@@ -163,32 +163,57 @@ export const DistanceMeasurer = React.memo(function DistanceMeasurer({
   point2,
   visible = false,
 }) {
-  if (!visible || !point1 || !point2) return null;
+  if (!visible || !point1) return null;
 
-  const distance = Math.sqrt(
-    Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[2] - point1[2], 2)
-  ).toFixed(0);
+  // 거리 계산 (point2가 없으면 0)
+  const distance = point2 
+    ? Math.sqrt(
+        Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[2] - point1[2], 2)
+      ).toFixed(0)
+    : null;
 
-  const midpoint = [
-    (point1[0] + point2[0]) / 2,
-    Math.max(point1[1], point2[1]) + 10,
-    (point1[2] + point2[2]) / 2,
-  ];
+  // 중점 계산 (point2가 없으면 point1 위에 표시)
+  const midpoint = point2 
+    ? [
+        (point1[0] + point2[0]) / 2,
+        Math.max(point1[1], point2[1]) + 10,
+        (point1[2] + point2[2]) / 2,
+      ]
+    : [point1[0], point1[1] + 15, point1[2]];
 
   return (
     <group>
-      <Line points={[point1, point2]} color="#FF4081" lineWidth={3} />
+      {/* 첫 번째 측정 포인트 시각화 */}
+      <mesh position={point1}>
+        <sphereGeometry args={[5, 16, 16]} />
+        <meshBasicMaterial color="#007bff" />
+      </mesh>
+      
+      {/* 두 번째 측정 포인트 시각화 (있을 때만) */}
+      {point2 && (
+        <mesh position={point2}>
+          <sphereGeometry args={[5, 16, 16]} />
+          <meshBasicMaterial color="#007bff" />
+        </mesh>
+      )}
+      
+      {/* 연결선 (두 번째 포인트가 있을 때만) */}
+      {point2 && (
+        <Line points={[point1, point2]} color="#334155" lineWidth={3} />
+      )}
+      
+      {/* 거리 텍스트 또는 대기 메시지 */}
       <Text
         position={midpoint}
         fontSize={12}
-        color="#FF4081"
+        color="#334155"
         anchorX="center"
         fontWeight="bold"
         backgroundColor="#FFFFFF"
         backgroundOpacity={0.8}
         padding={2}
       >
-        {distance}cm
+        {distance ? `${distance}cm` : "두 번째 점을 클릭하세요"}
       </Text>
     </group>
   );
