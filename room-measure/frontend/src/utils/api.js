@@ -7,17 +7,82 @@
 const LOCAL_API_BASE = 'http://localhost:3010';  // 로컬 이미지/AI 처리
 const CLOUD_API_BASE = 'http://localhost:3000';  // 클라우드 데이터 저장/조회
 
+// 헤더 생성 함수
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
+
 // ---------------------------
-// 클라우드 API (EC2 배포용)
+// 인증 API
 // ---------------------------
 
-// MongoDB 저장 API 호출 함수
-export const saveRoomLayoutToMongoDB = async (saveData) => {
-  const response = await fetch(`${CLOUD_API_BASE}/save-room-layout`, {
+// 회원가입
+export const signup = async (userData) => {
+  const response = await fetch(`${CLOUD_API_BASE}/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    body: JSON.stringify(userData)
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw { response: { data: error } };
+  }
+  
+  return response.json();
+};
+
+// 로그인
+export const login = async (userData) => {
+  const response = await fetch(`${CLOUD_API_BASE}/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData)
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw { response: { data: error } };
+  }
+  
+  return response.json();
+};
+
+// 현재 사용자 정보 조회
+export const getCurrentUser = async () => {
+  const response = await fetch(`${CLOUD_API_BASE}/me`, {
+    method: 'GET',
+    headers: getAuthHeaders()
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw { response: { data: error } };
+  }
+  
+  return response.json();
+};
+
+// ---------------------------
+// 클라우드 API (EC2 배포용)
+// ---------------------------
+
+// 방 레이아웃 저장 (로그인 사용자)
+export const saveRoomLayoutToMongoDB = async (saveData) => {
+  const token = localStorage.getItem('token');
+  const endpoint = token ? '/save-room-layout' : '/save-room-layout-guest';
+  
+  const response = await fetch(`${CLOUD_API_BASE}${endpoint}`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
     body: JSON.stringify(saveData)
   });
   
@@ -30,9 +95,16 @@ export const saveRoomLayoutToMongoDB = async (saveData) => {
   return result;
 };
 
-// 모든 방 레이아웃 조회
+// 사용자별 방 레이아웃 조회
 export const getAllRoomLayouts = async () => {
-  const response = await fetch(`${CLOUD_API_BASE}/room-layouts`);
+  const token = localStorage.getItem('token');
+  const endpoint = token ? '/room-layouts' : '/room-layouts-guest';
+  
+  const response = await fetch(`${CLOUD_API_BASE}${endpoint}`, {
+    method: 'GET',
+    headers: getAuthHeaders()
+  });
+  
   const result = await response.json();
   
   if (!result.success) {

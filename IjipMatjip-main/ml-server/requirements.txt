@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+scikit-learn
+pandas
+requests
+python-dotenv
+joblib
+python-multipartlxml
+psycopg2-binary
+pyproj
