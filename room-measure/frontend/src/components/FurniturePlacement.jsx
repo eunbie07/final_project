@@ -32,11 +32,11 @@ const FURNITURE_CATALOG = Object.entries(FURNITURE_PRESETS).map(([id, preset]) =
 }));
 
 const CATEGORIES = [
-  { id: "all", name: "전체", icon: "" },
-  { id: "bedroom", name: "침실", icon: "" },
-  { id: "living", name: "거실", icon: "" },
-  { id: "office", name: "사무", icon: "" },
-  { id: "storage", name: "수납", icon: "" },
+  { id: "all", name: "All", icon: "" },
+  { id: "bedroom", name: "Bedroom", icon: "" },
+  { id: "living", name: "Living", icon: "" },
+  { id: "office", name: "Office", icon: "" },
+  { id: "storage", name: "Storage", icon: "" },
 ];
 
 const FurnitureItem = ({ furniture, onDragStart }) => (
@@ -502,33 +502,58 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
       const newActualDepth =
         newRotation % 180 === 0 ? furniture.depth : furniture.width;
 
-      // 회전 후 경계 체크
+      // 회전 후 경계 체크 및 자동 위치 조정
       const maxX = validRoomWidth - newActualWidth;
       const maxZ = validRoomDepth - newActualDepth;
 
-      if (furniture.x > maxX || furniture.z > maxZ) {
-        alert("회전하면 방 범위를 벗어납니다!");
-        return;
-      }
+      let newX = furniture.x;
+      let newZ = furniture.z;
 
-      // 충돌 체크
+      // 범위를 벗어나면 안전한 위치로 이동
+      if (newX > maxX) newX = Math.max(0, maxX);
+      if (newZ > maxZ) newZ = Math.max(0, maxZ);
+
+      // 충돌 체크 (새로운 위치와 회전에서)
       if (
         checkCollision(
-          furniture.x,
-          furniture.z,
+          newX,
+          newZ,
           furniture.width,
           furniture.depth,
           index,
           newRotation
         )
       ) {
-        alert("회전하면 다른 가구와 겹칩니다!");
-        return;
+        // 충돌이 발생하면 빈 공간을 찾아서 이동
+        let foundPosition = false;
+        const stepSize = 25; // 25cm씩 이동하며 탐색
+
+        // 가까운 위치부터 탐색
+        for (let radius = 0; radius <= Math.max(validRoomWidth, validRoomDepth) && !foundPosition; radius += stepSize) {
+          // 원래 위치 주변을 나선형으로 탐색
+          for (let angle = 0; angle < 360 && !foundPosition; angle += 45) {
+            const testX = Math.max(0, Math.min(newX + radius * Math.cos(angle * Math.PI / 180), maxX));
+            const testZ = Math.max(0, Math.min(newZ + radius * Math.sin(angle * Math.PI / 180), maxZ));
+            
+            if (!checkCollision(testX, testZ, furniture.width, furniture.depth, index, newRotation)) {
+              newX = testX;
+              newZ = testZ;
+              foundPosition = true;
+            }
+          }
+        }
+
+        if (!foundPosition) {
+          alert("회전할 수 있는 빈 공간이 없습니다!");
+          return;
+        }
       }
 
       const newPlaced = [...placedFurniture];
       newPlaced[index] = {
         ...furniture,
+        x: newX,
+        z: newZ,
         rotation: newRotation,
       };
       onFurnitureChange(newPlaced);
@@ -653,175 +678,6 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
     return ((totalFurnitureArea / roomArea) * 100).toFixed(1);
   }, [placedFurniture, validRoomWidth, validRoomDepth]);
 
-  // JSON 저장 기능
-  const handleSaveAsJson = useCallback(() => {
-    if (placedFurniture.length === 0 && detectedWindows.length === 0) {
-      alert("저장할 가구나 창문이 없습니다!");
-      return;
-    }
-
-    // JSON 데이터 구성
-    const saveData = {
-      roomInfo: {
-        width: validRoomWidth,
-        depth: validRoomDepth,
-        height: roomHeight,
-        area: ((validRoomWidth * validRoomDepth) / 10000).toFixed(1) + "㎡",
-        aspectRatio: (validRoomWidth / validRoomDepth).toFixed(2),
-      },
-      furniture: placedFurniture.map((furniture) => {
-        const rotation = furniture.rotation || 0;
-        const actualWidth =
-          rotation % 180 === 0 ? furniture.width : furniture.depth;
-        const actualDepth =
-          rotation % 180 === 0 ? furniture.depth : furniture.width;
-
-        return {
-          id: furniture.id,
-          name: furniture.name,
-          category: furniture.category,
-          originalSize: {
-            width: furniture.width,
-            depth: furniture.depth,
-          },
-          currentSize: {
-            width: actualWidth,
-            depth: actualDepth,
-          },
-          position: {
-            leftBottom: {
-              x: Math.round(furniture.x),
-              z: Math.round(furniture.z),
-            },
-            rightTop: {
-              x: Math.round(furniture.x + actualWidth),
-              z: Math.round(furniture.z + actualDepth),
-            },
-          },
-          rotation: rotation,
-          color: furniture.color,
-          icon: furniture.icon,
-        };
-      }),
-      windows: detectedWindows.map((window, index) => {
-        const widthCm = Math.round((window.width_meters || 1.2) * 100);
-        const heightCm = Math.round((window.height_meters || 1.5) * 100);
-        
-        // 3D 좌표 계산
-        const userYPosition = window.y_position !== undefined ? window.y_position : 0.8;
-        const calculatedYPos = userYPosition * roomHeight;
-        let x_3d, y_3d, z_3d;
-        
-        switch (window.wall_position) {
-          case "front":
-            x_3d = (window.x_position || 0.5) * validRoomWidth;
-            y_3d = calculatedYPos;
-            z_3d = validRoomDepth;
-            break;
-          case "back":
-            x_3d = (window.x_position || 0.5) * validRoomWidth;
-            y_3d = calculatedYPos;
-            z_3d = 0;
-            break;
-          case "left":
-            x_3d = 0;
-            y_3d = calculatedYPos;
-            z_3d = (window.x_position || 0.5) * validRoomDepth;
-            break;
-          case "right":
-            x_3d = validRoomWidth;
-            y_3d = calculatedYPos;
-            z_3d = (window.x_position || 0.5) * validRoomDepth;
-            break;
-          default:
-            x_3d = validRoomWidth / 2;
-            y_3d = calculatedYPos;
-            z_3d = 0;
-        }
-        
-        return {
-          id: `window_${index + 1}`,
-          wall_position: window.wall_position || "back",
-          size: {
-            width_cm: widthCm,
-            height_cm: heightCm,
-            width_meters: (window.width_meters || 1.2).toFixed(2),
-            height_meters: (window.height_meters || 1.5).toFixed(2),
-          },
-          position: {
-            relative: {
-              x_position: (window.x_position || 0.5).toFixed(3),
-              y_position: (window.y_position || 0.8).toFixed(3),
-            },
-            absolute_3d: {
-              x: Math.round(x_3d),
-              y: Math.round(y_3d),
-              z: Math.round(z_3d),
-            },
-            wall_coordinates: {
-              horizontal_percent: Math.round((window.x_position || 0.5) * 100),
-              vertical_percent: Math.round((window.y_position || 0.8) * 100),
-            }
-          },
-          confidence: window.confidence || 1.0,
-        };
-      }),
-      statistics: {
-        furnitureCount: placedFurniture.length,
-        windowCount: detectedWindows.length,
-        spaceUtilization: calculateSpaceUtilization + "%",
-        totalFurnitureArea:
-          placedFurniture.reduce((sum, furniture) => {
-            const rotation = furniture.rotation || 0;
-            const actualWidth =
-              rotation % 180 === 0 ? furniture.width : furniture.depth;
-            const actualDepth =
-              rotation % 180 === 0 ? furniture.depth : furniture.width;
-            return sum + actualWidth * actualDepth;
-          }, 0) + " cm²",
-        totalWindowArea:
-          detectedWindows.reduce((sum, window) => {
-            const widthCm = (window.width_meters || 1.2) * 100;
-            const heightCm = (window.height_meters || 1.5) * 100;
-            return sum + widthCm * heightCm;
-          }, 0).toFixed(0) + " cm²",
-      },
-      metadata: {
-        exportDate: new Date().toISOString(),
-        coordinateSystem: "leftBottom_origin", // 왼쪽 아래가 (0,0)
-        unit: "cm",
-      },
-    };
-
-    // JSON 파일 다운로드
-    const jsonString = JSON.stringify(saveData, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const currentDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    const filename = `room_layout_${validRoomWidth}x${validRoomDepth}x${roomHeight}_${currentDate}.json`;
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
-
-    // AI Design을 위해 localStorage에도 저장
-    localStorage.setItem('roomPlannerData', JSON.stringify(saveData));
-
-    console.log("JSON 저장 완료:", saveData);
-  }, [
-    placedFurniture,
-    validRoomWidth,
-    validRoomDepth,
-    calculateSpaceUtilization,
-    detectedWindows,
-    roomHeight,
-  ]);
 
   return (
     <div className="mt-8 p-6 bg-surface rounded-xl shadow-lg border border-border">
@@ -870,13 +726,6 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
             </button>
           </div>
 
-          <button
-            onClick={handleSaveAsJson}
-            className="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={placedFurniture.length === 0}
-          >
-            <strong>JSON 저장</strong>
-          </button>
           <button
             onClick={() => {
               // 데이터 저장 후 AI Design 페이지로 이동

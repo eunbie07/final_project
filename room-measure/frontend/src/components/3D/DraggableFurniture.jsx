@@ -6,6 +6,7 @@ import CollisionDetector from "../../utils/CollisionDetector";
 import PositionSnapper from "../../utils/PositionSnapper";
 import { FurnitureDimensions } from "./DimensionComponents";
 import { CollisionIndicator } from "./CollisionComponents";
+import { FurnitureModel } from "./FurnitureModel";
 
 // 향상된 가구 컴포넌트 (드래그 시스템 개선)
 export const DraggableFurnitureWithCollision = React.memo(
@@ -26,19 +27,24 @@ export const DraggableFurnitureWithCollision = React.memo(
     onDragStateChange,
     customFurnitureData = null,
     updatePlacedFurniturePosition,
+    use3DModels = false, // 3D 모델 사용 여부
   }) {
     const mesh = useRef();
 
     // 커스텀 가구인 경우 전달된 size를 직접 사용, 아니면 preset에서 가져오기
-    let size, color;
+    let size, color, preset;
     if (customFurnitureData && customFurnitureData.size) {
       size = customFurnitureData.size;
       color = customFurnitureData.color || "#cccccc";
+      preset = null;
     } else {
-      const preset = furniturePresets[type];
+      preset = furniturePresets[type];
       size = preset?.size || [100, 100, 100];
       color = preset?.color || "#cccccc";
     }
+
+    // 3D 모델 사용 가능 여부 체크
+    const canUse3DModel = use3DModels && preset && preset.model3D && !customFurnitureData;
 
     const [hovered, setHovered] = useState(false);
     const [dragging, setDragging] = useState(false);
@@ -193,7 +199,7 @@ export const DraggableFurnitureWithCollision = React.memo(
 
     return (
       <group position={position}>
-        <mesh
+        <group
           ref={mesh}
           rotation={rotation}
           onPointerDown={handlePointerDown}
@@ -208,20 +214,32 @@ export const DraggableFurnitureWithCollision = React.memo(
             if (!dragging) gl.domElement.style.cursor = "auto";
           }}
           scale={hovered ? 1.02 : 1}
-          castShadow
-          receiveShadow
         >
-          <boxGeometry args={size} />
-          <meshStandardMaterial
-            color={materialColor}
-            roughness={0.7}
-            metalness={0.3}
-            emissive={
-              selected ? "white" : hasCollision ? "#EF4444" : "#000000"
-            }
-            emissiveIntensity={selected ? 0.1 : hasCollision ? 0.2 : 0}
-          />
-        </mesh>
+          {canUse3DModel ? (
+            // 3D 모델 렌더링
+            <FurnitureModel
+              modelConfig={preset.model3D}
+              size={size}
+              color={color}
+              selected={selected}
+              hasCollision={hasCollision}
+            />
+          ) : (
+            // 기본 박스 렌더링
+            <mesh castShadow receiveShadow>
+              <boxGeometry args={size} />
+              <meshStandardMaterial
+                color={materialColor}
+                roughness={0.7}
+                metalness={0.3}
+                emissive={
+                  selected ? "white" : hasCollision ? "#EF4444" : "#000000"
+                }
+                emissiveIntensity={selected ? 0.1 : hasCollision ? 0.2 : 0}
+              />
+            </mesh>
+          )}
+        </group>
 
         {/* 가구 이름 텍스트 */}
         <Text

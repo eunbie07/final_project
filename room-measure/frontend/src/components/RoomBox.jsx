@@ -75,6 +75,10 @@ import { convertCoordinatesLocally } from "../utils/coordinateConversion";
 import { createRoomLayoutData } from "../utils/dataConversion";
 import { saveRoomLayoutToMongoDB, detectWindowsInImage } from "../utils/api";
 
+// GLB 추출 스크립트 임포트 (임시)
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
+
 // 스냅 그리드 컴포넌트
 const SnapGrid = React.memo(function SnapGrid({
   roomSize,
@@ -180,8 +184,6 @@ export default function RoomBox({
     setPlacementMode,
     activeView,
     setActiveView,
-    walkthroughMode,
-    setWalkthroughMode,
     measurementMode,
     setMeasurementMode,
     isDragging,
@@ -199,6 +201,85 @@ export default function RoomBox({
     isSaving,
     setIsSaving,
   } = roomState;
+
+  // 3D 모델 사용 상태
+  const [use3DModels, setUse3DModels] = useState(false);
+
+  // GLB 메시 추출 함수 (임시)
+  const extractMeshesToSeparateFiles = async () => {
+    const loader = new GLTFLoader();
+    const exporter = new GLTFExporter();
+    
+    try {
+      console.log('GLB 파일 로딩 중...');
+      const gltf = await new Promise((resolve, reject) => {
+        loader.load('/low_poly_furnitures_full_bundle.glb', resolve, undefined, reject);
+      });
+      
+      console.log('=== 메시 추출 시작 ===');
+      const meshes = [];
+      
+      gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+          meshes.push({
+            name: child.name,
+            mesh: child.clone()
+          });
+        }
+      });
+      
+      console.log(`총 ${meshes.length}개의 메시를 찾았습니다.`);
+      
+      for (let i = 0; i < meshes.length; i++) {
+        const { name, mesh } = meshes[i];
+        
+        try {
+          const scene = new THREE.Scene();
+          mesh.position.set(0, 0, 0);
+          scene.add(mesh);
+          
+          const result = await new Promise((resolve, reject) => {
+            exporter.parse(
+              scene,
+              (gltf) => resolve(gltf),
+              { binary: true },
+              (error) => reject(error)
+            );
+          });
+          
+          const blob = new Blob([result], { type: 'application/octet-stream' });
+          const url = URL.createObjectURL(blob);
+          
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${name}.glb`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          URL.revokeObjectURL(url);
+          console.log(`✅ ${name}.glb 파일 다운로드 완료`);
+          
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+        } catch (error) {
+          console.error(`❌ ${name} 메시 내보내기 실패:`, error);
+        }
+      }
+      
+      console.log('=== 모든 메시 추출 완료 ===');
+      
+    } catch (error) {
+      console.error('GLB 파일 처리 실패:', error);
+    }
+  };
+
+  // 브라우저 콘솔에서 사용할 수 있도록 등록
+  useEffect(() => {
+    window.extractMeshes = extractMeshesToSeparateFiles;
+    console.log('🚀 GLB 추출 도구 준비 완료!');
+    console.log('콘솔에서 extractMeshes() 를 실행하세요.');
+  }, []);
 
   // 방 계산 최적화
   const roomSize = useMemo(() => [w, h, d], [w, h, d]);
@@ -600,10 +681,6 @@ export default function RoomBox({
         setEnableSnap(!enableSnap);
       }
 
-      if (key === "w" && !event.ctrlKey) {
-        event.preventDefault();
-        setWalkthroughMode(!walkthroughMode);
-      }
     };
 
     window.addEventListener("keydown", handleKeyPress);
@@ -622,8 +699,6 @@ export default function RoomBox({
     setShowFloorGrid,
     enableSnap,
     setEnableSnap,
-    walkthroughMode,
-    setWalkthroughMode,
   ]);
 
   return (
@@ -697,12 +772,6 @@ export default function RoomBox({
                   S
                 </span>
                 <span>스냅 토글</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-mono bg-slate-100 px-2 py-1 rounded">
-                  W
-                </span>
-                <span>시점 모드 토글</span>
               </div>
             </div>
           </div>
@@ -929,7 +998,7 @@ export default function RoomBox({
                 충돌 표시
               </span>
             </label>
-            <label className="flex items-center gap-2 group cursor-pointer col-span-2">
+            <label className="flex items-center gap-2 group cursor-pointer">
               <input
                 type="checkbox"
                 checked={showWindows}
@@ -938,6 +1007,17 @@ export default function RoomBox({
               />
               <span className="text-white group-hover:text-primary transition-colors duration-200">
                 창문 표시
+              </span>
+            </label>
+            <label className="flex items-center gap-2 group cursor-pointer">
+              <input
+                type="checkbox"
+                checked={use3DModels}
+                onChange={(e) => setUse3DModels(e.target.checked)}
+                className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
+              />
+              <span className="text-white group-hover:text-primary transition-colors duration-200">
+                3D 모델
               </span>
             </label>
           </div>
@@ -1280,84 +1360,6 @@ export default function RoomBox({
         {/* 뷰 컨트롤 */}
         <ViewPresets onViewChange={handleViewChange} roomSize={roomSize} />
 
-        {/* 시점 모드 토글 */}
-        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-primary/10">
-              <svg
-                className="w-4 h-4 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-            </div>
-            <h4 className="font-bold text-sm text-text-primary">시점 모드</h4>
-          </div>
-          <button
-            onClick={() => setWalkthroughMode(!walkthroughMode)}
-            className={`w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
-              walkthroughMode
-                ? "bg-white text-primary border border-primary hover:bg-gray-100"
-                : "bg-white text-primary border border-primary hover:bg-gray-100"
-            }`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              {walkthroughMode ? (
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              )}
-              {walkthroughMode ? "조감도 모드" : "걸어다니기 모드"}
-            </span>
-          </button>
-          {walkthroughMode && (
-            <div className="mt-3 p-3 bg-background rounded-lg border border-border">
-              <p className="text-xs text-text-secondary font-medium">
-                키보드 조작:
-              </p>
-              <p className="text-xs text-text-secondary mt-1">
-                WASD - 이동 / 마우스 - 시점 변경
-              </p>
-            </div>
-          )}
-        </div>
 
         {/* 공간 분석 */}
         <SpaceUtilization
@@ -1447,6 +1449,7 @@ export default function RoomBox({
                 updatePlacedFurniturePosition={
                   updatePlacedFurniturePositionOnDragEnd
                 }
+                use3DModels={use3DModels}
               />
             ))}
 

@@ -15,7 +15,14 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 # 환경변수 로드
-load_dotenv()
+import pathlib
+env_path = pathlib.Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
+# 디버그: 환경변수 확인
+print(f"DB_HOST: {os.getenv('DB_HOST', 'localhost')}")
+print(f"DB_USER: {os.getenv('DB_USER', 'root')}")
+print(f"DB_NAME: {os.getenv('DB_NAME', 'room_measure')}")
 
 # 모델 정의
 from pydantic import BaseModel, EmailStr
@@ -132,7 +139,51 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="토큰이 유효하지 않습니다")
 
-# 스토리지 서비스 (JSON 파일 기반)
+# MongoDB 서비스
+from pymongo import MongoClient
+
+class MongoDBService:
+    def __init__(self):
+        self.mongo_url = "mongodb://13.55.21.100:27017"
+        self.db_name = "room_measure"
+        self.client = None
+        self.db = None
+        self.room_layouts_collection = None
+        self.connect()
+    
+    def connect(self):
+        try:
+            self.client = MongoClient(self.mongo_url)
+            self.db = self.client[self.db_name]
+            self.room_layouts_collection = self.db.room_layouts
+            print("MongoDB 연결 성공")
+            return True
+        except Exception as e:
+            print(f"MongoDB 연결 실패: {e}")
+            self.client = None
+            self.db = None
+            self.room_layouts_collection = None
+            return False
+    
+    def is_connected(self):
+        return self.room_layouts_collection is not None
+    
+    def save_room_layout(self, layout_data: dict):
+        if not self.is_connected():
+            return False
+        
+        try:
+            layout_data["saved_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            layout_data["format_version"] = "2.0.0"
+            
+            result = self.room_layouts_collection.insert_one(layout_data)
+            logger.info(f"MongoDB에 저장 완료: {result.inserted_id}")
+            return True
+        except Exception as e:
+            logger.error(f"MongoDB 저장 오류: {e}")
+            return False
+
+# 스토리지 서비스 (JSON 파일 기반 - 백업용)
 import json
 
 class SimpleStorageService:
@@ -188,6 +239,7 @@ app.add_middleware(
 
 # 서비스 초기화
 db_service = DatabaseService()
+mongodb_service = MongoDBService()
 storage_service = SimpleStorageService()
 
 @app.get("/")
@@ -374,11 +426,19 @@ async def save_room_layout_guest(layout_data: RoomLayoutData):
     try:
         layout_dict = layout_data.dict()
         layout_dict['user_id'] = None  # 게스트 사용자
-        success = storage_service.save_room_layout(layout_dict)
         
-        if success:
-            logger.info("방 레이아웃 저장 완료 (게스트)")
-            return {"success": True, "message": "방 레이아웃이 저장되었습니다"}
+        # MongoDB 우선 저장 시도
+        mongodb_success = mongodb_service.save_room_layout(layout_dict.copy())
+        
+        # JSON 파일에도 백업 저장
+        json_success = storage_service.save_room_layout(layout_dict)
+        
+        if mongodb_success:
+            logger.info("방 레이아웃 저장 완료 (게스트 - MongoDB)")
+            return {"success": True, "message": "방 레이아웃이 MongoDB에 저장되었습니다"}
+        elif json_success:
+            logger.info("방 레이아웃 저장 완료 (게스트 - JSON 백업)")
+            return {"success": True, "message": "방 레이아웃이 JSON 파일에 저장되었습니다"}
         else:
             return JSONResponse(
                 status_code=500,
