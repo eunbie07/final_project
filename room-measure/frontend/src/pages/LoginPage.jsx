@@ -38,15 +38,15 @@ const LoginPage = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-text-primary">
-            로그인
+            Login
           </h2>
           <p className="mt-2 text-center text-sm text-text-secondary">
-            또는{' '}
+            or{' '}
             <button
               onClick={() => navigate('/signup')}
               className="font-medium text-primary hover:text-primary/80"
             >
-              새 계정 만들기
+              Create new account
             </button>
           </p>
         </div>
@@ -61,7 +61,7 @@ const LoginPage = () => {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-text-primary">
-                이메일
+                Email
               </label>
               <input
                 id="email"
@@ -72,13 +72,13 @@ const LoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm placeholder-text-secondary focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="이메일을 입력하세요"
+                placeholder="Enter your email"
               />
             </div>
             
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-text-primary">
-                비밀번호
+                Password
               </label>
               <input
                 id="password"
@@ -89,7 +89,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm placeholder-text-secondary focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="비밀번호를 입력하세요"
+                placeholder="Enter your password"
               />
             </div>
           </div>
@@ -100,7 +100,7 @@ const LoginPage = () => {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? '로그인 중...' : '로그인'}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </div>
           
@@ -110,7 +110,7 @@ const LoginPage = () => {
               onClick={() => navigate('/')}
               className="text-sm text-text-secondary hover:text-primary"
             >
-              게스트로 계속하기
+              Continue as Guest
             </button>
           </div>
         </form>

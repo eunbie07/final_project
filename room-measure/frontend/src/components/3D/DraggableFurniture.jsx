@@ -120,7 +120,7 @@ export const DraggableFurnitureWithCollision = React.memo(
                 );
               }
 
-              // 먼저 방 경계 내로 조정
+              // 먼저 방 경계 내로 조정 (회전 정보 포함)
               const boundaryAdjustedPosition =
                 CollisionDetector.adjustToValidPosition(
                   newPosition,
@@ -128,7 +128,8 @@ export const DraggableFurnitureWithCollision = React.memo(
                   roomSize,
                   [],
                   id,
-                  furniturePresets
+                  furniturePresets,
+                  rotation
                 );
 
               // 가구 충돌 체크
@@ -223,6 +224,7 @@ export const DraggableFurnitureWithCollision = React.memo(
               color={color}
               selected={selected}
               hasCollision={hasCollision}
+              isChildComponent={true}
             />
           ) : (
             // 기본 박스 렌더링

@@ -49,9 +49,9 @@ const AIDesignPage = () => {
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8 md:mb-12 pt-24 md:pt-28">
-          <h1 className="text-5xl md:text-6xl font-black text-text-primary mb-8 leading-tight tracking-tight">AI <span className="text-primary bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Interior Design</span></h1>
-          <p className="text-xl md:text-2xl text-text-secondary mb-12 max-w-4xl mx-auto leading-relaxed font-light">
+        <div className="text-left mb-8 pt-24 md:pt-28">
+          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6 leading-tight">AI <span className="text-primary">Interior Design</span></h1>
+          <p className="text-lg text-text-secondary mb-8">
             AI suggests personalized interior designs based on room data and furniture placement from 2D/3D Room Planner.
           </p>
         </div>

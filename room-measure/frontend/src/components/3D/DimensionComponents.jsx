@@ -3,7 +3,7 @@ import { Line, Text } from "@react-three/drei";
 import * as THREE from "three";
 
 // 치수선 관련 컴포넌트들
-const DIMENSION_COLOR = "#475569";
+const DIMENSION_COLOR = "#FFFFFF";
 
 export const DimensionArrow = React.memo(function DimensionArrow({ start, end }) {
   const points = useMemo(() => {

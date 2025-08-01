@@ -683,7 +683,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
     <div className="mt-8 p-6 bg-surface rounded-xl shadow-lg border border-border">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-text-primary flex items-center gap-2">
-          <strong>가구 배치 시뮬레이션</strong>
+          가구 배치 시뮬레이셔
         </h2>
         <div className="flex flex-wrap gap-2">
           {/* 실행취소/다시실행 */}
@@ -756,7 +756,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
           </button>
           <button
             onClick={handleClearAll}
-            className="px-4 py-2 bg-danger hover:bg-red-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-danger hover:bg-danger-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={placedFurniture.length === 0}
           >
             <strong>전체 삭제</strong>
@@ -766,7 +766,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
 
       {/* 통계 정보 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-surface p-4 rounded-lg border border-border">
+        <div className="bg-background p-4 rounded-lg border border-border">
           <div className="text-sm text-text-secondary font-medium">
             방 크기
           </div>
@@ -774,7 +774,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
             {validRoomWidth.toFixed(1)} × {validRoomDepth.toFixed(1)} cm
           </div>
         </div>
-        <div className="bg-surface p-4 rounded-lg border border-border">
+        <div className="bg-background p-4 rounded-lg border border-border">
           <div className="text-sm text-text-secondary font-medium">
             배치된 가구
           </div>
@@ -782,7 +782,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
             {placedFurniture.length} 개
           </div>
         </div>
-        <div className="bg-surface p-4 rounded-lg border border-border">
+        <div className="bg-background p-4 rounded-lg border border-border">
           <div className="text-sm text-text-secondary font-medium">
             공간 활용률
           </div>
@@ -796,7 +796,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
         {/* 가구 카탈로그 */}
         <div className="lg:col-span-1">
           <h3 className="text-2xl font-bold mb-4 text-text-primary">
-            <strong>가구 선택</strong>
+            가구 선택
           </h3>
 
           {/* 카테고리 탭 */}
@@ -872,7 +872,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
               <button
                 onClick={handleAddCustomFurniture}
                 disabled={!customFurnitureName || !customFurnitureSize.width || !customFurnitureSize.depth || !customFurnitureSize.height}
-                className="w-full px-3 py-2 bg-primary text-white rounded text-sm font-medium hover:bg-secondary disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 bg-primary text-white rounded text-sm font-medium hover:bg-secondary disabled:bg-border disabled:cursor-not-allowed"
               >
                 커스텀 가구 추가
               </button>
@@ -899,7 +899,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
                     }
                   }}
                   disabled={placedFurniture.length === 0}
-                  className="px-3 py-1 bg-primary text-white rounded text-sm font-medium hover:bg-secondary disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="px-3 py-1 bg-primary text-white rounded text-sm font-medium hover:bg-secondary disabled:bg-border disabled:cursor-not-allowed"
                 >
                   저장
                 </button>
@@ -907,7 +907,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
               
               <div className="max-h-32 overflow-y-auto">
                 {getSavedTemplates().map((template, index) => (
-                  <div key={index} className="flex items-center justify-between py-1 px-2 bg-white rounded text-sm">
+                  <div key={index} className="flex items-center justify-between py-1 px-2 bg-surface rounded text-sm">
                     <span className="truncate flex-1">{template.name}</span>
                     <div className="flex gap-1 ml-2">
                       <button
@@ -924,7 +924,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
                             setSelectedFurnitureIndex(selectedFurnitureIndex);
                           }
                         }}
-                        className="px-2 py-1 bg-danger text-white rounded text-xs hover:bg-red-600"
+                        className="px-2 py-1 bg-danger text-white rounded text-xs hover:bg-danger-dark"
                       >
                         삭제
                       </button>
@@ -932,7 +932,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
                   </div>
                 ))}
                 {getSavedTemplates().length === 0 && (
-                  <div className="text-xs text-gray-500 text-center py-2">저장된 템플릿이 없습니다</div>
+                  <div className="text-xs text-text-secondary text-center py-2">저장된 템플릿이 없습니다</div>
                 )}
               </div>
             </div>
@@ -965,7 +965,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
             <strong>방 평면도</strong>
           </h3>
 
-          <div className="border-2 border-dashed border-border rounded-lg p-4 bg-white">
+          <div className="border-2 border-dashed border-border rounded-lg p-4 bg-surface">
             <div className="mb-2 text-sm text-text-secondary text-center">
               실제 비율: {validRoomWidth} × {validRoomDepth} cm (
               {(validRoomWidth / validRoomDepth).toFixed(2)}:1) - 좌표: 왼쪽 위
@@ -977,7 +977,7 @@ const FurniturePlacement = ({ roomWidth, roomDepth, placedFurniture, onFurniture
                 ref={canvasRef}
                 width={svgDimensions.svgWidth + 40}
                 height={svgDimensions.svgHeight + 40}
-                className="border border-border bg-white rounded-lg cursor-crosshair"
+                className="border border-border bg-surface rounded-lg cursor-crosshair"
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 onDragLeave={(e) => {

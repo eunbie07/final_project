@@ -265,7 +265,10 @@ function RoomPlannerPage() {
         })),
         target_height: parseFloat(ceilingHeight) / 100,
       };
+      
+      console.log("API 요청 payload:", payload);
       const res = await estimateRoomSize(payload.points, payload.target_height);
+      console.log("API 응답 전문:", res);
 
       const resultData = { ...res, detectionMethod: method };
 
@@ -313,28 +316,22 @@ function RoomPlannerPage() {
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8 md:mb-12 pt-24 md:pt-28">
-          <h1 className="text-5xl md:text-6xl font-black text-text-primary mb-8 leading-tight tracking-tight">
-            2D/3D <span className="text-primary bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Room Planner</span>
+        <div className="mb-8 pt-24 md:pt-28 max-w-4xl">
+          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6 leading-tight">
+            Room <span className="text-primary">Planner</span>
           </h1>
-          <p className="text-xl md:text-2xl text-text-secondary mb-12 max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-lg text-text-secondary mb-8">
             Measure accurate room dimensions from a single photo using artificial intelligence
           </p>
-          <button
-            onClick={() => setIsHelpOpen(true)}
-            className="text-text-secondary hover:text-primary transition-colors mb-8"
-          >
-            ❔
-          </button>
         </div>
 
       {!result && (
         <div className="max-w-6xl mx-auto">
           <div className="bg-surface border border-border rounded-lg shadow-sm p-4 sm:p-6 lg:p-8 mb-6">
             <div className="mb-6">
-              <div className="w-full border-2 border-dashed border-border rounded-xl p-6 sm:p-8 flex flex-col items-center justify-center bg-background hover:bg-background/70 transition-colors">
+              <div className="w-full border-2 border-dashed border-border rounded-xl p-6 sm:p-8 flex flex-col items-center justify-center bg-background hover:bg-gray-100 transition-colors">
                 <span className="font-medium text-lg sm:text-xl mb-2 text-text-primary">
-                  <strong>Upload Photo</strong>
+                  Upload Photo
                 </span>
                 <span className="text-text-secondary text-sm sm:text-base mb-4 text-center">
                   Please select a photo where the room corners are clearly
@@ -348,15 +345,15 @@ function RoomPlannerPage() {
 
             <div className="border-t border-border pt-6">
               <h3 className="font-medium text-lg mb-4 text-text-primary">
-                <strong>측정 설정</strong>
+                측정 설정
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block font-medium text-text-primary mb-2">
-                    <strong>건물 유형</strong>
+                    건물 유형
                   </label>
                   <select
-                    className="w-full border border-border rounded-lg px-4 py-3 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                    className="w-full border border-border rounded-lg px-4 py-3 focus:border-blue-600 focus:ring focus:ring-blue-600 focus:ring-opacity-50"
                     value={housingType}
                     onChange={(e) => setHousingType(e.target.value)}
                   >
@@ -369,7 +366,7 @@ function RoomPlannerPage() {
                 </div>
                 <div>
                   <label className="block font-medium text-text-primary mb-2">
-                    <strong>천장 높이</strong>
+                    천장 높이
                   </label>
                   <div className="flex items-center gap-3">
                     <input
@@ -379,7 +376,7 @@ function RoomPlannerPage() {
                       step="5"
                       value={ceilingHeight}
                       onChange={(e) => setCeilingHeight(e.target.value)}
-                      className="flex-1 border border-border rounded-lg px-4 py-3 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                      className="flex-1 border border-border rounded-lg px-4 py-3 focus:border-blue-600 focus:ring focus:ring-blue-600 focus:ring-opacity-50"
                     />
                     <span className="text-text-secondary text-base font-medium">
                       cm
@@ -405,56 +402,56 @@ function RoomPlannerPage() {
 
       {result && (
         <div className="space-y-6">
-          <div className="bg-surface/90 backdrop-blur border border-border rounded-2xl shadow-xl overflow-visible">
+          <div className="bg-surface rounded-lg shadow-sm border border-border overflow-visible">
             <div className="flex flex-wrap border-b border-border">
               <button
                 onClick={() => setActiveTab("analysis")}
                 className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-center font-medium transition-colors text-sm sm:text-base ${
                   activeTab === "analysis"
-                    ? "bg-background text-primary border-b-2 border-primary"
-                    : "text-text-secondary hover:text-primary hover:bg-background/50"
+                    ? "bg-surface text-primary border-b-2 border-blue-600"
+                    : "text-text-secondary hover:text-text-primary hover:bg-background"
                 }`}
               >
-                <strong>Analysis</strong>
+                Analysis
               </button>
               <button
                 onClick={() => setActiveTab("2d")}
                 className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-center font-medium transition-colors text-sm sm:text-base ${
                   activeTab === "2d"
-                    ? "bg-background text-primary border-b-2 border-primary"
-                    : "text-text-secondary hover:text-primary hover:bg-background/50"
+                    ? "bg-surface text-primary border-b-2 border-blue-600"
+                    : "text-text-secondary hover:text-text-primary hover:bg-background"
                 }`}
               >
-                <strong>2D Floor Plan</strong>
+                2D Floor Plan
               </button>
               <button
                 onClick={() => setActiveTab("furniture")}
                 className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-center font-medium transition-colors text-sm sm:text-base ${
                   activeTab === "furniture"
-                    ? "bg-background text-primary border-b-2 border-primary"
-                    : "text-text-secondary hover:text-primary hover:bg-background/50"
+                    ? "bg-surface text-primary border-b-2 border-blue-600"
+                    : "text-text-secondary hover:text-text-primary hover:bg-background"
                 }`}
               >
-                <strong>Furniture Layout</strong>
+                Furniture Layout
               </button>
               <button
                 onClick={() => handleTabClick("3d")}
                 className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-center font-medium transition-colors text-sm sm:text-base ${
                   activeTab === "3d"
-                    ? "bg-background text-primary border-b-2 border-primary"
-                    : "text-text-secondary hover:text-primary hover:bg-background/50"
+                    ? "bg-surface text-primary border-b-2 border-blue-600"
+                    : "text-text-secondary hover:text-text-primary hover:bg-background"
                 }`}
               >
-                <strong>3D Viewer</strong>
+                3D Viewer
               </button>
             </div>
 
             <div className="p-4 sm:p-6 lg:p-8">
               {activeTab === "analysis" && (
                 <div className="max-w-6xl mx-auto space-y-6">
-                  <div className="bg-background rounded-lg p-6 shadow-sm">
+                  <div className="bg-surface rounded-lg p-6 shadow-sm border border-border">
                     <h3 className="text-2xl font-bold mb-4 text-text-primary">
-                      <strong>AI Room Measurement Analysis</strong>
+                      AI Room Measurement Analysis
                       {result?.detectionMethod && (
                         <span className="ml-3 text-sm font-normal text-text-secondary">
                           ({result.detectionMethod === "auto" ? "🤖 Auto Detection" : "📍 Manual 4-Point"})
@@ -470,19 +467,19 @@ function RoomPlannerPage() {
                     <div className="grid grid-cols-3 gap-4 mb-6">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">
-                          {(result.width_cm / 100).toFixed(1)}m
+                          {((result.dimensions?.width_cm || result.width_cm) / 100).toFixed(1)}m
                         </div>
                         <div className="text-sm text-text-secondary">Width</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">
-                          {(result.depth_cm / 100).toFixed(1)}m
+                          {((result.dimensions?.depth_cm || result.depth_cm) / 100).toFixed(1)}m
                         </div>
                         <div className="text-sm text-text-secondary">Depth</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">
-                          {(result.height_cm / 100).toFixed(1)}m
+                          {((result.dimensions?.height_cm || result.height_cm) / 100).toFixed(1)}m
                         </div>
                         <div className="text-sm text-text-secondary">Height</div>
                       </div>
@@ -490,15 +487,15 @@ function RoomPlannerPage() {
 
                     {/* 계산된 값들 */}
                     <div className="grid grid-cols-2 gap-4 mt-4">
-                      <div className="text-center p-3 bg-surface rounded">
-                        <div className="text-xl font-bold text-secondary">
-                          {((result.width_cm * result.depth_cm) / 10000).toFixed(1)}㎡
+                      <div className="text-center p-3 bg-background rounded border border-border">
+                        <div className="text-xl font-bold text-text-primary">
+                          {(result.calculated_values?.area_sqm || (((result.dimensions?.width_cm || result.width_cm) * (result.dimensions?.depth_cm || result.depth_cm)) / 10000)).toFixed(1)}㎡
                         </div>
                         <div className="text-sm text-text-secondary">Floor Area</div>
                       </div>
-                      <div className="text-center p-3 bg-surface rounded">
-                        <div className="text-xl font-bold text-secondary">
-                          {((result.width_cm * result.depth_cm * result.height_cm) / 1000000).toFixed(1)}㎥
+                      <div className="text-center p-3 bg-background rounded border border-border">
+                        <div className="text-xl font-bold text-text-primary">
+                          {(result.calculated_values?.volume_cum || (((result.dimensions?.width_cm || result.width_cm) * (result.dimensions?.depth_cm || result.depth_cm) * (result.dimensions?.height_cm || result.height_cm)) / 1000000)).toFixed(1)}㎥
                         </div>
                         <div className="text-sm text-text-secondary">Volume</div>
                       </div>
@@ -506,7 +503,7 @@ function RoomPlannerPage() {
                   </div>
 
                   {/* 측정 정확도 및 신뢰도 */}
-                  <div className="bg-background rounded-lg p-6 shadow-sm">
+                  <div className="bg-surface rounded-lg p-6 shadow-sm border border-border">
                     <h4 className="text-lg font-semibold text-text-primary mb-3">Measurement Accuracy</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center gap-2">
@@ -514,7 +511,7 @@ function RoomPlannerPage() {
                         <span className="text-text-secondary">Accuracy: ±5~10cm</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-secondary rounded-full"></span>
+                        <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
                         <span className="text-text-secondary">Confidence: {(result.confidence * 100).toFixed(0)}%</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -522,7 +519,7 @@ function RoomPlannerPage() {
                         <span className="text-text-secondary">Processing time: ~30 seconds</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-secondary rounded-full"></span>
+                        <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
                         <span className="text-text-secondary">Method: {result.detectionMethod === "auto" ? "Automatic" : "Manual"}</span>
                       </div>
                     </div>
@@ -530,7 +527,7 @@ function RoomPlannerPage() {
 
                   {/* 원본 이미지와 깊이 분석 이미지 비교 */}
                   {depthImageUrl && (
-                    <div className="bg-background rounded-lg p-6 shadow-sm">
+                    <div className="bg-surface rounded-lg p-6 shadow-sm border border-border">
                       <h4 className="text-lg font-semibold text-text-primary mb-4">Image Analysis Process</h4>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-3">
@@ -575,7 +572,7 @@ function RoomPlannerPage() {
                   )}
 
                   {/* 측정 설정 정보 */}
-                  <div className="bg-background rounded-lg p-6 shadow-sm">
+                  <div className="bg-surface rounded-lg p-6 shadow-sm border border-border">
                     <h4 className="text-lg font-semibold text-text-primary mb-4">Measurement Parameters</h4>
                     <div className="grid grid-cols-2 gap-4 text-sm text-text-secondary">
                       <div className="flex justify-between">
@@ -602,7 +599,7 @@ function RoomPlannerPage() {
                   </div>
 
                   {/* 기술 정보 */}
-                  <div className="bg-background rounded-lg p-6 shadow-sm">
+                  <div className="bg-surface rounded-lg p-6 shadow-sm border border-border">
                     <h4 className="text-lg font-semibold text-text-primary mb-4">Technology Details</h4>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <div className="space-y-3">
@@ -626,8 +623,8 @@ function RoomPlannerPage() {
                       </div>
                     </div>
                     
-                    <div className="mt-4 p-4 bg-surface rounded-lg border-l-4 border-primary">
-                      <p className="text-sm text-text-secondary">
+                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-600">
+                      <p className="text-sm text-text-primary">
                         <strong>Tip:</strong> For more accurate measurements, ensure good lighting 
                         and clear visibility of room corners and edges.
                       </p>

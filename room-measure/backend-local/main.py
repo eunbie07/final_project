@@ -256,26 +256,33 @@ async def auto_detect_room(file: UploadFile = File(...), confidence_threshold: f
                 content={"error": "이미지를 읽을 수 없습니다"}
             )
 
-        # RoomNet 시뮬레이션 감지 수행
-        room_request = RoomNetRequest(confidence_threshold=confidence_threshold)
-        detected_points = simulate_roomnet_detection(img, room_request)
+        # 임시 이미지 파일 저장
+        import tempfile
+        import os
         
-        if detected_points:
-            logger.info(f"RoomNet 자동 감지 완료: {len(detected_points)}개 포인트")
-            return {
-                "success": True,
-                "detected_points": [point.dict() for point in detected_points],
-                "confidence_threshold": confidence_threshold,
-                "detection_method": "roomnet_simulation"
-            }
-        else:
-            return JSONResponse(
-                status_code=422,
-                content={
-                    "success": False,
-                    "error": "이미지에서 방 경계를 자동으로 감지할 수 없습니다"
-                }
-            )
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as temp_file:
+            cv2.imwrite(temp_file.name, img)
+            temp_image_path = temp_file.name
+        
+        try:
+            # RoomNet 시뮬레이션 감지 수행 (올바른 매개변수로)
+            result = simulate_roomnet_detection(temp_image_path, confidence_threshold)
+            
+            if result and result.get("success"):
+                logger.info(f"RoomNet 자동 감지 완료: {len(result.get('detected_points', []))}개 포인트")
+                return result
+            else:
+                return JSONResponse(
+                    status_code=422,
+                    content={
+                        "success": False,
+                        "error": "이미지에서 방 경계를 자동으로 감지할 수 없습니다"
+                    }
+                )
+        finally:
+            # 임시 파일 삭제
+            if os.path.exists(temp_image_path):
+                os.unlink(temp_image_path)
             
     except Exception as e:
         logger.error(f"자동 감지 실패: {e}")

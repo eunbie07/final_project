@@ -13,14 +13,14 @@ const LoadingSpinner = ({ size = 'medium', text = '로딩 중...', overlay = fal
   };
 
   const spinner = (
-    <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-primary ${getSizeClass()}`} />
+    <div className={`animate-spin rounded-full border-2 border-border border-t-primary ${getSizeClass()}`} />
   );
 
   if (overlay) {
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="bg-surface rounded-lg p-6 shadow-lg flex flex-col items-center space-y-3">
-          <div className="animate-spin rounded-full border-4 border-gray-300 border-t-primary w-8 h-8" />
+          <div className="animate-spin rounded-full border-4 border-border border-t-primary w-8 h-8" />
           <span className="text-text-primary font-medium">{text}</span>
         </div>
       </div>

@@ -47,7 +47,7 @@ const RoomCanvas = ({ x, y }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-white py-8 rounded-lg shadow-sm border border-border">
+    <div className="flex flex-col items-center justify-center bg-surface py-8 rounded-lg shadow-sm border border-border">
       {/* Room layout 제목 */}
       <div className="mb-4 text-xl font-bold text-text-primary text-center">
         <strong>Room Layout</strong>
@@ -219,7 +219,7 @@ const RoomCanvas = ({ x, y }) => {
       </svg>
 
       {/* 비율 정보 */}
-      <div className="mt-4 text-xs text-gray-500 text-center max-w-md">
+      <div className="mt-4 text-xs text-text-secondary text-center max-w-md">
         <strong>비율 정보:</strong>
         {aspectRatio >= 1.5
           ? " 가로가 매우 긴 방"

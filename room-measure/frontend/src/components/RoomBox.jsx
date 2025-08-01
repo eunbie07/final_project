@@ -128,18 +128,27 @@ const Wall = React.memo(function Wall({
   position,
   rotation,
   isWindow = false,
+  color = "#f8f6f0",
+  texture = null,
+  roughness = 0.9,
+  metalness = 0.02,
 }) {
   return (
     <mesh position={position} rotation={rotation} castShadow receiveShadow>
       <planeGeometry args={[width, height]} />
       <meshPhysicalMaterial
-        color={isWindow ? "#FFE4EC" : "#FFF0F5"}
-        roughness={0.7}
-        metalness={0.1}
-        clearcoat={0.2}
+        color={isWindow ? "#E8F4FD" : color}
+        map={texture}
+        roughness={isWindow ? 0.1 : roughness}
+        metalness={isWindow ? 0.02 : metalness}
+        clearcoat={isWindow ? 0.8 : (metalness > 0.1 ? 0.6 : 0.1)}
+        clearcoatRoughness={isWindow ? 0.1 : roughness}
         opacity={isWindow ? 0.3 : 1}
         transparent={isWindow}
         side={THREE.DoubleSide}
+        normalScale={[0.5, 0.5]}
+        envMapIntensity={0.7}
+        reflectivity={metalness > 0.1 ? 0.8 : 0.2}
       />
     </mesh>
   );
@@ -204,6 +213,49 @@ export default function RoomBox({
 
   // 3D 모델 사용 상태
   const [use3DModels, setUse3DModels] = useState(false);
+
+  // 벽면 스타일 상태
+  const [wallSettings, setWallSettings] = useState({
+    color: "#f8f6f0",
+    roughness: 0.9,
+    metalness: 0.02,
+    textureType: "none" // "none", "brick", "wood", "concrete", "wallpaper"
+  });
+
+  // 바닥 스타일 상태
+  const [floorSettings, setFloorSettings] = useState({
+    color: "#e8dcc0",
+    roughness: 0.85,
+    metalness: 0.05
+  });
+
+  // 벽 텍스처 프리셋
+  const wallPresets = {
+    white: { color: "#f8f6f0", roughness: 0.9, metalness: 0.02, name: "화이트" },
+    beige: { color: "#f5f5dc", roughness: 0.85, metalness: 0.01, name: "베이지" },
+    gray: { color: "#d3d3d3", roughness: 0.8, metalness: 0.05, name: "회색" },
+    blue: { color: "#e6f3ff", roughness: 0.9, metalness: 0.02, name: "파란색" },
+    green: { color: "#f0fff0", roughness: 0.9, metalness: 0.02, name: "연두색" },
+    pink: { color: "#ffeef5", roughness: 0.85, metalness: 0.01, name: "핑크" },
+    yellow: { color: "#fffacd", roughness: 0.9, metalness: 0.02, name: "노란색" },
+    brick: { color: "#cd853f", roughness: 0.95, metalness: 0.0, name: "벽돌" },
+    wood: { color: "#deb887", roughness: 0.8, metalness: 0.0, name: "나무" },
+    concrete: { color: "#a9a9a9", roughness: 0.95, metalness: 0.1, name: "콘크리트" }
+  };
+
+  // 바닥 텍스처 프리셋 (극단적 차이로 수정)
+  const floorPresets = {
+    wood_light: { color: "#e8dcc0", roughness: 0.9, metalness: 0.0, name: "밝은 목재" },
+    wood_dark: { color: "#8b4513", roughness: 0.85, metalness: 0.0, name: "진한 목재" },
+    tile_white: { color: "#f8f8ff", roughness: 0.05, metalness: 0.8, name: "화이트 타일" },
+    tile_gray: { color: "#d3d3d3", roughness: 0.1, metalness: 0.7, name: "그레이 타일" },
+    marble: { color: "#f0f0f0", roughness: 0.02, metalness: 0.9, name: "대리석" },
+    concrete: { color: "#a9a9a9", roughness: 0.98, metalness: 0.0, name: "콘크리트" },
+    carpet_beige: { color: "#f5deb3", roughness: 0.99, metalness: 0.0, name: "베이지 카펫" },
+    carpet_gray: { color: "#808080", roughness: 0.99, metalness: 0.0, name: "그레이 카펫" },
+    linoleum: { color: "#dda0dd", roughness: 0.2, metalness: 0.4, name: "리놀륨" },
+    mirror: { color: "#c0c0c0", roughness: 0.0, metalness: 1.0, name: "거울" }
+  };
 
   // GLB 메시 추출 함수 (임시)
   const extractMeshesToSeparateFiles = async () => {
@@ -832,13 +884,13 @@ export default function RoomBox({
                 <button
                   key={type}
                   onClick={() => handleAddFurniture(type)}
-                  className="group flex items-center gap-2 px-3 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02]"
+                  className="group flex items-center gap-2 px-3 py-2.5 bg-surface text-text-secondary border border-border rounded-lg hover:bg-background transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02]"
                 >
                   <FontAwesomeIcon
                     icon={iconMapping[preset.icon]}
-                    className="text-lg group-hover:scale-110 transition-transform duration-200 text-gray-700"
+                    className="text-lg group-hover:scale-110 transition-transform duration-200 text-text-secondary"
                   />
-                  <span className="text-gray-700 group-hover:text-primary">
+                  <span className="text-text-secondary group-hover:text-primary">
                     {preset.name}
                   </span>
                 </button>
@@ -875,8 +927,8 @@ export default function RoomBox({
               }}
               className={`w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
                 measurementMode
-                  ? "bg-blue-500 text-white hover:bg-blue-600"
-                  : "bg-white text-primary border border-primary hover:bg-gray-100"
+                  ? "bg-accent text-white hover:bg-primary"
+                  : "bg-white text-primary border border-primary hover:bg-background"
               }`}
             >
               <span className="flex items-center justify-center gap-2">
@@ -926,8 +978,189 @@ export default function RoomBox({
         </div>
       </div>
 
-      {/* 왼쪽 하단 - 시각 옵션 패널 */}
-      <div className="absolute bottom-4 left-4 z-10 w-80 max-w-sm">
+      {/* 왼쪽 하단 - 벽면 스타일 패널 */}
+      <div className="absolute bottom-4 left-4 z-10 w-80 max-w-sm space-y-4">
+        {/* 벽면 스타일 패널 */}
+        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <svg
+                className="w-4 h-4 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21a4.5 4.5 0 01-4.5-4.5V5a2 2 0 012-2h14L21 10v6.5a4.5 4.5 0 01-4.5 4.5"
+                />
+              </svg>
+            </div>
+            <h4 className="font-bold text-sm text-text-primary">벽면 스타일</h4>
+          </div>
+          <div className="space-y-3">
+            {/* 색상 프리셋 선택 */}
+            <div>
+              <p className="text-xs text-text-secondary mb-2 font-medium">벽 색상</p>
+              <div className="grid grid-cols-5 gap-1">
+                {Object.entries(wallPresets).map(([key, preset]) => (
+                  <button
+                    key={key}
+                    onClick={() => setWallSettings({
+                      ...wallSettings,
+                      color: preset.color,
+                      roughness: preset.roughness,
+                      metalness: preset.metalness
+                    })}
+                    className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 hover:scale-110 ${
+                      wallSettings.color === preset.color 
+                        ? 'border-primary shadow-lg' 
+                        : 'border-white/30 hover:border-white/60'
+                    }`}
+                    style={{ backgroundColor: preset.color }}
+                    title={preset.name}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            {/* 커스텀 색상 선택 */}
+            <div>
+              <p className="text-xs text-text-secondary mb-2 font-medium">커스텀 색상</p>
+              <input
+                type="color"
+                value={wallSettings.color}
+                onChange={(e) => setWallSettings({...wallSettings, color: e.target.value})}
+                className="w-full h-8 rounded-lg border border-border bg-background cursor-pointer"
+              />
+            </div>
+            
+            {/* 재질 조절 */}
+            <div>
+              <p className="text-xs text-text-secondary mb-2 font-medium">거칠기 ({wallSettings.roughness.toFixed(1)})</p>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={wallSettings.roughness}
+                onChange={(e) => setWallSettings({...wallSettings, roughness: parseFloat(e.target.value)})}
+                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
+                style={{
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${wallSettings.roughness * 100}%, #e5e7eb ${wallSettings.roughness * 100}%, #e5e7eb 100%)`
+                }}
+              />
+              <div className="flex justify-between text-xs text-text-secondary mt-1">
+                <span>매끄러움</span>
+                <span>거침</span>
+              </div>
+            </div>
+            
+            {/* 금속성 조절 */}
+            <div>
+              <p className="text-xs text-text-secondary mb-2 font-medium">금속성 ({wallSettings.metalness.toFixed(2)})</p>
+              <input
+                type="range"
+                min="0"
+                max="0.5"
+                step="0.01"
+                value={wallSettings.metalness}
+                onChange={(e) => setWallSettings({...wallSettings, metalness: parseFloat(e.target.value)})}
+                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
+                style={{
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${wallSettings.metalness * 200}%, #e5e7eb ${wallSettings.metalness * 200}%, #e5e7eb 100%)`
+                }}
+              />
+              <div className="flex justify-between text-xs text-text-secondary mt-1">
+                <span>매트</span>
+                <span>금속</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* 바닥 스타일 패널 */}
+        <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <svg
+                className="w-4 h-4 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+                />
+              </svg>
+            </div>
+            <h4 className="font-bold text-sm text-text-primary">바닥 스타일</h4>
+          </div>
+          <div className="space-y-3">
+            {/* 바닥 색상 프리셋 */}
+            <div>
+              <p className="text-xs text-text-secondary mb-2 font-medium">바닥 재질</p>
+              <div className="grid grid-cols-5 gap-1">
+                {Object.entries(floorPresets).map(([key, preset]) => (
+                  <button
+                    key={key}
+                    onClick={() => setFloorSettings({
+                      color: preset.color,
+                      roughness: preset.roughness,
+                      metalness: preset.metalness
+                    })}
+                    className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 hover:scale-110 ${
+                      floorSettings.color === preset.color 
+                        ? 'border-primary shadow-lg' 
+                        : 'border-white/30 hover:border-white/60'
+                    }`}
+                    style={{ backgroundColor: preset.color }}
+                    title={preset.name}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            {/* 커스텀 바닥 색상 */}
+            <div>
+              <p className="text-xs text-text-secondary mb-2 font-medium">커스텀 색상</p>
+              <input
+                type="color"
+                value={floorSettings.color}
+                onChange={(e) => setFloorSettings({...floorSettings, color: e.target.value})}
+                className="w-full h-8 rounded-lg border border-border bg-background cursor-pointer"
+              />
+            </div>
+            
+            {/* 바닥 거칠기 */}
+            <div>
+              <p className="text-xs text-text-secondary mb-2 font-medium">바닥 거칠기 ({floorSettings.roughness.toFixed(1)})</p>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={floorSettings.roughness}
+                onChange={(e) => setFloorSettings({...floorSettings, roughness: parseFloat(e.target.value)})}
+                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
+                style={{
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${floorSettings.roughness * 100}%, #e5e7eb ${floorSettings.roughness * 100}%, #e5e7eb 100%)`
+                }}
+              />
+              <div className="flex justify-between text-xs text-text-secondary mt-1">
+                <span>매끄러움</span>
+                <span>거침</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* 시각 옵션 패널 */}
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 rounded-lg bg-primary/10">
@@ -961,7 +1194,7 @@ export default function RoomBox({
                 onChange={(e) => setEnableSnap(e.target.checked)}
                 className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="text-white group-hover:text-primary transition-colors duration-200">
+              <span className="text-text-primary group-hover:text-primary transition-colors duration-200">
                 스냅 기능
               </span>
             </label>
@@ -972,7 +1205,7 @@ export default function RoomBox({
                 onChange={(e) => setShowSnapGrid(e.target.checked)}
                 className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="text-white group-hover:text-primary transition-colors duration-200">
+              <span className="text-text-primary group-hover:text-primary transition-colors duration-200">
                 스냅 그리드
               </span>
             </label>
@@ -983,7 +1216,7 @@ export default function RoomBox({
                 onChange={(e) => setShowFloorGrid(e.target.checked)}
                 className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="text-white group-hover:text-primary transition-colors duration-200">
+              <span className="text-text-primary group-hover:text-primary transition-colors duration-200">
                 바닥 그리드
               </span>
             </label>
@@ -994,7 +1227,7 @@ export default function RoomBox({
                 onChange={(e) => setShowCollisions(e.target.checked)}
                 className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="text-white group-hover:text-primary transition-colors duration-200">
+              <span className="text-text-primary group-hover:text-primary transition-colors duration-200">
                 충돌 표시
               </span>
             </label>
@@ -1005,7 +1238,7 @@ export default function RoomBox({
                 onChange={(e) => setShowWindows(e.target.checked)}
                 className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="text-white group-hover:text-primary transition-colors duration-200">
+              <span className="text-text-primary group-hover:text-primary transition-colors duration-200">
                 창문 표시
               </span>
             </label>
@@ -1016,7 +1249,7 @@ export default function RoomBox({
                 onChange={(e) => setUse3DModels(e.target.checked)}
                 className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
               />
-              <span className="text-white group-hover:text-primary transition-colors duration-200">
+              <span className="text-text-primary group-hover:text-primary transition-colors duration-200">
                 3D 모델
               </span>
             </label>
@@ -1075,7 +1308,7 @@ export default function RoomBox({
               loading={isSaving}
               loadingText="저장 중..."
               disabled={furniture.length === 0 && detectedWindows.length === 0}
-              className="w-full px-4 py-3 bg-white text-primary border border-primary rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+              className="w-full px-4 py-3 bg-white text-primary border border-primary rounded-lg text-sm font-semibold hover:bg-background disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
             >
               <span className="flex items-center justify-center gap-2">
                 <svg
@@ -1134,7 +1367,7 @@ export default function RoomBox({
                 onClick={handleDetectWindows}
                 loading={isDetectingWindows}
                 loadingText="창문 감지 중..."
-                className="w-full px-4 py-3 bg-white text-primary border border-primary rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                className="w-full px-4 py-3 bg-white text-primary border border-primary rounded-lg text-sm font-semibold hover:bg-background disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
               >
                 <span className="flex items-center justify-center gap-2">
                   <svg
@@ -1334,7 +1567,7 @@ export default function RoomBox({
                   };
                   setDetectedWindows([...detectedWindows, newWindow]);
                 }}
-                className="w-full px-3 py-2 bg-white text-primary border border-primary rounded-lg text-xs font-medium hover:bg-gray-100 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                className="w-full px-3 py-2 bg-white text-primary border border-primary rounded-lg text-xs font-medium hover:bg-background transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
               >
                 <span className="flex items-center justify-center gap-1">
                   <svg
@@ -1378,18 +1611,28 @@ export default function RoomBox({
             near: 1,
             far: Math.max(w, h, d) * 5,
           }}
-          shadows
+          shadows="soft"
           gl={{
             antialias: true,
             alpha: true,
             preserveDrawingBuffer: false,
             powerPreference: "high-performance",
             failIfMajorPerformanceCaveat: false,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.2,
+            outputColorSpace: THREE.SRGBColorSpace,
+            shadowMapType: THREE.PCFSoftShadowMap,
+            physicallyCorrectLights: true
           }}
         >
           <Suspense fallback={null}>
             <EnhancedLighting roomSize={roomSize} />
-            <Environment preset="apartment" />
+            <Environment 
+              preset="studio" 
+              background={false}
+              environmentIntensity={0.8}
+              environmentRotation={[0, Math.PI / 4, 0]}
+            />
 
             {/* 바닥 */}
             <mesh
@@ -1399,8 +1642,17 @@ export default function RoomBox({
               onClick={handleFloorClick}
             >
               <planeGeometry args={[w, d]} />
-              <meshStandardMaterial
-                color={placementMode ? "#e0f2fe" : "#f8f9fa"}
+              <meshPhysicalMaterial
+                color={placementMode ? "#E1F5FE" : floorSettings.color}
+                roughness={floorSettings.roughness}
+                metalness={floorSettings.metalness}
+                clearcoat={floorSettings.metalness > 0.1 ? 0.8 : 0.15}
+                clearcoatRoughness={floorSettings.roughness}
+                normalScale={[1.0, 1.0]}
+                envMapIntensity={1.0}
+                reflectivity={floorSettings.metalness > 0.1 ? 0.9 : 0.1}
+                transmission={0}
+                thickness={0.1}
               />
             </mesh>
 
@@ -1410,6 +1662,9 @@ export default function RoomBox({
               height={h}
               position={[0, h / 2, d / 2]}
               rotation={[0, Math.PI / 2, 0]}
+              color={wallSettings.color}
+              roughness={wallSettings.roughness}
+              metalness={wallSettings.metalness}
             />
 
             {/* 뒤쪽 벽 */}
@@ -1418,7 +1673,11 @@ export default function RoomBox({
               height={h}
               position={[w / 2, h / 2, 0]}
               rotation={[0, 0, 0]}
+              color={wallSettings.color}
+              roughness={wallSettings.roughness}
+              metalness={wallSettings.metalness}
             />
+
 
             <SnapGrid roomSize={roomSize} visible={showSnapGrid} />
             <FloorGrid roomSize={roomSize} visible={showFloorGrid} />
@@ -1510,9 +1769,9 @@ export default function RoomBox({
       {selectedFurnitureData && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 backdrop-blur-lg p-4 rounded-xl shadow-xl bg-white/90 border border-white/50 max-w-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-lg bg-blue-100">
+            <div className="p-2 rounded-lg bg-window-fill">
               <svg
-                className="w-5 h-5 text-blue-600"
+                className="w-5 h-5 text-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -1653,7 +1912,7 @@ export default function RoomBox({
           <div className="flex gap-2">
             <button
               onClick={() => handleRotateFurniture(selectedFurniture)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white text-primary border border-primary rounded-lg hover:bg-window-fill text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
             >
               <svg
                 className="w-4 h-4"
@@ -1697,9 +1956,9 @@ export default function RoomBox({
       {placementMode && (
         <div className="absolute inset-0 z-30 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="animate-pulse bg-blue-500/20 rounded-full p-8">
-              <div className="bg-blue-600/30 rounded-full p-6">
-                <div className="bg-blue-700/40 rounded-full p-4 flex items-center justify-center">
+            <div className="animate-pulse bg-accent/20 rounded-full p-8">
+              <div className="bg-primary/30 rounded-full p-6">
+                <div className="bg-secondary/40 rounded-full p-4 flex items-center justify-center">
                   <svg
                     className="w-8 h-8 text-white"
                     fill="none"
@@ -1718,7 +1977,7 @@ export default function RoomBox({
             </div>
           </div>
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
-            <div className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
+            <div className="bg-primary text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
               바닥을 클릭하여 {FURNITURE_PRESETS[placementMode]?.name}를
               배치하세요
             </div>

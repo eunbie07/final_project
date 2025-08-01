@@ -2,7 +2,7 @@ import React from "react";
 import { ContactShadows, Text } from "@react-three/drei";
 import * as THREE from "three";
 
-// 창문 컴포넌트 (개선된 디자인)
+// 창문 컴포넌트 (사실적인 디자인)
 export const Window3D = React.memo(function Window3D({
   position,
   size,
@@ -11,13 +11,13 @@ export const Window3D = React.memo(function Window3D({
   rotation = [0, 0, 0],
 }) {
   const [width, height, depth] = size;
-  const frameThickness = 6; // 프레임 두께 증가
-  const glassThickness = 2;
+  const frameThickness = 4; // 프레임을 더 얇게
+  const glassThickness = 0.5;
 
   return (
     <group position={position} rotation={rotation}>
-      {/* 창문 프레임 - 더 진한 색상으로 */}
-      <mesh castShadow receiveShadow>
+      {/* 외부 창틀 (벽에 박힌 부분) */}
+      <mesh castShadow receiveShadow position={[0, 0, 0]}>
         <boxGeometry
           args={[
             width + frameThickness,
@@ -25,50 +25,95 @@ export const Window3D = React.memo(function Window3D({
             frameThickness,
           ]}
         />
-        <meshStandardMaterial color="#334155" roughness={0.3} metalness={0.2} />
-      </mesh>
-
-      {/* 유리창 - 더 뚜렷한 청색으로 */}
-      <mesh position={[0, 0, frameThickness / 2]} castShadow receiveShadow>
-        <boxGeometry args={[width * 0.85, height * 0.85, glassThickness]} />
-        <meshStandardMaterial
-          color="var(--window-fill)"
-          transparent={true}
-          opacity={0.6}
-          roughness={0.05}
+        <meshStandardMaterial 
+          color="#FFFFFF" 
+          roughness={0.2} 
           metalness={0.1}
-          emissive="var(--window-stroke)"
-          emissiveIntensity={0.2}
         />
       </mesh>
 
-      {/* 창문 채색 (4분할) - 더 뚜렷한 색상 */}
-      <group position={[0, 0, frameThickness / 2 + 1]}>
-        {/* 세로 채색 */}
-        <mesh>
-          <boxGeometry args={[3, height * 0.8, 1]} />
-          <meshStandardMaterial color="#1E293B" roughness={0.2} />
+      {/* 하늘 배경 (창문 구멍을 통해 보이는 배경) */}
+      <mesh position={[0, 0, frameThickness / 2 + 1]}>
+        <planeGeometry args={[width * 0.8, height * 0.8]} />
+        <meshBasicMaterial 
+          color="#87CEEB" // 스카이블루
+        />
+      </mesh>
+      
+      {/* 구름 효과 */}
+      <mesh position={[-width * 0.1, height * 0.1, frameThickness / 2 + 1.5]}>
+        <planeGeometry args={[width * 0.15, height * 0.08]} />
+        <meshBasicMaterial 
+          color="#FFFFFF" 
+          transparent={true}
+          opacity={0.8}
+        />
+      </mesh>
+      <mesh position={[width * 0.08, height * 0.05, frameThickness / 2 + 1.5]}>
+        <planeGeometry args={[width * 0.12, height * 0.06]} />
+        <meshBasicMaterial 
+          color="#FFFFFF" 
+          transparent={true}
+          opacity={0.6}
+        />
+      </mesh>
+
+      {/* 유리창 - 투명하게 */}
+      <mesh position={[0, 0, frameThickness / 2]} receiveShadow>
+        <boxGeometry args={[width * 0.85, height * 0.85, 1]} />
+        <meshPhysicalMaterial
+          color="#E8F4FD"
+          transparent={true}
+          opacity={0.1}
+          roughness={0.02}
+          metalness={0.0}
+          transmission={0.9}
+          thickness={0.1}
+          ior={1.52}
+          clearcoat={0.8}
+          clearcoatRoughness={0.1}
+        />
+      </mesh>
+
+      {/* 창문 프레임 (가로, 세로 분할) */}
+      <group position={[0, 0, frameThickness / 2]}>
+        {/* 세로 중앙 프레임 */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[3, height * 0.8, 2]} />
+          <meshStandardMaterial 
+            color="#FFFFFF" 
+            roughness={0.2} 
+            metalness={0.1}
+          />
         </mesh>
-        {/* 가로 채색 */}
-        <mesh>
-          <boxGeometry args={[width * 0.8, 3, 1]} />
-          <meshStandardMaterial color="#1E293B" roughness={0.2} />
+        {/* 가로 중앙 프레임 */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[width * 0.8, 3, 2]} />
+          <meshStandardMaterial 
+            color="#FFFFFF" 
+            roughness={0.2} 
+            metalness={0.1}
+          />
         </mesh>
       </group>
 
-      {/* 창문 테두리 강조 */}
-      <mesh position={[0, 0, frameThickness / 2 + 2]}>
-        <boxGeometry args={[width + frameThickness + 2, height + frameThickness + 2, 0.5]} />
-        <meshStandardMaterial color="#334155" transparent={true} opacity={0.8} />
+      {/* 창문 손잡이 */}
+      <mesh castShadow receiveShadow position={[width * 0.3, 0, frameThickness]}>
+        <cylinderGeometry args={[1.5, 1.5, 3, 8]} />
+        <meshStandardMaterial 
+          color="#D1D5DB" 
+          roughness={0.1} 
+          metalness={0.8}
+        />
       </mesh>
       
       {/* 그림자 */}
       <ContactShadows
-        position={[0, 0, -frameThickness]}
-        opacity={0.4}
-        scale={Math.max(width, height) * 1.2}
-        blur={1.5}
-        far={15}
+        position={[0, 0, -frameThickness - 2]}
+        opacity={0.3}
+        scale={Math.max(width, height) * 1.3}
+        blur={2}
+        far={20}
       />
     </group>
   );
@@ -114,7 +159,7 @@ export const WindowsOnWalls = React.memo(function WindowsOnWalls({
             x_pos = window.x_position ? window.x_position * roomWidth : roomWidth / 2;
             y_pos = calculatedYPos;
             z_pos = wallThickness;
-            rotation = [0, Math.PI, 0];
+            rotation = [0, 0, 0];
             break;
           case "left":
             // 왼쪽 벽: X=0

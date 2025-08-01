@@ -22,8 +22,8 @@ export const FURNITURE_PRESETS = {
       meshNames: ["bed", "Bed", "mesh", "Mesh", "Object"], // 가능한 메시 이름들
       scale: [6, 3.5, 3.5], // 크기를 5배로 확대
       rotation: [-Math.PI / 2, 0, 0], // X축 -90도 회전
-      offset: [0, -60, 0] // Y축으로 30cm 아래로 이동 (침대 높이의 절반)
-    }
+      offset: [0, -60, 0], // Y축 오프셋을 가구 높이의 절반으로 조정
+    },
   },
   // 사무용
   desk: {
@@ -35,10 +35,10 @@ export const FURNITURE_PRESETS = {
     model3D: {
       path: "/desk.glb",
       meshNames: ["*"], // 전체 파일 로드 (메시 이름 무관)
-      scale: [1, 1, 1],
-      rotation: [0, 0, 0],
-      offset: [-500, -25, 0]
-    }
+      scale: [2, 2.5, 2],
+      rotation: [0, -Math.PI / 2, 0],
+      offset: [-25, -350, 655], // X축으로 50cm 이동, Y축 중립
+    },
   },
   chair: {
     name: "Chair",
@@ -46,12 +46,13 @@ export const FURNITURE_PRESETS = {
     color: "#90EE90",
     icon: "faChair",
     category: "office",
-    // model3D: {
-    //   path: "/low_poly_furnitures_full_bundle.glb",
-    //   meshNames: ["Object_6"],
-    //   scale: [1, 1, 1],
-    //   rotation: [0, 0, 0]
-    // }
+    model3D: {
+      path: "/chair.glb",
+      meshNames: ["*"],
+      scale: [1, 1, 1],
+      rotation: [0, 0, 0],
+      offset: [0, -85, 0],
+    },
   },
   // 거실
   sofa: {
@@ -60,38 +61,41 @@ export const FURNITURE_PRESETS = {
     color: "#87CEEB",
     icon: "faCouch",
     category: "living",
-    // model3D: {
-    //   path: "/low_poly_furnitures_full_bundle.glb",
-    //   meshNames: ["Object_16"],
-    //   scale: [1, 1, 1],
-    //   rotation: [0, 0, 0]
-    // }
+    model3D: {
+      path: "/sofa.glb",
+      meshNames: ["*"],
+      scale: [1, 1, 1],
+      rotation: [0, 0, 0],
+      offset: [0, -85, 0],
+    },
   },
   table: {
     name: "Table",
-    size: [100, 45, 50],
+    size: [100, 40, 50],
     color: "#B0E0E6",
     icon: "faTable",
     category: "living",
-    // model3D: {
-    //   path: "/low_poly_furnitures_full_bundle.glb",
-    //   meshNames: ["Object_14"],
-    //   scale: [1, 1, 1],
-    //   rotation: [0, 0, 0]
-    // }
+    model3D: {
+      path: "/table.glb",
+      meshNames: ["*"],
+      scale: [1, 1, 1],
+      rotation: [0, 0, 0],
+      offset: [0, -40, 0],
+    },
   },
   // 수납
   wardrobe: {
     name: "Wardrobe",
-    size: [80, 200, 60],
+    size: [120, 200, 60],
     color: "#DDA0DD",
     icon: "faBox",
     category: "storage",
-    // model3D: {
-    //   path: "/low_poly_furnitures_full_bundle.glb",
-    //   meshNames: ["Object_10"],
-    //   scale: [1, 1, 1],
-    //   rotation: [0, 0, 0]
-    // }
+    model3D: {
+      path: "/wardrobe.glb",
+      meshNames: ["*"],
+      scale: [0.9, 1.3, 1.4],
+      rotation: [0, 0, 0],
+      offset: [-200, -230, -260],
+    },
   },
 };

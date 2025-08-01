@@ -83,7 +83,6 @@ export const convertFurnitureToSaveFormat = (furniture) => {
     return {
       type: "furniture",
       name: presetData ? presetData.name.toLowerCase().replace(/\s+/g, '_') : "furniture",
-      material: presetData ? presetData.color : "gray",
       shape: "rectangle",
       position: {
         center: { x: centerXMm, y: centerYMm, z: 0 },
