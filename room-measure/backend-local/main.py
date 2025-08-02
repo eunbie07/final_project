@@ -21,9 +21,10 @@ from models import (
 )
 from window_detection import detect_windows_in_image
 from room_measurement import (
-    detect_room_simple_and_stable, detect_room_with_advanced_cv,
+    detect_room_simple_and_stable, detect_vanishing_points_and_room_corners,
     simulate_roomnet_detection, improved_room_measurement
 )
+from ai_room_detection import detect_room_with_ai
 from depth_processing import (
     generate_depth_map, get_depth_image_path, get_depth_at_point,
     get_depth_map_meta, compute_3d_distance, check_depth_files_exist
@@ -265,20 +266,30 @@ async def auto_detect_room(file: UploadFile = File(...), confidence_threshold: f
             temp_image_path = temp_file.name
         
         try:
-            # RoomNet 시뮬레이션 감지 수행 (올바른 매개변수로)
-            result = simulate_roomnet_detection(temp_image_path, confidence_threshold)
+            # 새로운 AI 기반 방 감지 수행 (더 낮은 임계값으로)
+            logger.info("🤖 개선된 AI 기반 방 모서리 감지 시작...")
+            # 개선된 AI는 더 낮은 임계값을 사용 (원래 요청된 임계값의 70%)
+            adjusted_threshold = max(confidence_threshold * 0.7, 0.4)
+            result = detect_room_with_ai(temp_image_path, adjusted_threshold)
             
             if result and result.get("success"):
-                logger.info(f"RoomNet 자동 감지 완료: {len(result.get('detected_points', []))}개 포인트")
+                logger.info(f"✅ AI 감지 완료: {len(result.get('detected_points', []))}개 포인트, 방법: {result.get('method')}")
                 return result
             else:
-                return JSONResponse(
-                    status_code=422,
-                    content={
-                        "success": False,
-                        "error": "이미지에서 방 경계를 자동으로 감지할 수 없습니다"
-                    }
-                )
+                # AI 감지 실패시 기존 방법으로 폴백
+                logger.info("⚠️ AI 감지 실패, 기존 방법으로 폴백...")
+                fallback_result = simulate_roomnet_detection(temp_image_path, confidence_threshold)
+                
+                if fallback_result and fallback_result.get("success"):
+                    return fallback_result
+                else:
+                    return JSONResponse(
+                        status_code=422,
+                        content={
+                            "success": False,
+                            "error": "이미지에서 방 경계를 자동으로 감지할 수 없습니다"
+                        }
+                    )
         finally:
             # 임시 파일 삭제
             if os.path.exists(temp_image_path):

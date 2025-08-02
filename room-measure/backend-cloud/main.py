@@ -1,10 +1,11 @@
 # EC2 배포용 경량 백엔드 (포트 3000)
 # 데이터 저장/조회만 담당
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.exceptions import RequestValidationError
 import logging
 import os
 from typing import List
@@ -14,6 +15,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import traceback
 
 # 환경변수 로드
 import pathlib
@@ -225,10 +227,41 @@ class SimpleStorageService:
         return None
 
 # 로깅 설정
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('room_measure_cloud.log'),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Room Measure Cloud API", version="1.0.0")
+app = FastAPI(
+    title="Room Measure Cloud API",
+    version="1.0.0",
+    description="""
+    방 크기 측정 및 가구 배치 서비스의 클라우드 API
+
+    ## 주요 기능
+    - 사용자 인증 (회원가입/로그인)
+    - 방 레이아웃 저장/조회
+    - 가구 좌표 변환
+
+    ## 포트 구분
+    - **포트 3000**: 클라우드 데이터 저장/조회 (이 API)
+    - **포트 3010**: 로컬 이미지/AI 처리
+    """,
+    contact={
+        "name": "Room Measure Team",
+        "email": "support@roommeasure.com"
+    },
+    license_info={
+        "name": "MIT License"
+    },
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -237,6 +270,61 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 요청 ID 추적을 위한 미들웨어
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = datetime.now()
+    request_id = id(request)
+    
+    logger.info(f"Request {request_id}: {request.method} {request.url}")
+    
+    response = await call_next(request)
+    
+    process_time = (datetime.now() - start_time).total_seconds()
+    logger.info(f"Request {request_id} completed in {process_time:.3f}s - Status: {response.status_code}")
+    
+    return response
+
+# 전역 예외 핸들러
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """입력 검증 오류 처리"""
+    logger.error(f"Validation error: {exc}")
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "error": "입력 데이터가 올바르지 않습니다",
+            "details": exc.errors()
+        }
+    )
+
+@app.exception_handler(500)
+async def internal_server_error_handler(request: Request, exc: Exception):
+    """서버 내부 오류 처리"""
+    logger.error(f"Internal server error: {str(exc)}\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+            "request_id": id(request)
+        }
+    )
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """일반 예외 처리"""
+    logger.error(f"Unhandled exception: {str(exc)}\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": "예기치 않은 오류가 발생했습니다",
+            "request_id": id(request)
+        }
+    )
 
 # 서비스 초기화
 db_service = DatabaseService()
@@ -252,9 +340,25 @@ async def health_check():
     return {"status": "healthy", "service": "cloud"}
 
 # 사용자 인증 API
-@app.post("/signup", response_model=dict)
+@app.post(
+    "/signup", 
+    response_model=dict,
+    summary="사용자 회원가입",
+    description="새 사용자 계정을 생성합니다",
+    responses={
+        200: {"description": "회원가입 성공"},
+        400: {"description": "이미 가입된 이메일"},
+        422: {"description": "입력 데이터 검증 실패"},
+        500: {"description": "서버 오류"}
+    }
+)
 async def signup(user_data: UserSignup):
-    """사용자 회원가입"""
+    """
+    새 사용자 계정을 생성합니다.
+    
+    - **email**: 유효한 이메일 주소
+    - **password**: 6자 이상의 비밀번호
+    """
     try:
         conn = db_service.get_connection()
         if not conn:
@@ -283,9 +387,27 @@ async def signup(user_data: UserSignup):
         logger.error(f"회원가입 오류: {e}")
         raise HTTPException(status_code=500, detail="서버 오류가 발생했습니다")
 
-@app.post("/login", response_model=Token)
+@app.post(
+    "/login", 
+    response_model=Token,
+    summary="사용자 로그인",
+    description="사용자 인증 후 JWT 토큰을 발급합니다",
+    responses={
+        200: {"description": "로그인 성공, JWT 토큰 반환"},
+        401: {"description": "이메일 또는 비밀번호 불일치"},
+        422: {"description": "입력 데이터 검증 실패"},
+        500: {"description": "서버 오류"}
+    }
+)
 async def login(user_data: UserLogin):
-    """사용자 로그인"""
+    """
+    사용자 로그인을 처리합니다.
+    
+    - **email**: 등록된 이메일 주소
+    - **password**: 계정 비밀번호
+    
+    성공시 JWT 토큰과 사용자 정보를 반환합니다.
+    """
     try:
         conn = db_service.get_connection()
         if not conn:

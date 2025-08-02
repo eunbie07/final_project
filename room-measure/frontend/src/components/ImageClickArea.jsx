@@ -104,10 +104,71 @@ const PointMarker = ({ point, index, isActive }) => {
           isAutoDetected ? "bg-primary" : `bg-${color}`
         } text-white text-xs font-bold px-2 py-1 rounded shadow-lg`}
       >
-        {isAutoDetected ? "AI" : index + 1}
+        {point.pointNumber || index + 1}
       </div>
     </div>
   );
+};
+
+const calculateDynamicThreshold = (canvas) => {
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  
+  // 이미지 품질 분석
+  let brightness = 0;
+  const values = [];
+  let edgePixels = 0;
+  
+  // 밝기와 엣지 픽셀 계산
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+    values.push(gray);
+    brightness += gray;
+    
+    // 인접 픽셀과의 차이가 큰 경우 엣지로 판단
+    if (i > 4 && Math.abs(gray - values[values.length - 2]) > 30) {
+      edgePixels++;
+    }
+  }
+  
+  brightness /= values.length;
+  const edgeRatio = edgePixels / values.length;
+  
+  // 표준편차 (대비) 계산
+  const variance = values.reduce((sum, val) => sum + Math.pow(val - brightness, 2), 0) / values.length;
+  const contrast = Math.sqrt(variance);
+  
+  // 동적 임계값 계산 (더 보수적으로)
+  let threshold = 0.6; // 기본값을 낮춤
+  
+  // 밝기에 따른 조정
+  if (brightness < 70) {
+    threshold = 0.4; // 어두운 이미지
+  } else if (brightness > 190) {
+    threshold = 0.7; // 매우 밝은 이미지
+  } else if (brightness > 150) {
+    threshold = 0.65; // 밝은 이미지
+  }
+  
+  // 대비에 따른 조정
+  if (contrast < 25) {
+    threshold -= 0.15; // 매우 낮은 대비
+  } else if (contrast < 40) {
+    threshold -= 0.1; // 낮은 대비
+  } else if (contrast > 90) {
+    threshold += 0.1; // 높은 대비
+  }
+  
+  // 엣지 비율에 따른 조정
+  if (edgeRatio < 0.1) {
+    threshold -= 0.1; // 엣지가 적으면 임계값 낮춤
+  } else if (edgeRatio > 0.3) {
+    threshold += 0.05; // 엣지가 많으면 약간 높임
+  }
+  
+  // 경계값 제한 (더 넓은 범위)
+  return Math.max(0.2, Math.min(0.8, threshold));
 };
 
 const validateClickedPoints = (points) => {
@@ -291,6 +352,7 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
         // 실제 계산용 깊이 맵 좌표도 저장
         depthX: depthCoords.x,
         depthY: depthCoords.y,
+        pointNumber: points.length + 1, // 수동 클릭 포인트에도 순서 번호 추가 (1, 2, 3, 4)
       };
 
       const newPoints = [...points, newPoint];
@@ -346,6 +408,32 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
     }
   };
 
+  const enhancedImagePreprocessing = async (img, canvas, ctx) => {
+    // 이미지를 캔버스에 그리기
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+    // 백엔드에서 수행할 전처리와 유사하게 간단하게 처리
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    // 간단한 대비 개선 및 그레이스케일 변환
+    for (let i = 0; i < data.length; i += 4) {
+      // RGB를 그레이스케일로 변환
+      const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+      
+      // 간단한 대비 개선 (선형 스트레칭)
+      const enhanced = Math.min(255, Math.max(0, gray * 1.1 + 10));
+      
+      data[i] = enhanced;     // Red
+      data[i + 1] = enhanced; // Green  
+      data[i + 2] = enhanced; // Blue
+      // Alpha는 그대로 유지
+    }
+
+    // 처리된 데이터를 캔버스에 적용
+    ctx.putImageData(imageData, 0, 0);
+  };
+
   const handleAutoDetect = async () => {
     setIsAutoDetecting(true);
     setDetectionMethod("auto");
@@ -353,11 +441,11 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
     setWarnings([]);
 
     try {
-      // 이미지를 Canvas로 로드하고 그레이스케일로 변환
+      // 이미지를 Canvas로 로드하고 고급 전처리 적용
       const response = await fetch(imageUrl);
       const blob = await response.blob();
 
-      // 이미지를 Canvas에 그려서 그레이스케일로 변환
+      // 이미지를 Canvas에 그려서 고급 전처리 수행
       const img = new Image();
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -371,26 +459,8 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
       canvas.width = img.width;
       canvas.height = img.height;
 
-      // 이미지를 Canvas에 그리기
-      ctx.drawImage(img, 0, 0);
-
-      // 그레이스케일 변환
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-
-      for (let i = 0; i < data.length; i += 4) {
-        // RGB를 그레이스케일로 변환 (가중평균)
-        const gray = Math.round(
-          0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
-        );
-        data[i] = gray; // Red
-        data[i + 1] = gray; // Green
-        data[i + 2] = gray; // Blue
-        // Alpha는 그대로 유지
-      }
-
-      // 변환된 이미지 데이터를 다시 Canvas에 적용
-      ctx.putImageData(imageData, 0, 0);
+      // 고급 이미지 전처리 적용
+      await enhancedImagePreprocessing(img, canvas, ctx);
 
       // Canvas를 Blob으로 변환
       const grayscaleBlob = await new Promise((resolve) => {
@@ -405,23 +475,52 @@ const ImageClickArea = ({ imageUrl, onComplete, depthWidth, depthHeight }) => {
       formData.append("file", file);
       formData.append("confidence_threshold", "0.7");
 
-      console.log("RoomNet 자동 감지 시작...");
+      console.log("Enhanced RoomNet 자동 감지 시작 (개선된 전처리 적용)...");
 
-      const autoDetectData = await autoDetectRoom(file, 0.7);
+      // 동적 신뢰도 임계값 계산
+      const dynamicThreshold = calculateDynamicThreshold(canvas);
+      console.log(`동적 신뢰도 임계값: ${dynamicThreshold}`);
+
+      const autoDetectData = await autoDetectRoom(file, dynamicThreshold);
 
       if (autoDetectData.success) {
         console.log("RoomNet 감지 성공:", autoDetectData);
 
-        // 자동 감지된 포인트들을 표시용으로 변환
+        // 자동 감지된 포인트들을 표시용으로 변환 (좌표 스케일 조정)
+        console.log("원본 백엔드 포인트들:", autoDetectData.detected_points);
+        console.log("현재 이미지 표시 크기:", imageSize);
+        console.log("깊이 맵 크기:", depthMeta);
+        
         const detectedPoints = autoDetectData.detected_points.map(
-          (point, index) => ({
-            x: point.x,
-            y: point.y,
-            z: point.z,
-            depthX: point.x,
-            depthY: point.y,
-            autoDetected: true,
-          })
+          (point, index) => {
+            // 백엔드에서 반환된 좌표는 이미 원본 이미지 크기 기준
+            // 프론트엔드 표시 크기로 변환 필요
+            let displayX = point.x;
+            let displayY = point.y;
+            
+            // 좌표 변환: 원본 이미지 크기 -> 표시 크기
+            if (imageSize.naturalWidth > 0 && imageSize.naturalHeight > 0) {
+              const scaleX = imageSize.clientWidth / imageSize.naturalWidth;
+              const scaleY = imageSize.clientHeight / imageSize.naturalHeight;
+              
+              displayX = point.x * scaleX;
+              displayY = point.y * scaleY;
+              
+              console.log(`✅ 포인트 ${index}: (${point.x}, ${point.y}) -> (${displayX.toFixed(1)}, ${displayY.toFixed(1)}) [스케일: ${scaleX.toFixed(2)}, ${scaleY.toFixed(2)}]`);
+            } else {
+              console.log(`⚠️ 포인트 ${index}: 스케일링 정보 없음, 원본 좌표 사용 (${point.x}, ${point.y})`);
+            }
+            
+            return {
+              x: displayX,
+              y: displayY,
+              z: point.z,
+              depthX: point.x,  // 서버로 전송시 사용할 원본 좌표
+              depthY: point.y,  // 서버로 전송시 사용할 원본 좌표
+              autoDetected: true,
+              pointNumber: index + 1,  // AI 감지 포인트에도 순서 번호 추가 (1, 2, 3, 4)
+            };
+          }
         );
 
         setPoints(detectedPoints);
