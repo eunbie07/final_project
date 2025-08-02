@@ -10,7 +10,8 @@ import os
 from typing import List
 import jwt
 import bcrypt
-import pymysql
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
@@ -20,9 +21,9 @@ env_path = pathlib.Path(__file__).parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
 # 디버그: 환경변수 확인
-print(f"DB_HOST: {os.getenv('DB_HOST', 'localhost')}")
-print(f"DB_USER: {os.getenv('DB_USER', 'root')}")
-print(f"DB_NAME: {os.getenv('DB_NAME', 'room_measure')}")
+print(f"POSTGRES_HOST: {os.getenv('POSTGRES_HOST', 'localhost')}")
+print(f"POSTGRES_USER: {os.getenv('POSTGRES_USER', 'postgres')}")
+print(f"POSTGRES_DB: {os.getenv('POSTGRES_DB', 'user_auth')}")
 
 # 모델 정의
 from pydantic import BaseModel, EmailStr
@@ -84,7 +85,7 @@ JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key-here")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
-# MySQL 데이터베이스 연결
+# PostgreSQL 데이터베이스 연결
 class DatabaseService:
     def __init__(self):
         self.connection = None
@@ -92,22 +93,22 @@ class DatabaseService:
     
     def connect(self):
         try:
-            self.connection = pymysql.connect(
-                host=os.getenv("DB_HOST", "localhost"),
-                user=os.getenv("DB_USER", "root"),
-                password=os.getenv("DB_PASSWORD", ""),
-                database=os.getenv("DB_NAME", "room_measure"),
-                charset='utf8mb4',
-                cursorclass=pymysql.cursors.DictCursor,
-                autocommit=True
+            self.connection = psycopg2.connect(
+                host=os.getenv("POSTGRES_HOST", "localhost"),
+                user=os.getenv("POSTGRES_USER", "postgres"),
+                password=os.getenv("POSTGRES_PASSWORD", ""),
+                database=os.getenv("POSTGRES_DB", "user_auth"),
+                port=os.getenv("POSTGRES_PORT", "5432"),
+                cursor_factory=RealDictCursor
             )
-            print("MySQL 데이터베이스 연결 성공")
+            self.connection.autocommit = True
+            print("PostgreSQL 데이터베이스 연결 성공")
         except Exception as e:
             print(f"데이터베이스 연결 실패: {e}")
             self.connection = None
     
     def get_connection(self):
-        if not self.connection or not self.connection.open:
+        if not self.connection or self.connection.closed:
             self.connect()
         return self.connection
 
@@ -144,7 +145,7 @@ from pymongo import MongoClient
 
 class MongoDBService:
     def __init__(self):
-        self.mongo_url = "mongodb://13.55.21.100:27017"
+        self.mongo_url = f"mongodb://{os.getenv('MONGO_HOST', '13.55.21.100')}:27017"
         self.db_name = "room_measure"
         self.client = None
         self.db = None
