@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ijipmatjip-config
+  namespace: ijipmatjip
+data:
+  VITE_CLOUD_API_BASE: "http://backend-cloud-service:3000"
+  VITE_LOCAL_API_BASE: "http://host.minikube.internal:3010"

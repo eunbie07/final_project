@@ -3,9 +3,9 @@
  * 포트 분리: 로컬 이미지 처리(3010), 클라우드 데이터(3000)
  */
 
-// API 엔드포인트 설정
-const LOCAL_API_BASE = 'http://localhost:3010';  // 로컬 이미지/AI 처리
-const CLOUD_API_BASE = 'http://localhost:3000';  // 클라우드 데이터 저장/조회
+// API 엔드포인트 설정 (환경변수 사용)
+const LOCAL_API_BASE = import.meta.env.VITE_LOCAL_API_BASE || 'http://localhost:3010';  // 로컬 이미지/AI 처리
+const CLOUD_API_BASE = import.meta.env.VITE_CLOUD_API_BASE || 'http://localhost:3000';  // 클라우드 데이터 저장/조회
 
 // 헤더 생성 함수
 const getAuthHeaders = () => {

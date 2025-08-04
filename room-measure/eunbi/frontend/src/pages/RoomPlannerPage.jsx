@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { undistortImage, generateDepthMap, getDepthMapImage, estimateRoomSize } from "../utils/api";
+import { undistortImage, generateDepthMap, getDepthMapImage, getDepthMeta, estimateRoomSize } from "../utils/api";
 import ImageUploader from "../components/ImageUploader";
 import ImageClickArea from "../components/ImageClickArea";
 import RoomResult from "../components/RoomResult";
@@ -214,9 +214,17 @@ function RoomPlannerPage() {
       setImageUrl(URL.createObjectURL(file));
 
       setUploadStatus("AI 깊이 분석 중... (30초 소요)");
-      const res = await generateDepthMap();
-      const { depth_width, depth_height } = res;
-      setDepthSize({ width: depth_width, height: depth_height });
+      await generateDepthMap();
+      
+      // 깊이 맵 크기 정보 가져오기
+      try {
+        const metaData = await getDepthMeta();
+        if (metaData.success) {
+          setDepthSize({ width: metaData.width, height: metaData.height });
+        }
+      } catch (error) {
+        console.error("깊이 맵 메타 정보 가져오기 실패:", error);
+      }
 
       try {
         const imageBlob = await getDepthMapImage();

@@ -17,7 +17,7 @@ DEPTH_MAP_PATH = os.path.join(BASE_DIR, "depth_map.npy")
 DEPTH_IMAGE_PATH = os.path.join(BASE_DIR, "depth_map_output.png")
 DEPTH_META_PATH = os.path.join(BASE_DIR, "depth_meta.txt")
 
-async def generate_depth_map(file: UploadFile) -> dict:
+async def generate_depth_map(file) -> dict:
     """이미지로부터 깊이 맵 생성"""
     try:
         logger.info("Depth map 생성 시작...")
@@ -31,10 +31,15 @@ async def generate_depth_map(file: UploadFile) -> dict:
         model.to(device)
         model.eval()
 
-        # 이미지 디코딩
-        contents = await file.read()
-        nparr = np.frombuffer(contents, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        # 이미지 디코딩 (파일 경로 또는 UploadFile 처리)
+        if isinstance(file, str):
+            # 파일 경로인 경우
+            img = cv2.imread(file, cv2.IMREAD_COLOR)
+        else:
+            # UploadFile인 경우
+            contents = await file.read()
+            nparr = np.frombuffer(contents, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if img is None:
             raise ValueError("이미지를 디코딩할 수 없습니다")
             

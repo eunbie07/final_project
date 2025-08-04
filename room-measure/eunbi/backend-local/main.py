@@ -124,7 +124,7 @@ async def create_depth_map():
                 content={"error": "왜곡 보정된 이미지를 찾을 수 없습니다. 먼저 이미지를 업로드하고 왜곡 보정을 수행해주세요."}
             )
         
-        success = generate_depth_map(undistorted_path)
+        success = await generate_depth_map(undistorted_path)
         
         if success:
             logger.info("깊이 맵 생성 완료")

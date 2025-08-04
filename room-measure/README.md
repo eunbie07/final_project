@@ -5,15 +5,14 @@
 ## 📁 프로젝트 구조
 
 ```
-room-measure/
+IjipMatjip/
 ├── eunbi/                       # 은비 전용 서비스
 │   ├── frontend/               # 방측정 전용 앱
-│   ├── backend/                # 메인 백엔드 (MongoDB)
-│   ├── backend-local/          # 로컬 AI 이미지 처리
-│   └── backend-cloud/          # 클라우드 데이터 관리
+│   ├── backend-cloud/          # 클라우드 데이터 관리 (MongoDB)
+│   └── backend-local/          # 로컬 AI 이미지 처리
 ├── frontend-main/              # 팀 통합 홈페이지
 ├── integration-files/          # 팀 통합용 템플릿
-├── frontend/                   # 기존 백업
+├── frontend-backup/                   # 기존 백업
 └── INTEGRATION_GUIDE.md        # 팀 통합 가이드
 ```
 
@@ -23,13 +22,13 @@ room-measure/
 
 **클라우드 API 서버 (터미널 1)**
 ```bash
-cd C:\Users\kibwa07\Documents\GitHub\final_project\room-measure\eunbi\backend-cloud
+cd eunbi/backend-cloud
 uv run uvicorn main:app --host 0.0.0.0 --port 3000 --reload --log-level debug
 ```
 
 **로컬 AI 처리 서버 (터미널 2)**
 ```bash
-cd C:\Users\kibwa07\Documents\GitHub\final_project\room-measure\eunbi\backend-local
+cd eunbi/backend-local
 uv run uvicorn main:app --host 0.0.0.0 --port 3010 --reload --log-level debug
 ```
 
@@ -37,13 +36,13 @@ uv run uvicorn main:app --host 0.0.0.0 --port 3010 --reload --log-level debug
 
 **방측정 전용 앱 (터미널 3)**
 ```bash
-cd C:\Users\kibwa07\Documents\GitHub\final_project\room-measure\eunbi\frontend
+cd eunbi/frontend
 npm run dev -- --host 0.0.0.0 --port 4000
 ```
 
 **팀 통합 앱 (터미널 4)**
 ```bash
-cd C:\Users\kibwa07\Documents\GitHub\final_project\room-measure\frontend-main
+cd frontend-main
 npm run dev -- --host 0.0.0.0 --port 4010
 ```
 

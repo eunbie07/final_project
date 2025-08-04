@@ -1,0 +1,10 @@
+2025-08-04 13:41:30,087 - main - INFO - Request 1982398496992: OPTIONS http://localhost:3000/save-room-layout-guest
+2025-08-04 13:41:30,087 - main - INFO - Request 1982398496992 completed in 0.000s - Status: 200
+2025-08-04 13:41:30,100 - main - INFO - Request 1982398509856: POST http://localhost:3000/save-room-layout-guest
+2025-08-04 13:41:30,552 - main - INFO - MongoDB에 저장 완료: 689039fa46f9b427c9096d5c
+2025-08-04 13:41:30,562 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-04 13:41:30,565 - main - INFO - Request 1982398509856 completed in 0.464s - Status: 200
+2025-08-04 13:41:36,404 - main - INFO - Request 1982398512592: POST http://localhost:3000/save-room-layout-guest
+2025-08-04 13:41:36,553 - main - INFO - MongoDB에 저장 완료: 68903a0046f9b427c9096d5d
+2025-08-04 13:41:36,558 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-04 13:41:36,559 - main - INFO - Request 1982398512592 completed in 0.156s - Status: 200
