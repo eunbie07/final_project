@@ -19,15 +19,28 @@ const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <a href="/" className="text-2xl font-bold text-text-primary">
-              방측정
+              이집맞집
             </a>
           </div>
           <div className="hidden md:flex items-center space-x-1">
             <a
-              href="/"
+              href="/find-house"
+              className="px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors font-bold"
+            >
+              {" "}
+              Find Your Home
+            </a>
+            <a
+              href="/room-planner"
               className="px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors font-bold"
             >
               Room Planner
+            </a>
+            <a
+              href="/ai-design"
+              className="px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors font-bold"
+            >
+              AI Interior Design
             </a>
 
             {/* 인증 관련 버튼 */}
