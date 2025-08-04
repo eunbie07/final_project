@@ -5,11 +5,14 @@
 ```
 room-measure/
 ├── eunbi/                    # 은비 개발 공간
-│   ├── frontend/            # 개발용 프론트엔드
+│   ├── frontend/            # 개발/테스트용 프론트엔드
 │   ├── backend/             # 메인 백엔드 (FastAPI)
 │   ├── backend-local/       # 로컬 이미지 처리
 │   └── backend-cloud/       # 클라우드 데이터 관리
-├── frontend-main/           # 팀 통합 프론트엔드
+├── integration-files/       # 팀 통합시 사용할 파일들
+│   ├── teamApi.js          # 팀 API 통합 유틸리티
+│   └── .env.example        # 환경변수 템플릿
+├── frontend/                # 기존 프론트엔드 (백업)
 └── INTEGRATION_GUIDE.md
 ```
 
