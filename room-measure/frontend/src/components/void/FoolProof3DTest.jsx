@@ -1,3 +1,0 @@
-// Moved to void directory
-import React from 'react';
-// ... rest of the file content ... 
