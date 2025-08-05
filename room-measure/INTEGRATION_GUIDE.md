@@ -2,36 +2,94 @@
 
 이 문서는 3팀(은비, 민아, 단비)의 서비스를 하나의 플랫폼으로 통합하는 가이드입니다.
 
-## 📁 통합 후 폴더 구조
+## 📁 새 레포 폴더 구조 (브랜치별 완전 분리)
 
+**🔥 브랜치별 완전 분리 전략으로 변경되었습니다!**
+
+### main 브랜치 (통합 홈페이지)
 ```
 IjipMatjip/
-├── eunbi/                    # 은비 개발 공간
-│   ├── frontend/            # 개발/테스트용 프론트엔드 (포트: 4000)
-│   ├── backend-cloud/       # 클라우드 데이터 관리 (포트: 3000)
-│   └── backend-local/       # 로컬 AI 이미지 처리 (포트: 3010)
-├── minah/                   # 민아 개발 공간 (예정)
-│   ├── frontend/           # AI 인테리어 개발용
-│   └── backend/            # AI 인테리어 API
-├── danbi/                   # 단비 개발 공간 (예정)  
-│   ├── frontend/           # 집찾기 개발용
-│   └── backend/            # 집찾기 API
 ├── frontend-main/           # 🏠 통합 홈페이지 (포트: 4010)
-├── integration-files/       # 팀 통합용 템플릿
-│   ├── teamApi.js          # 팀 API 통합 유틸리티
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── AIDesignPage.jsx      # 플레이스홀더
+│   │   │   ├── FindHousePage.jsx     # 플레이스홀더
+│   │   │   └── RoomPlannerPage.jsx   # 플레이스홀더
+│   │   └── utils/
+│   ├── public/
+│   └── package.json
+├── integration-files/       # 🔗 팀 API 통합 유틸리티
+│   ├── teamApi.js          # 모든 팀 API 통합 함수
 │   └── .env.example        # 환경변수 템플릿
-└── frontend-backup/         # 기존 백업
+└── README.md               # 프로젝트 메인 문서
 ```
 
-## 🌿 브랜치 전략
+### dev-eunbi 브랜치 (은비 서비스)
+```
+IjipMatjip/
+├── eunbi/                  # 은비 서비스 전체
+│   ├── frontend/           # React + Vite (포트: 4000)
+│   │   ├── src/
+│   │   │   ├── components/3D/
+│   │   │   ├── pages/RoomPlannerPage.jsx
+│   │   │   └── utils/
+│   │   └── package.json
+│   ├── backend-cloud/      # 클라우드 데이터 관리 (포트: 3000)
+│   │   ├── main.py
+│   │   └── requirements.txt
+│   ├── backend-local/      # 로컬 AI 이미지 처리 (포트: 3010)
+│   │   ├── main.py
+│   │   ├── ai_room_detection.py
+│   │   └── requirements.txt
+│   └── k8s/               # Kubernetes 배포 설정
+└── README.md              # 은비 서비스 전용 문서
+```
 
-현재 상황에 맞게 업데이트된 브랜치 전략:
+### dev-minah 브랜치 (민아 서비스)
+```
+IjipMatjip/
+├── minah/                 # 민아 서비스
+│   ├── frontend/          # React (포트: 4001)
+│   │   └── .gitkeep      # 개발 시작용 플레이스홀더
+│   └── backend/           # FastAPI (포트: 8001)
+│       └── .gitkeep      # 개발 시작용 플레이스홀더
+└── README.md             # 민아 서비스 전용 문서
+```
 
-- `main` - 현재 통합 홈페이지 버전 (frontend-main 중심)
-- `dev-eunbi` - 은비 개발 브랜치 (eunbi/frontend 중심)
-- `dev-minah` - 민아 개발 브랜치 (예정)
-- `dev-danbi` - 단비 개발 브랜치 (예정)
-- `integration` - 팀 통합 테스트 브랜치 (통합 시 사용)
+### dev-danbi 브랜치 (단비 서비스)
+```
+IjipMatjip/
+├── danbi/                 # 단비 서비스
+│   ├── frontend/          # React (포트: 4002)
+│   │   └── .gitkeep      # 개발 시작용 플레이스홀더
+│   └── backend/           # FastAPI (포트: 8002)
+│       └── .gitkeep      # 개발 시작용 플레이스홀더
+└── README.md             # 단비 서비스 전용 문서
+```
+
+### integration 브랜치 (통합 테스트용)
+```
+IjipMatjip/
+├── eunbi/                 # 은비 서비스 전체
+├── minah/                 # 민아 서비스 전체
+├── danbi/                 # 단비 서비스 전체
+├── frontend-main/         # 통합 홈페이지
+├── integration-files/     # 공유 유틸리티
+├── docker-compose.yml     # 통합 테스트용
+└── README.md             # 통합 테스트 가이드
+```
+
+## 🌿 브랜치 전략 (완전 분리)
+
+**새로운 브랜치별 완전 분리 전략:**
+
+- **`main`** - 통합 홈페이지만 (frontend-main + integration-files)
+- **`dev-eunbi`** - 은비 서비스만 (eunbi/ 폴더 + README)
+- **`dev-minah`** - 민아 서비스만 (minah/ 폴더 + README)
+- **`dev-danbi`** - 단비 서비스만 (danbi/ 폴더 + README)
+- **`integration`** - 모든 서비스 통합 (모든 폴더)
 
 ## 🔌 현재 API 구조 (은비 서비스)
 
