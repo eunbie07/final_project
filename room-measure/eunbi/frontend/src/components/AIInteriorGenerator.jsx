@@ -24,20 +24,20 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
     }
 
     setIsGenerating(true);
-    setCurrentStep('MongoDB에 방 데이터 저장 중...');
+    setCurrentStep('AI 인테리어 이미지 생성 중...');
     
     try {
       console.log('Starting AI interior generation with data:', roomData);
       
       const response = await generateAIInteriorImage(roomData, selectedStyle);
       
-      if (response.success && response.image_path) {
+      if (response.success && (response.image_path || response.image_url)) {
         const newImage = {
           path: response.image_path,
+          url: response.image_url,  // HTTP URL 추가
           style: selectedStyle,
           generated_at: new Date().toISOString(),
-          room_dimensions: roomData.dimensions,
-          mongo_id: response.mongo_save?.layout_id
+          room_dimensions: roomData.dimensions
         };
         
         setGeneratedImages(prev => [newImage, ...prev]);
@@ -138,17 +138,13 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
           
           {/* 단계별 진행 상황 */}
           <div className="text-sm text-blue-600 space-y-1">
-            <div className={`flex items-center gap-2 ${currentStep.includes('MongoDB') ? 'text-blue-700 font-semibold' : ''}`}>
-              {currentStep.includes('MongoDB') ? '⏳' : '✅'} 
-              <span>1단계: MongoDB에 방 데이터 저장</span>
-            </div>
-            <div className={`flex items-center gap-2 ${currentStep.includes('AI') || currentStep === '완료!' ? 'text-blue-700 font-semibold' : ''}`}>
-              {currentStep === '완료!' ? '✅' : (currentStep.includes('MongoDB') ? '⏳' : '⏳')} 
-              <span>2단계: {INTERIOR_STYLES.find(s => s.id === selectedStyle)?.name} 스타일 AI 이미지 생성</span>
+            <div className={`flex items-center gap-2 ${currentStep.includes('AI') && !currentStep.includes('완료') ? 'text-blue-700 font-semibold' : ''}`}>
+              {currentStep === '완료!' ? '✅' : '⏳'} 
+              <span>1단계: {INTERIOR_STYLES.find(s => s.id === selectedStyle)?.name} 스타일 AI 이미지 생성</span>
             </div>
             <div className={`flex items-center gap-2 ${currentStep === '완료!' ? 'text-green-700 font-semibold' : ''}`}>
               {currentStep === '완료!' ? '✅' : '⏳'} 
-              <span>3단계: 고품질 이미지 렌더링 및 결과 표시</span>
+              <span>2단계: 고품질 이미지 렌더링 및 결과 표시</span>
             </div>
           </div>
           
@@ -168,8 +164,21 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {generatedImages.map((image, index) => (
               <div key={index} className="bg-background rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                  <div className="text-center text-text-secondary">
+                <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {image.url ? (
+                    <img 
+                      src={image.url} 
+                      alt={`${INTERIOR_STYLES.find(s => s.id === image.style)?.name} 스타일 인테리어`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('이미지 로드 실패:', image.url);
+                        // 이미지 로드 실패 시 대체 UI 표시
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div className="text-center text-text-secondary" style={{display: image.url ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
                     <div className="text-4xl mb-2">🎨</div>
                     <div className="text-sm">
                       {INTERIOR_STYLES.find(s => s.id === image.style)?.name || image.style} 스타일

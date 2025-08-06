@@ -173,7 +173,7 @@ class MongoDBService:
     
     def save_room_layout(self, layout_data: dict):
         if not self.is_connected():
-            return False
+            return False, None
         
         try:
             layout_data["saved_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -181,10 +181,10 @@ class MongoDBService:
             
             result = self.room_layouts_collection.insert_one(layout_data)
             logger.info(f"MongoDB에 저장 완료: {result.inserted_id}")
-            return True
+            return True, str(result.inserted_id)
         except Exception as e:
             logger.error(f"MongoDB 저장 오류: {e}")
-            return False
+            return False, None
 
 # 스토리지 서비스 (JSON 파일 기반 - 백업용)
 import json
@@ -519,7 +519,7 @@ async def save_room_layout(
             
             if success:
                 logger.info(f"방 레이아웃 저장 완료 (JSON): 사용자 {current_user_id}")
-                return {"success": True, "message": "방 레이아웃이 저장되었습니다"}
+                return {"success": True, "message": "방 레이아웃이 저장되었습니다", "layout_id": None}
             else:
                 return JSONResponse(
                     status_code=500,
@@ -532,9 +532,10 @@ async def save_room_layout(
                 "INSERT INTO room_layouts (user_id, layout_data, created_at) VALUES (%s, %s, %s)",
                 (current_user_id, json.dumps(layout_data.dict()), datetime.now())
             )
+            layout_id = cursor.lastrowid
             
         logger.info(f"방 레이아웃 저장 완료 (DB): 사용자 {current_user_id}")
-        return {"success": True, "message": "방 레이아웃이 저장되었습니다"}
+        return {"success": True, "message": "방 레이아웃이 저장되었습니다", "layout_id": str(layout_id)}
         
     except Exception as e:
         logger.error(f"레이아웃 저장 오류: {e}")
@@ -551,17 +552,17 @@ async def save_room_layout_guest(layout_data: RoomLayoutData):
         layout_dict['user_id'] = None  # 게스트 사용자
         
         # MongoDB 우선 저장 시도
-        mongodb_success = mongodb_service.save_room_layout(layout_dict.copy())
+        mongodb_success, mongodb_result = mongodb_service.save_room_layout(layout_dict.copy())
         
         # JSON 파일에도 백업 저장
         json_success = storage_service.save_room_layout(layout_dict)
         
         if mongodb_success:
             logger.info("방 레이아웃 저장 완료 (게스트 - MongoDB)")
-            return {"success": True, "message": "방 레이아웃이 MongoDB에 저장되었습니다"}
+            return {"success": True, "message": "방 레이아웃이 MongoDB에 저장되었습니다", "layout_id": mongodb_result}
         elif json_success:
             logger.info("방 레이아웃 저장 완료 (게스트 - JSON 백업)")
-            return {"success": True, "message": "방 레이아웃이 JSON 파일에 저장되었습니다"}
+            return {"success": True, "message": "방 레이아웃이 JSON 파일에 저장되었습니다", "layout_id": None}
         else:
             return JSONResponse(
                 status_code=500,

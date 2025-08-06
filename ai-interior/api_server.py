@@ -5,10 +5,13 @@ RoomBox.jsx와 연결되는 FastAPI 서버
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Dict, Any, Optional, List
 import asyncio
 import json
+import os
 from datetime import datetime
 
 from roombox_integration import DifyRoomImageGenerator
@@ -25,6 +28,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 생성된 이미지 파일 정적 서빙
+if not os.path.exists("generated_images"):
+    os.makedirs("generated_images")
+    
+app.mount("/images", StaticFiles(directory="generated_images"), name="images")
 
 # 전역 변수
 generator = None
@@ -128,6 +137,14 @@ async def generate_interior(request: RoomDataRequest):
         
         if result["success"]:
             print(f"OK: 이미지 생성 성공: {result['image_path']}")
+            
+            # 로컬 파일 경로를 HTTP URL로 변환
+            if 'image_path' in result and result['image_path']:
+                # 파일명만 추출 (경로 제거)
+                filename = os.path.basename(result['image_path'])
+                # HTTP URL로 변환
+                result['image_url'] = f"http://localhost:8000/images/{filename}"
+                print(f"   이미지 URL: {result['image_url']}")
         else:
             print(f"ERROR: 이미지 생성 실패: {result.get('error')}")
         
@@ -258,9 +275,9 @@ async def main():
     import uvicorn
     
     print("LAUNCH: Dify Room Image Generator API 시작...")
-    print("   - 포트: 8080")  
-    print("   - 문서: http://localhost:8080/docs")
-    print("   - 테스트: http://localhost:8080/test-consistency?style=modern")
+    print("   - 포트: 8000")  
+    print("   - 문서: http://localhost:8000/docs")
+    print("   - 테스트: http://localhost:8000/test-consistency?style=modern")
     
     config = uvicorn.Config(
         app,
