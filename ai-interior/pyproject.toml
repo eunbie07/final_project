@@ -20,6 +20,15 @@ dependencies = [
     "pymongo>=4.0.0",
     "pathlib2>=2.3.0",
     "opencv-python>=4.12.0.88",
+    # Stable Diffusion & ControlNet 의존성
+    "diffusers>=0.21.0",
+    "transformers>=4.35.0",
+    "accelerate>=0.24.0",
+    "controlnet-aux>=0.0.7",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
 ]
 
 [project.scripts]
