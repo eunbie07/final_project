@@ -310,3 +310,107 @@ export const calculateDepthDistance = async (point1, point2) => {
 
   return await response.json();
 };
+
+// ---------------------------
+// AI 인테리어 API (ai-interior 백엔드 연결)
+// ---------------------------
+
+// AI 인테리어 API 기본 설정
+const AI_INTERIOR_API_BASE = import.meta.env.VITE_AI_INTERIOR_API_BASE || 'http://localhost:8000';
+
+// MongoDB에 방 데이터 저장 후 AI 인테리어 생성
+export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian') => {
+  try {
+    // 1. 먼저 MongoDB에 방 데이터 저장
+    console.log('Step 1: MongoDB에 방 데이터 저장 중...');
+    const saveResult = await saveRoomLayoutToMongoDB({
+      room_dimensions: {
+        width_cm: roomData.dimensions.width_cm,
+        height_cm: roomData.dimensions.height_cm,
+        depth_cm: roomData.dimensions.depth_cm
+      },
+      furniture_3d: roomData.furniture_3d || [],
+      area_sqm: roomData.area_sqm,
+      volume_cum: roomData.volume_cum,
+      created_at: roomData.created_at,
+      ai_generation_request: true // AI 생성 요청임을 표시
+    });
+
+    console.log('Step 1 완료: MongoDB 저장 성공', saveResult);
+
+    // 2. MongoDB 저장 성공 후 AI 인테리어 생성
+    console.log('Step 2: AI 인테리어 이미지 생성 중...');
+    const response = await fetch(`${AI_INTERIOR_API_BASE}/generate-interior`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        room_data: {
+          ...roomData,
+          mongo_id: saveResult.layout_id // MongoDB ID 추가
+        },
+        style: style,
+        generate_image: true
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`AI 인테리어 생성 실패: ${response.status} - ${errorText}`);
+    }
+
+    const aiResult = await response.json();
+    console.log('Step 2 완료: AI 이미지 생성 성공', aiResult);
+
+    return {
+      success: true,
+      mongo_save: saveResult,
+      ai_generation: aiResult,
+      image_path: aiResult.image_path
+    };
+
+  } catch (error) {
+    console.error('방 데이터 저장 또는 AI 생성 실패:', error);
+    throw error;
+  }
+};
+
+// 기존 AI 인테리어 이미지 생성 (하위 호환성 유지)
+export const generateAIInteriorImage = async (roomData, style = 'scandinavian') => {
+  return await saveRoomDataAndGenerateAI(roomData, style);
+};
+
+// 생성된 AI 인테리어 이미지 목록 조회
+export const getGeneratedImages = async (roomId = null) => {
+  const url = roomId 
+    ? `${AI_INTERIOR_API_BASE}/images?room_id=${roomId}`
+    : `${AI_INTERIOR_API_BASE}/images`;
+    
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`이미지 목록 조회 실패: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
+// 특정 이미지 다운로드
+export const downloadAIImage = async (imagePath) => {
+  const response = await fetch(`${AI_INTERIOR_API_BASE}/download-image`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      image_path: imagePath
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`이미지 다운로드 실패: ${response.status}`);
+  }
+
+  return response.blob();
+};

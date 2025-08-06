@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
+import { useNavigate } from "react-router-dom";
 import { Canvas } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -167,6 +168,7 @@ export default function RoomBox({
   const w = width;
   const h = height;
   const d = depth;
+  const navigate = useNavigate();
 
   // 커스텀 훅으로 상태 관리
   const roomState = useRoomState([w, h, d]);
@@ -174,6 +176,7 @@ export default function RoomBox({
   // Toast 알림 시스템
   const { toasts, removeToast, showSuccess, showError, showWarning, showInfo } =
     useToast();
+  
   const {
     furniture,
     setFurniture,
@@ -210,6 +213,37 @@ export default function RoomBox({
     isSaving,
     setIsSaving,
   } = roomState;
+
+  // AI 인테리어 생성 핸들러
+  const handleAIInteriorGenerate = useCallback(() => {
+    // 현재 방 데이터를 localStorage에 저장
+    const roomData = {
+      dimensions: {
+        width_cm: w,
+        height_cm: h,
+        depth_cm: d
+      },
+      area_sqm: (w * d) / 10000,
+      volume_cum: (w * h * d) / 1000000,
+      furniture_3d: furniture.map(f => ({
+        name: f.name || f.type,
+        type: f.type,
+        position: f.position,
+        scale: f.scale,
+        rotation: f.rotation
+      })),
+      created_at: new Date().toISOString()
+    };
+    
+    localStorage.setItem('currentRoomData', JSON.stringify(roomData));
+    
+    // AI 인테리어 페이지로 네비게이션
+    navigate('/ai-interior', { 
+      state: { roomData }
+    });
+    
+    showInfo('AI 인테리어 디자이너로 이동합니다...');
+  }, [w, h, d, furniture, navigate, showInfo]);
 
   // 3D 모델 사용 상태
   const [use3DModels, setUse3DModels] = useState(false);
@@ -1992,6 +2026,47 @@ export default function RoomBox({
 
       {/* Toast 알림 */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+      {/* AI 인테리어 생성 버튼 - 우측 하단 */}
+      <div className="absolute bottom-4 right-4 z-20">
+        <button
+          onClick={handleAIInteriorGenerate}
+          className="group flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+        >
+          <div className="p-2 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+              />
+            </svg>
+          </div>
+          <div className="text-left">
+            <div className="font-bold text-lg">AI 인테리어 생성</div>
+            <div className="text-xs text-white/80">방 크기 기반 맞춤 디자인</div>
+          </div>
+          <svg
+            className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

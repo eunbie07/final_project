@@ -1,0 +1,44 @@
+[project]
+name = "ai-interior"
+version = "0.1.0"
+description = "RoomBox.jsx ↔ Dify 통합 AI 인테리어 시스템"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "pillow>=11.3.0",
+    "python-dotenv>=1.1.1",
+    "requests>=2.32.4",
+    "uvicorn>=0.35.0",
+    "websockets>=12.0",
+    "pydantic>=2.0.0",
+    # Google Cloud 라이브러리들 (호환 버전)
+    "google-cloud-aiplatform==1.71.1",
+    "vertexai==1.71.1",
+    "google-generativeai>=0.8.0",
+    # 추가 의존성
+    "pymongo>=4.0.0",
+    "pathlib2>=2.3.0",
+]
+
+[project.scripts]
+demo = "integration_example:cli_main"
+sync-server = "realtime_sync:cli_main"
+api-server = "api_server:cli_main"
+# minah 통합 기능들
+enhanced-test = "test_minah_integration:cli_main"
+batch-process = "mongodb_integration:batch_main"
+monitor-layouts = "mongodb_integration:monitor_main"
+# 이미지 임베딩 기능
+image-embed = "image_embedding_processor:cli_main"
+smart-test = "enhanced_dify_integration:smart_test_main"
+system-analysis = "enhanced_dify_integration:system_analysis_main"
+
+[tool.uv]
+package = false
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.8.0",
+]

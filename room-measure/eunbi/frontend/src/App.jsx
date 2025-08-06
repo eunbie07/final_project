@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import RoomPlannerPage from "./pages/RoomPlannerPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import AIInteriorPage from "./pages/AIInteriorPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <div className="pt-16">
           <Routes>
             <Route path="/" element={<RoomPlannerPage />} />
+            <Route path="/ai-interior" element={<AIInteriorPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
           </Routes>

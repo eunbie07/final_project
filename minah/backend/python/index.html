@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 방 꾸미기 시뮬레이터</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <h1 class="text-3xl font-bold mb-2 text-gray-900">AI 방 꾸미기 시뮬레이터</h1>
+            <p class="text-gray-600 mb-6">방 크기와 가구를 선택하면 AI가 이미지를 생성해줍니다.</p>
+
+            <!-- API Key Input -->
+            <div class="mb-6">
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">OpenAI API Key</label>
+                <input type="password" id="apiKey" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                <p class="text-xs text-gray-500 mt-1">API 키는 브라우저에만 저장되며, 서버로 전송되지 않습니다.</p>
+            </div>
+
+            <!-- Room & Furniture Settings -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Room Dimensions -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-3">1. 방 크기 설정 (mm)</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="roomWidth" class="text-sm font-medium">가로 (Width)</label>
+                            <input type="number" id="roomWidth" value="4000" class="mt-1 w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="roomDepth" class="text-sm font-medium">세로 (Depth)</label>
+                            <input type="number" id="roomDepth" value="5000" class="mt-1 w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="roomHeight" class="text-sm font-medium">높이 (Height)</label>
+                            <input type="number" id="roomHeight" value="2800" class="mt-1 w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Furniture Selection -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-3">2. 가구 선택</h2>
+                    <div id="furniture-options" class="space-y-2">
+                        <div class="flex items-center"><input type="checkbox" id="double_bed" data-name="double_bed" class="h-4 w-4 rounded" checked><label for="double_bed" class="ml-2">더블 침대</label></div>
+                        <div class="flex items-center"><input type="checkbox" id="wardrobe" data-name="wardrobe" class="h-4 w-4 rounded" checked><label for="wardrobe" class="ml-2">옷장</label></div>
+                        <div class="flex items-center"><input type="checkbox" id="desk" data-name="desk" class="h-4 w-4 rounded" checked><label for="desk" class="ml-2">책상</label></div>
+                        <div class="flex items-center"><input type="checkbox" id="window" data-name="main_window" class="h-4 w-4 rounded" checked><label for="window" class="ml-2">창문</label></div>
+                        <div class="flex items-center"><input type="checkbox" id="door" data-name="entrance_door" class="h-4 w-4 rounded" checked><label for="door" class="ml-2">문</label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div class="mt-8">
+                <button id="generateBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+                    이미지 생성하기
+                </button>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result" class="mt-8" style="display: none;">
+                <h2 class="text-xl font-semibold mb-4">생성 결과</h2>
+                <div id="loader" class="loader mx-auto" style="display: none;"></div>
+                <div id="image-container" class="w-full aspect-video bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                    <img id="resultImage" src="" alt="생성된 이미지" class="w-full h-full object-contain">
+                </div>
+                <div id="error-message" class="mt-4 text-red-600"></div>
+                
+                <h3 class="text-lg font-semibold mt-6 mb-2">생성된 프롬프트 (JSON)</h3>
+                <pre id="generatedJson" class="bg-gray-900 text-white text-xs p-4 rounded-lg overflow-x-auto"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generateBtn');
+        const resultDiv = document.getElementById('result');
+        const loader = document.getElementById('loader');
+        const imageContainer = document.getElementById('image-container');
+        const resultImage = document.getElementById('resultImage');
+        const generatedJson = document.getElementById('generatedJson');
+        const errorMessage = document.getElementById('error-message');
+
+        // 가구 기본 정보
+        const furnitureData = {
+            double_bed: { type: "furniture", dimensions: { width: 1600, depth: 2100, height: 1000 }, material: "dark wood frame with grey linen bedding" },
+            wardrobe: { type: "furniture", dimensions: { width: 600, depth: 1800, height: 2200 }, material: "white matte finish" },
+            desk: { type: "furniture", dimensions: { width: 600, depth: 1200, height: 750 }, material: "light oak wood with black metal legs" },
+            main_window: { type: "window", dimensions: { width: 50, depth: 2500, height: 1500 }, details: "covered with sheer white curtains" },
+            entrance_door: { type: "door", dimensions: { width: 900, depth: 50, height: 2100 }, material: "white painted wood" }
+        };
+
+        generateBtn.addEventListener('click', async () => {
+            const apiKey = document.getElementById('apiKey').value;
+            if (!apiKey) {
+                alert('OpenAI API 키를 입력해주세요.');
+                return;
+            }
+
+            // UI 초기화
+            resultDiv.style.display = 'block';
+            loader.style.display = 'block';
+            imageContainer.style.display = 'none';
+            errorMessage.textContent = '';
+
+            try {
+                // 1. JSON 데이터 생성
+                const roomJson = buildRoomJson();
+                generatedJson.textContent = JSON.stringify(roomJson, null, 2);
+
+                // 2. JSON을 자연어 프롬프트로 변환
+                const prompt = jsonToPrompt(roomJson);
+                
+                // 3. OpenAI API 호출
+                const response = await fetch('https://api.openai.com/v1/images/generations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "dall-e-3",
+                        prompt: prompt,
+                        n: 1,
+                        size: "1792x1024",
+                        quality: "standard"
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || '이미지 생성에 실패했습니다.');
+                }
+
+                const data = await response.json();
+                const imageUrl = data.data[0].url;
+
+                // 4. 결과 표시
+                resultImage.src = imageUrl;
+                imageContainer.style.display = 'flex';
+
+            } catch (error) {
+                console.error(error);
+                errorMessage.textContent = `오류 발생: ${error.message}`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        });
+
+        function buildRoomJson() {
+            const roomWidth = parseInt(document.getElementById('roomWidth').value);
+            const roomDepth = parseInt(document.getElementById('roomDepth').value);
+            const roomHeight = parseInt(document.getElementById('roomHeight').value);
+
+            const selectedFurniture = Array.from(document.querySelectorAll('#furniture-options input:checked'))
+                                           .map(input => input.dataset.name);
+
+            const objects = [];
+            
+            // 자동 배치 로직
+            selectedFurniture.forEach(name => {
+                const data = furnitureData[name];
+                let obj = {
+                    type: data.type,
+                    name: name,
+                    dimensions: data.dimensions,
+                    position: {},
+                    rotation_z: 0,
+                    ...(data.material && {material: data.material}),
+                    ...(data.details && {details: data.details})
+                };
+
+                // 간단한 규칙 기반 배치
+                switch (name) {
+                    case 'double_bed':
+                        obj.position = { x: (roomWidth / 2) - (data.dimensions.width / 2), y: roomDepth, z: 0 };
+                        obj.rotation_z = 180;
+                        break;
+                    case 'wardrobe':
+                        obj.position = { x: 0, y: roomDepth / 2, z: 0 };
+                        break;
+                    case 'desk':
+                        obj.position = { x: roomWidth, y: (roomDepth / 2) + (data.dimensions.depth / 2), z: 0 };
+                        break;
+                    case 'main_window':
+                        obj.position = { x: roomWidth, y: roomDepth / 2, z: 1000 };
+                        break;
+                    case 'entrance_door':
+                        obj.position = { x: data.dimensions.width / 2, y: 0, z: 0 };
+                        break;
+                }
+                objects.push(obj);
+            });
+
+            return {
+                scene: {
+                    description: "A 3D scene definition for a room. All units are in millimeters. X-axis is width, Y-axis is depth, Z-axis is height.",
+                    view_point: {
+                        camera_position: { x: roomWidth / 2, y: -1000, z: roomHeight * 0.6 },
+                        look_at: { x: roomWidth / 2, y: roomDepth / 2, z: roomHeight * 0.4 },
+                        style: "cozy, modern, bright, photorealistic, wide-angle lens"
+                    },
+                    room: {
+                        dimensions: { width: roomWidth, depth: roomDepth, height: roomHeight },
+                        walls: { material: "light beige painted plaster" },
+                        floor: { material: "light oak wood planks" }
+                    },
+                    objects: objects
+                }
+            };
+        }
+
+        function jsonToPrompt(data) {
+            const scene = data.scene;
+            const roomDim = scene.room.dimensions;
+            const promptParts = [
+                `A ${scene.view_point.style} image of a room with dimensions ${roomDim.width}mm wide, ${roomDim.depth}mm deep, and ${roomDim.height}mm high.`,
+                `The floor is ${scene.room.floor.material}, and the walls are ${scene.room.walls.material}.`
+            ];
+
+            scene.objects.forEach(obj => {
+                let desc = `There is a ${obj.material || ''} ${obj.name.replace('_', ' ')}.`;
+                if (obj.position.z > 0) {
+                    desc += ` It is placed on a wall, starting ${obj.position.z}mm from the floor.`
+                }
+                if (obj.details) {
+                    desc += ` ${obj.details}.`
+                }
+                promptParts.push(desc);
+            });
+            
+            // AI가 JSON 구조를 더 잘 이해하도록 프롬프트에 JSON 문자열 자체를 포함시킵니다.
+            promptParts.push("\nFor precise layout, adhere to the following JSON structure:");
+            promptParts.push(JSON.stringify(data, null, 2));
+
+            return promptParts.join(' ');
+        }
+    </script>
+</body>
+</html>

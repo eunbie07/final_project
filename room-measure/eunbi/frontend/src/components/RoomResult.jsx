@@ -263,6 +263,7 @@ const RoomResult = ({ result, depthImageUrl }) => {
               </div>
             </div>
           </div>
+
         </div>
     </div>
   );
