@@ -17,37 +17,61 @@ class DifyLayoutRAG:
         }
     
     def create_spatial_embedding(self, room_data: Dict[str, Any]) -> str:
-        """방 레이아웃을 구조화된 텍스트로 변환"""
-        room = room_data["scene"]["room"]
-        objects = room_data["scene"]["objects"]
+        """방 레이아웃을 구조화된 텍스트로 변환 (새로운 데이터 구조 지원)"""
         
-        # 구조화된 설명 생성
-        description = f"""
-        Room Layout Analysis:
-        - Dimensions: {room['width']}×{room['depth']}×{room['height']}mm
-        - Total Area: {(room['width'] * room['depth']) / 1000000:.2f}㎡
-        - Room Ratio: {room['width']/room['depth']:.2f} (width/depth)
-        
-        Furniture Configuration:
-        """
-        
-        for obj in objects:
-            if obj["type"] == "furniture":
-                pos = obj["position"]["center"]
-                dims = obj["dimensions"]
+        # 새로운 데이터 구조 처리 (furniture_3d 형식)
+        if "dimensions" in room_data and "furniture_3d" in room_data:
+            dimensions = room_data["dimensions"]
+            furniture_list = room_data["furniture_3d"]
+            
+            description = f"""
+ROOM SPATIAL ANALYSIS:
+- Room Size: {dimensions['width_cm']:.1f}cm × {dimensions['depth_cm']:.1f}cm × {dimensions['height_cm']:.1f}cm
+- Room Center Point: ({dimensions['width_cm']/2:.1f}cm, {dimensions['depth_cm']/2:.1f}cm)
+- Total Floor Area: {(dimensions['width_cm'] * dimensions['depth_cm']) / 10000:.2f}㎡
+
+CRITICAL FURNITURE POSITIONING:"""
+            
+            for furniture in furniture_list:
+                name = furniture.get('name', 'furniture')
+                pos = furniture["position"]
+                pos_x_cm = pos[0]  
+                pos_z_cm = pos[2]  # Z축이 depth
                 
-                # 상대적 위치 계산
-                rel_x = (pos["x"] / room["width"]) * 100
-                rel_y = (pos["y"] / room["depth"]) * 100
+                # 중앙도 계산 (0.5가 완전 중앙)
+                rel_x = pos_x_cm / dimensions['width_cm']
+                rel_z = pos_z_cm / dimensions['depth_cm']
+                center_distance = ((rel_x - 0.5) ** 2 + (rel_z - 0.5) ** 2) ** 0.5
+                
+                # 배치 유형 결정
+                if center_distance < 0.1:
+                    placement = "PERFECT CENTER"
+                elif center_distance < 0.2:
+                    placement = "NEAR CENTER"
+                elif center_distance < 0.3:
+                    placement = "OFF-CENTER"
+                else:
+                    placement = "EDGE/WALL"
                 
                 description += f"""
-        - {obj['name']}:
-          * Absolute Position: ({pos['x']}, {pos['y']})mm
-          * Relative Position: {rel_x:.1f}% from left, {rel_y:.1f}% from bottom
-          * Size: {dims['width']}×{dims['depth']}mm
-          * Area Ratio: {(dims['width']*dims['depth'])/(room['width']*room['depth'])*100:.1f}%
-          * Wall Distance: Left={pos['x']}mm, Right={room['width']-pos['x']}mm
-                """
+- {name.upper()} PLACEMENT:
+  EXACT COORDINATES: X={pos_x_cm:.1f}cm, Z={pos_z_cm:.1f}cm
+  RELATIVE POSITION: ({rel_x:.3f}, {rel_z:.3f}) where (0.5,0.5)=center
+  CENTER DISTANCE: {center_distance:.3f} (0.0=perfect center, 0.5+=edge)
+  PLACEMENT TYPE: {placement}
+  WALL CLEARANCES: Left={pos_x_cm:.1f}cm, Right={dimensions['width_cm']-pos_x_cm:.1f}cm
+  POSITIONING INSTRUCTION: Place {name} EXACTLY at coordinates ({pos_x_cm:.1f}, {pos_z_cm:.1f}) - THIS IS {placement}
+"""
+            
+        else:
+            # 기존 MongoDB 구조 처리 (fallback)
+            room = room_data.get("scene", {}).get("room", {})
+            objects = room_data.get("scene", {}).get("objects", [])
+            
+            description = "LEGACY FORMAT SPATIAL ANALYSIS:\n"
+            for obj in objects:
+                if obj.get("type") == "furniture":
+                    description += f"- {obj.get('name', 'furniture')}: Legacy format detected\n"
         
         return description.strip()
     
@@ -73,15 +97,24 @@ class DifyLayoutRAG:
         
         # Dify Knowledge Base에 추가
         try:
-            response = requests.post(
-                f"{self.base_url}/datasets/{self.dataset_id}/documents",
-                headers=self.headers,
-                json={
-                    "name": f"layout_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-                    "text": layout_text,
-                    "indexing_technique": "high_quality"
-                }
-            )
+            url = f"{self.base_url}/datasets/{self.dataset_id}/document/create_by_text"
+            payload = {
+                "name": f"layout_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                "text": layout_text,
+                "indexing_technique": "high_quality",
+                "process_rule": {"mode": "automatic"}
+            }
+            
+            print(f"DEBUG: API URL: {url}")
+            print(f"DEBUG: Headers: {self.headers}")
+            print(f"DEBUG: Payload name: {payload['name']}")
+            print(f"DEBUG: Text length: {len(payload['text'])}")
+            
+            response = requests.post(url, headers=self.headers, json=payload)
+            
+            print(f"DEBUG: Response status: {response.status_code}")
+            if response.status_code != 200:
+                print(f"DEBUG: Response text: {response.text}")
             
             return response.status_code == 200
         except Exception as e:
@@ -112,13 +145,16 @@ class DifyLayoutRAG:
                 json={
                     "inputs": {},
                     "query": query,
-                    "response_mode": "blocking",
+                    "response_mode": "streaming",
                     "user": "layout_analyzer"
                 }
             )
             
             if response.status_code == 200:
-                return response.json()
+                response_text = response.text
+                if len(response_text) > 100:
+                    print(f"OK: Knowledge Base에서 {len(response_text)} 문자 응답")
+                    return {"answer": response_text, "success": True}
             return None
         except Exception as e:
             print(f"Error finding similar layouts: {e}")

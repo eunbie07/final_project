@@ -1,62 +1,88 @@
-import React, { useState } from 'react';
-import { generateAIInteriorImage, getGeneratedImages } from '../utils/api';
+import React, { useState } from "react";
+import { saveRoomDataAndGenerateAI, getGeneratedImages } from "../utils/api";
 
 const INTERIOR_STYLES = [
-  { id: 'scandinavian', name: '스칸디나비안', description: '심플하고 밝은 북유럽 스타일' },
-  { id: 'modern', name: '모던', description: '깔끔하고 세련된 현대적 스타일' },
-  { id: 'industrial', name: '인더스트리얼', description: '도시적이고 개성 있는 스타일' },
-  { id: 'cozy', name: '코지', description: '따뜻하고 아늑한 스타일' },
-  { id: 'bohemian', name: '보헤미안', description: '자유롭고 자연친화적 스타일' }
+  {
+    id: "scandinavian",
+    name: "스칸디나비안",
+    description: "심플하고 밝은 북유럽 스타일",
+  },
+  { id: "modern", name: "모던", description: "깔끔하고 세련된 현대적 스타일" },
+  {
+    id: "industrial",
+    name: "인더스트리얼",
+    description: "도시적이고 개성 있는 스타일",
+  },
+  { id: "cozy", name: "코지", description: "따뜻하고 아늑한 스타일" },
+  {
+    id: "bohemian",
+    name: "보헤미안",
+    description: "자유롭고 자연친화적 스타일",
+  },
 ];
 
 const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
-  const [selectedStyle, setSelectedStyle] = useState('scandinavian');
+  const [selectedStyle, setSelectedStyle] = useState("scandinavian");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
-  const [currentStep, setCurrentStep] = useState('');
+  const [currentStep, setCurrentStep] = useState("");
 
   const handleGenerateImage = async () => {
     if (!roomData || !roomData.dimensions) {
-      alert('방 데이터가 필요합니다. 먼저 방을 측정해주세요.');
+      alert("방 데이터가 필요합니다. 먼저 방을 측정해주세요.");
       return;
     }
 
     setIsGenerating(true);
-    setCurrentStep('AI 인테리어 이미지 생성 중...');
-    
+    setCurrentStep("AI 인테리어 이미지 생성 중...");
+
     try {
-      console.log('Starting AI interior generation with data:', roomData);
+      console.log("Starting AI interior generation with data:", roomData);
+
+      // MongoDB ID가 있으면 기존 ID 사용, 없으면 새로 저장
+      const mongoId = localStorage.getItem('mongoRoomId');
+      let finalRoomData = { ...roomData };
       
-      const response = await generateAIInteriorImage(roomData, selectedStyle);
+      if (mongoId) {
+        console.log('기존 MongoDB ID 사용:', mongoId);
+        finalRoomData.mongo_id = mongoId;
+      }
       
+      const response = await saveRoomDataAndGenerateAI(finalRoomData, selectedStyle);
+
       if (response.success && (response.image_path || response.image_url)) {
+        console.log("DEBUG - Response:", response);
+        console.log("DEBUG - Image URL:", response.image_url);
+        console.log("DEBUG - Image Path:", response.image_path);
+        
         const newImage = {
           path: response.image_path,
-          url: response.image_url,  // HTTP URL 추가
+          url: response.image_url || response.ai_generation?.image_url, // 대안 경로 추가
           style: selectedStyle,
           generated_at: new Date().toISOString(),
-          room_dimensions: roomData.dimensions
+          room_dimensions: roomData.dimensions,
         };
-        
-        setGeneratedImages(prev => [newImage, ...prev]);
+
+        console.log("DEBUG - New Image Object:", newImage);
+        setGeneratedImages((prev) => [newImage, ...prev]);
         setShowResults(true);
-        setCurrentStep('완료!');
-        
+        setCurrentStep("완료!");
+
         if (onImageGenerated) {
           onImageGenerated(newImage);
         }
       } else {
-        throw new Error(response.message || 'AI 이미지 생성에 실패했습니다.');
+        throw new Error(response.message || "AI 이미지 생성에 실패했습니다.");
       }
     } catch (error) {
-      console.error('AI 인테리어 생성 오류:', error);
-      setCurrentStep('오류 발생');
+      console.error("AI 인테리어 생성 오류:", error);
+      setCurrentStep("오류 발생");
       alert(`AI 인테리어 생성 중 오류가 발생했습니다: ${error.message}`);
     } finally {
       setIsGenerating(false);
-      setTimeout(() => setCurrentStep(''), 2000); // 2초 후 상태 초기화
+      setTimeout(() => setCurrentStep(""), 2000); // 2초 후 상태 초기화
     }
   };
 
@@ -68,7 +94,7 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
         setShowResults(true);
       }
     } catch (error) {
-      console.error('이미지 목록 조회 오류:', error);
+      console.error("이미지 목록 조회 오류:", error);
     }
   };
 
@@ -77,7 +103,7 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
       <h3 className="text-xl font-bold mb-4 text-text-primary flex items-center gap-2">
         🎨 AI 인테리어 디자인 생성
       </h3>
-      
+
       {/* 스타일 선택 */}
       <div className="mb-6">
         <h4 className="font-semibold mb-3 text-text-primary">스타일 선택</h4>
@@ -88,8 +114,8 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
               onClick={() => setSelectedStyle(style.id)}
               className={`p-3 rounded-lg border transition-all text-left ${
                 selectedStyle === style.id
-                  ? 'border-primary bg-primary/10 text-primary font-semibold'
-                  : 'border-border bg-background text-text-secondary hover:border-primary/50 hover:bg-primary/5'
+                  ? "border-primary bg-primary/10 text-primary font-semibold"
+                  : "border-border bg-background text-text-secondary hover:border-primary/50 hover:bg-primary/5"
               }`}
             >
               <div className="font-medium text-sm">{style.name}</div>
@@ -106,8 +132,8 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
           disabled={isGenerating || !roomData}
           className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
             isGenerating || !roomData
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-xl'
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-xl"
           }`}
         >
           {isGenerating ? (
@@ -116,10 +142,12 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
               AI 이미지 생성 중...
             </span>
           ) : (
-            `${INTERIOR_STYLES.find(s => s.id === selectedStyle)?.name} 스타일로 생성`
+            `${
+              INTERIOR_STYLES.find((s) => s.id === selectedStyle)?.name
+            } 스타일로 생성`
           )}
         </button>
-        
+
         <button
           onClick={loadExistingImages}
           className="px-4 py-3 border border-primary text-primary rounded-lg hover:bg-primary/10 transition-all"
@@ -135,19 +163,33 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
             <div className="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
             AI가 인테리어를 디자인하고 있습니다...
           </div>
-          
+
           {/* 단계별 진행 상황 */}
           <div className="text-sm text-blue-600 space-y-1">
-            <div className={`flex items-center gap-2 ${currentStep.includes('AI') && !currentStep.includes('완료') ? 'text-blue-700 font-semibold' : ''}`}>
-              {currentStep === '완료!' ? '✅' : '⏳'} 
-              <span>1단계: {INTERIOR_STYLES.find(s => s.id === selectedStyle)?.name} 스타일 AI 이미지 생성</span>
+            <div
+              className={`flex items-center gap-2 ${
+                currentStep.includes("AI") && !currentStep.includes("완료")
+                  ? "text-blue-700 font-semibold"
+                  : ""
+              }`}
+            >
+              {currentStep === "완료!" ? "✅" : "⏳"}
+              <span>
+                1단계:{" "}
+                {INTERIOR_STYLES.find((s) => s.id === selectedStyle)?.name}{" "}
+                스타일 AI 이미지 생성
+              </span>
             </div>
-            <div className={`flex items-center gap-2 ${currentStep === '완료!' ? 'text-green-700 font-semibold' : ''}`}>
-              {currentStep === '완료!' ? '✅' : '⏳'} 
+            <div
+              className={`flex items-center gap-2 ${
+                currentStep === "완료!" ? "text-green-700 font-semibold" : ""
+              }`}
+            >
+              {currentStep === "완료!" ? "✅" : "⏳"}
               <span>2단계: 고품질 이미지 렌더링 및 결과 표시</span>
             </div>
           </div>
-          
+
           {/* 현재 단계 표시 */}
           {currentStep && (
             <div className="mt-3 p-2 bg-blue-100 rounded text-sm text-blue-800 font-medium">
@@ -160,42 +202,75 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
       {/* 생성된 이미지 결과 */}
       {showResults && generatedImages.length > 0 && (
         <div className="border-t border-border pt-6">
-          <h4 className="font-semibold mb-4 text-text-primary">생성된 AI 인테리어 디자인</h4>
+          <h4 className="font-semibold mb-4 text-text-primary">
+            생성된 AI 인테리어 디자인
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {generatedImages.map((image, index) => (
-              <div key={index} className="bg-background rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div
+                key={index}
+                className="bg-background rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              >
                 <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                   {image.url ? (
-                    <img 
-                      src={image.url} 
-                      alt={`${INTERIOR_STYLES.find(s => s.id === image.style)?.name} 스타일 인테리어`}
+                    <img
+                      src={image.url}
+                      alt={`${
+                        INTERIOR_STYLES.find((s) => s.id === image.style)?.name
+                      } 스타일 인테리어`}
                       className="w-full h-full object-cover"
+                      onLoad={() => {
+                        console.log("이미지 로드 성공:", image.url);
+                      }}
                       onError={(e) => {
-                        console.error('이미지 로드 실패:', image.url);
+                        console.error("이미지 로드 실패:", image.url);
+                        console.error(
+                          "원인: 파일이 존재하지 않거나 서버에서 접근할 수 없습니다."
+                        );
                         // 이미지 로드 실패 시 대체 UI 표시
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'flex';
+                        e.target.style.display = "none";
+                        e.target.nextElementSibling.style.display = "flex";
                       }}
                     />
                   ) : null}
-                  <div className="text-center text-text-secondary" style={{display: image.url ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
+                  <div
+                    className="text-center text-text-secondary"
+                    style={{
+                      display: image.url ? "none" : "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
                     <div className="text-4xl mb-2">🎨</div>
                     <div className="text-sm">
-                      {INTERIOR_STYLES.find(s => s.id === image.style)?.name || image.style} 스타일
+                      {INTERIOR_STYLES.find((s) => s.id === image.style)
+                        ?.name || image.style}{" "}
+                      스타일
                     </div>
                     <div className="text-xs mt-1 text-text-tertiary">
-                      {image.generated_at && new Date(image.generated_at).toLocaleString()}
+                      {image.generated_at &&
+                        new Date(image.generated_at).toLocaleString()}
                     </div>
                   </div>
                 </div>
                 <div className="p-3">
                   <div className="text-sm font-medium text-text-primary mb-1">
-                    {INTERIOR_STYLES.find(s => s.id === image.style)?.name} 디자인
+                    {INTERIOR_STYLES.find((s) => s.id === image.style)?.name}{" "}
+                    디자인
                   </div>
                   <div className="text-xs text-text-secondary">
-                    {image.room_dimensions && 
-                      `${Math.round(image.room_dimensions.width_cm/100*image.room_dimensions.depth_cm/100*100)/100}㎡`
-                    }
+                    {image.room_dimensions &&
+                      `${
+                        Math.round(
+                          (((image.room_dimensions.width_cm / 100) *
+                            image.room_dimensions.depth_cm) /
+                            100) *
+                            100
+                        ) / 100
+                      }㎡`}
                   </div>
                 </div>
               </div>

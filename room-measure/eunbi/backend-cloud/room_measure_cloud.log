@@ -21,3 +21,123 @@
 2025-08-06 12:30:18,076 - main - INFO - MongoDB에 저장 완료: 6892cc49966337bf7b1b4bb2
 2025-08-06 12:30:18,092 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
 2025-08-06 12:30:18,092 - main - INFO - Request 1971863486288 completed in 0.150s - Status: 200
+2025-08-06 15:26:48,480 - main - INFO - Request 1630882116672: OPTIONS http://localhost:3000/save-room-layout-guest
+2025-08-06 15:26:48,485 - main - INFO - Request 1630882116672 completed in 0.005s - Status: 200
+2025-08-06 15:26:48,491 - main - INFO - Request 1630882118400: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:26:49,091 - main - INFO - MongoDB에 저장 완료: 6892f5a840e6a598d7386848
+2025-08-06 15:26:49,098 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:26:49,101 - main - INFO - Request 1630882118400 completed in 0.610s - Status: 200
+2025-08-06 15:26:52,368 - main - INFO - Request 1630882117584: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:26:52,509 - main - INFO - MongoDB에 저장 완료: 6892f5ac40e6a598d7386849
+2025-08-06 15:26:52,515 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:26:52,516 - main - INFO - Request 1630882117584 completed in 0.148s - Status: 200
+2025-08-06 15:27:46,231 - main - INFO - Request 1630882443776: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:27:46,372 - main - INFO - MongoDB에 저장 완료: 6892f5e240e6a598d738684a
+2025-08-06 15:27:46,380 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:27:46,381 - main - INFO - Request 1630882443776 completed in 0.150s - Status: 200
+2025-08-06 15:28:15,160 - main - INFO - Request 1630882442192: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:28:15,308 - main - INFO - MongoDB에 저장 완료: 6892f5ff40e6a598d738684b
+2025-08-06 15:28:15,317 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:28:15,317 - main - INFO - Request 1630882442192 completed in 0.157s - Status: 200
+2025-08-06 15:28:17,242 - main - INFO - Request 1630882446896: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:28:17,382 - main - INFO - MongoDB에 저장 완료: 6892f60140e6a598d738684c
+2025-08-06 15:28:17,392 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:28:17,393 - main - INFO - Request 1630882446896 completed in 0.151s - Status: 200
+2025-08-06 15:29:35,002 - main - INFO - Request 1630882442336: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:29:35,148 - main - INFO - MongoDB에 저장 완료: 6892f64f40e6a598d738684d
+2025-08-06 15:29:35,154 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:29:35,154 - main - INFO - Request 1630882442336 completed in 0.153s - Status: 200
+2025-08-06 15:30:56,154 - main - INFO - Request 1630882442240: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:30:56,296 - main - INFO - MongoDB에 저장 완료: 6892f6a040e6a598d738684e
+2025-08-06 15:30:56,310 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:30:56,310 - main - INFO - Request 1630882442240 completed in 0.155s - Status: 200
+2025-08-06 15:30:59,486 - main - INFO - Request 1630882436048: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:30:59,629 - main - INFO - MongoDB에 저장 완료: 6892f6a340e6a598d738684f
+2025-08-06 15:30:59,637 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:30:59,638 - main - INFO - Request 1630882436048 completed in 0.151s - Status: 200
+2025-08-06 15:34:26,329 - main - INFO - Request 1630882107312: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:34:26,468 - main - INFO - MongoDB에 저장 완료: 6892f77240e6a598d7386850
+2025-08-06 15:34:26,475 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:34:26,476 - main - INFO - Request 1630882107312 completed in 0.148s - Status: 200
+2025-08-06 15:36:19,461 - main - INFO - Request 1630882610352: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:36:19,603 - main - INFO - MongoDB에 저장 완료: 6892f7e340e6a598d7386851
+2025-08-06 15:36:19,610 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:36:19,612 - main - INFO - Request 1630882610352 completed in 0.151s - Status: 200
+2025-08-06 15:36:21,649 - main - INFO - Request 1630882605696: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:36:21,791 - main - INFO - MongoDB에 저장 완료: 6892f7e540e6a598d7386852
+2025-08-06 15:36:21,801 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:36:21,801 - main - INFO - Request 1630882605696 completed in 0.152s - Status: 200
+2025-08-06 15:38:49,019 - main - INFO - Request 1630882447328: OPTIONS http://localhost:3000/save-room-layout-guest
+2025-08-06 15:38:49,019 - main - INFO - Request 1630882447328 completed in 0.000s - Status: 200
+2025-08-06 15:38:49,023 - main - INFO - Request 1630882446320: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:38:49,166 - main - INFO - MongoDB에 저장 완료: 6892f87940e6a598d7386853
+2025-08-06 15:38:49,176 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:38:49,176 - main - INFO - Request 1630882446320 completed in 0.153s - Status: 200
+2025-08-06 15:38:54,143 - main - INFO - Request 1630882437296: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:38:54,284 - main - INFO - MongoDB에 저장 완료: 6892f87e40e6a598d7386854
+2025-08-06 15:38:54,290 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:38:54,291 - main - INFO - Request 1630882437296 completed in 0.148s - Status: 200
+2025-08-06 15:41:38,683 - main - INFO - Request 1630882437440: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:41:38,952 - main - INFO - MongoDB에 저장 완료: 6892f92240e6a598d7386855
+2025-08-06 15:41:38,960 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:41:38,961 - main - INFO - Request 1630882437440 completed in 0.278s - Status: 200
+2025-08-06 15:42:24,417 - main - INFO - Request 1630882599264: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:42:24,566 - main - INFO - MongoDB에 저장 완료: 6892f95040e6a598d7386856
+2025-08-06 15:42:24,577 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:42:24,577 - main - INFO - Request 1630882599264 completed in 0.159s - Status: 200
+2025-08-06 15:42:27,487 - main - INFO - Request 1630882609536: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:42:27,628 - main - INFO - MongoDB에 저장 완료: 6892f95340e6a598d7386857
+2025-08-06 15:42:27,640 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:42:27,640 - main - INFO - Request 1630882609536 completed in 0.153s - Status: 200
+2025-08-06 15:43:19,934 - main - INFO - Request 1630882609008: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:43:20,266 - main - INFO - MongoDB에 저장 완료: 6892f98740e6a598d7386858
+2025-08-06 15:43:20,274 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:43:20,275 - main - INFO - Request 1630882609008 completed in 0.341s - Status: 200
+2025-08-06 15:44:39,393 - main - INFO - Request 1630882433840: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:44:39,534 - main - INFO - MongoDB에 저장 완료: 6892f9d740e6a598d7386859
+2025-08-06 15:44:39,549 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:44:39,550 - main - INFO - Request 1630882433840 completed in 0.157s - Status: 200
+2025-08-06 15:48:11,341 - main - INFO - Request 1630882444064: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:48:11,482 - main - INFO - MongoDB에 저장 완료: 6892faab40e6a598d738685a
+2025-08-06 15:48:11,490 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:48:11,491 - main - INFO - Request 1630882444064 completed in 0.150s - Status: 200
+2025-08-06 15:48:16,021 - main - INFO - Request 1630882442432: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 15:48:16,171 - main - INFO - MongoDB에 저장 완료: 6892fab040e6a598d738685b
+2025-08-06 15:48:16,181 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 15:48:16,181 - main - INFO - Request 1630882442432 completed in 0.160s - Status: 200
+2025-08-06 16:24:16,695 - main - INFO - Request 1630882598592: OPTIONS http://localhost:3000/save-room-layout-guest
+2025-08-06 16:24:16,696 - main - INFO - Request 1630882598592 completed in 0.000s - Status: 200
+2025-08-06 16:24:16,698 - main - INFO - Request 1630882608912: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 16:24:16,840 - main - INFO - MongoDB에 저장 완료: 6893032040e6a598d738685c
+2025-08-06 16:24:16,851 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 16:24:16,851 - main - INFO - Request 1630882608912 completed in 0.152s - Status: 200
+2025-08-06 16:24:19,811 - main - INFO - Request 1630882603056: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 16:24:19,956 - main - INFO - MongoDB에 저장 완료: 6893032340e6a598d738685d
+2025-08-06 16:24:19,964 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 16:24:19,966 - main - INFO - Request 1630882603056 completed in 0.156s - Status: 200
+2025-08-06 16:29:55,793 - main - INFO - Request 1630882578944: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 16:29:55,935 - main - INFO - MongoDB에 저장 완료: 6893047340e6a598d738685e
+2025-08-06 16:29:55,947 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 16:29:55,947 - main - INFO - Request 1630882578944 completed in 0.154s - Status: 200
+2025-08-06 18:42:56,195 - main - INFO - Request 1630882443104: OPTIONS http://localhost:3000/save-room-layout-guest
+2025-08-06 18:42:56,196 - main - INFO - Request 1630882443104 completed in 0.001s - Status: 200
+2025-08-06 18:42:56,198 - main - INFO - Request 1630882436864: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 18:42:56,340 - main - INFO - MongoDB에 저장 완료: 689323a040e6a598d738685f
+2025-08-06 18:42:56,351 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 18:42:56,351 - main - INFO - Request 1630882436864 completed in 0.152s - Status: 200
+2025-08-06 18:49:25,245 - main - INFO - Request 1630882437008: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 18:49:25,393 - main - INFO - MongoDB에 저장 완료: 6893252540e6a598d7386860
+2025-08-06 18:49:25,403 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 18:49:25,403 - main - INFO - Request 1630882437008 completed in 0.158s - Status: 200
+2025-08-06 19:07:36,997 - main - INFO - Request 1630882596144: OPTIONS http://localhost:3000/save-room-layout-guest
+2025-08-06 19:07:36,998 - main - INFO - Request 1630882596144 completed in 0.002s - Status: 200
+2025-08-06 19:07:37,001 - main - INFO - Request 1630882610784: POST http://localhost:3000/save-room-layout-guest
+2025-08-06 19:07:37,141 - main - INFO - MongoDB에 저장 완료: 6893296940e6a598d7386861
+2025-08-06 19:07:37,151 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-06 19:07:37,153 - main - INFO - Request 1630882610784 completed in 0.152s - Status: 200
+2025-08-07 02:48:41,847 - main - INFO - Request 2264774616288: OPTIONS http://localhost:3000/save-room-layout-guest
+2025-08-07 02:48:41,848 - main - INFO - Request 2264774616288 completed in 0.001s - Status: 200
+2025-08-07 02:48:41,851 - main - INFO - Request 2264774617776: POST http://localhost:3000/save-room-layout-guest
+2025-08-07 02:48:42,373 - main - INFO - MongoDB에 저장 완료: 68939579d0babdae7895909d
+2025-08-07 02:48:42,380 - main - INFO - 방 레이아웃 저장 완료 (게스트 - MongoDB)
+2025-08-07 02:48:42,380 - main - INFO - Request 2264774617776 completed in 0.530s - Status: 200

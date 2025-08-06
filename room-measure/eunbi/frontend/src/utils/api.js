@@ -321,29 +321,41 @@ const AI_INTERIOR_API_BASE = import.meta.env.VITE_AI_INTERIOR_API_BASE || 'http:
 // MongoDB에 방 데이터 저장 후 AI 인테리어 생성
 export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian') => {
   try {
-    // 1. 먼저 MongoDB에 방 데이터 저장
-    console.log('Step 1: MongoDB에 방 데이터 저장 중...');
+    let layout_id;
     
-    // roomData를 백엔드가 기대하는 scene 구조로 변환
-    const saveData = {
-      scene: {
-        description: `AI 인테리어 생성을 위한 ${roomData.dimensions.width_cm/10}cm × ${roomData.dimensions.depth_cm/10}cm 방 공간`,
-        room: {
-          width: roomData.dimensions.width_cm,
-          depth: roomData.dimensions.depth_cm,
-          height: roomData.dimensions.height_cm
-        },
-        objects: roomData.furniture_3d || [],
-        ai_generation_request: true,
-        area_sqm: roomData.area_sqm,
-        volume_cum: roomData.volume_cum,
-        created_at: roomData.created_at || new Date().toISOString()
-      }
-    };
-    
-    const saveResult = await saveRoomLayoutToMongoDB(saveData);
+    // 이미 mongo_id가 있으면 저장 건너뛰기
+    if (roomData.mongo_id) {
+      console.log('Step 1: 기존 MongoDB ID 사용:', roomData.mongo_id);
+      layout_id = roomData.mongo_id;
+    } else {
+      // 1. 처음이면 MongoDB에 방 데이터 저장
+      console.log('Step 1: MongoDB에 방 데이터 저장 중...');
+      
+      // roomData를 백엔드가 기대하는 scene 구조로 변환
+      const saveData = {
+        scene: {
+          description: `AI 인테리어 생성을 위한 ${roomData.dimensions.width_cm/10}cm × ${roomData.dimensions.depth_cm/10}cm 방 공간`,
+          room: {
+            width: roomData.dimensions.width_cm,
+            depth: roomData.dimensions.depth_cm,
+            height: roomData.dimensions.height_cm
+          },
+          objects: roomData.furniture_3d || [],
+          ai_generation_request: true,
+          area_sqm: roomData.area_sqm,
+          volume_cum: roomData.volume_cum,
+          created_at: roomData.created_at || new Date().toISOString()
+        }
+      };
+      
+      const saveResult = await saveRoomLayoutToMongoDB(saveData);
+      layout_id = saveResult.layout_id;
+      
+      // localStorage에 MongoDB ID 저장 (다음 요청에서 재사용)
+      localStorage.setItem('mongoRoomId', layout_id);
 
-    console.log('Step 1 완료: MongoDB 저장 성공', saveResult);
+      console.log('Step 1 완료: MongoDB 저장 성공', saveResult);
+    }
 
     // 2. MongoDB 저장 성공 후 AI 인테리어 생성
     console.log('Step 2: AI 인테리어 이미지 생성 중...');
@@ -355,7 +367,7 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
       body: JSON.stringify({
         room_data: {
           ...roomData,
-          mongo_id: saveResult.layout_id // MongoDB ID 추가
+          mongo_id: layout_id // MongoDB ID 추가
         },
         style: style,
         generate_image: true
@@ -372,7 +384,7 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
 
     return {
       success: true,
-      mongo_save: saveResult,
+      mongo_save: { layout_id: layout_id },
       ai_generation: aiResult,
       image_path: aiResult.image_path
     };

@@ -68,25 +68,32 @@ class VertexAIImageGenerator:
             generation_params = {
                 "number_of_images": 1,
                 "aspect_ratio": "1:1",  # 정사각형
-                "safety_filter_level": "block_some",
+                "safety_filter_level": "block_only_high",  # 더 관대한 안전 필터
                 "person_generation": "dont_allow"  # 사람 생성 금지
             }
             
-            # 스타일별 추가 파라미터
-            if style == "modern":
-                generation_params["guidance_scale"] = 15  # 높은 가이던스 (정확도 우선)
-            elif style == "scandinavian":
-                generation_params["guidance_scale"] = 12  # 중간 가이던스 (자연스러움)
-            elif style == "industrial":
-                generation_params["guidance_scale"] = 18  # 최고 가이던스 (강한 스타일)
+            # 최대 제어를 위한 강화된 파라미터  
+            generation_params["guidance_scale"] = 35  # 강력한 가이던스 (너무 높으면 생성 실패)
+            # seed 파라미터는 워터마크와 충돌하므로 제거
+            # generation_params["seed"] = 42
+            generation_params["negative_prompt"] = self._generate_negative_prompt()  # 배제 항목 명시
             
-            print(f"RUNNING: Vertex AI 호출 중... (guidance: {generation_params.get('guidance_scale', 10)})")
+            # 가구 개수 분석
+            furniture_count = self._analyze_furniture_count(prompt)
+            print(f"RUNNING: Vertex AI 호출 중... (guidance: {generation_params.get('guidance_scale')}, 예상 가구: {furniture_count})")
             
-            # 실제 이미지 생성
+            # 프롬프트 강화 (가구 개수 제한)
+            enhanced_prompt = self._enhance_prompt_for_accuracy(prompt, furniture_count)
+            
+            # 실제 이미지 생성 (강화된 프롬프트 사용)
             response = self.model.generate_images(
-                prompt=prompt,
+                prompt=enhanced_prompt,
                 **generation_params
             )
+            
+            print(f"DEBUG: Vertex AI 응답 - 이미지 수: {len(response.images) if response.images else 0}")
+            if hasattr(response, 'safety_ratings') and response.safety_ratings:
+                print(f"DEBUG: 안전 등급: {response.safety_ratings}")
             
             if response.images:
                 # 첫 번째 이미지 저장
@@ -173,6 +180,81 @@ class VertexAIImageGenerator:
         
         adjustment = style_adjustments.get(style, "")
         return base_prompt + adjustment
+    
+    def _generate_negative_prompt(self) -> str:
+        """강력한 네거티브 프롬프트 생성 (불필요한 항목 배제)"""
+        return """extra furniture, additional items, side tables, nightstands, lamps, lighting fixtures, 
+        rugs, carpets, curtains, blinds, decorations, plants, artwork, mirrors, chairs, stools, 
+        desks, shelves, wardrobes, closets, dressers, cabinets, multiple beds, multiple sofas, 
+        cluttered room, messy space, too many objects, bedroom accessories, living room accessories, 
+        decorative items, functional accessories, wrong position, incorrect placement, furniture against wall,
+        furniture in corner, furniture off-center, misaligned furniture"""
+    
+    def _analyze_furniture_count(self, prompt: str) -> int:
+        """프롬프트에서 정확한 가구 개수 분석"""
+        furniture_keywords = [
+            'bed', 'sofa', 'chair', 'table', 'desk', 'cabinet', 'wardrobe', 
+            'dresser', 'nightstand', 'bookshelf', 'tv stand'
+        ]
+        
+        count = 0
+        prompt_lower = prompt.lower()
+        
+        # "ONE SINGLE" 또는 "EXACTLY ONE" 패턴 체크
+        if "one single" in prompt_lower or "exactly one" in prompt_lower:
+            return 1
+        
+        # "EXACTLY N" 패턴 체크
+        import re
+        exactly_pattern = r"exactly (\d+)"
+        match = re.search(exactly_pattern, prompt_lower)
+        if match:
+            return int(match.group(1))
+        
+        # 개별 가구 카운트
+        for keyword in furniture_keywords:
+            count += prompt_lower.count(keyword)
+        
+        return max(1, count)  # 최소 1개
+    
+    def _enhance_prompt_for_accuracy(self, original_prompt: str, furniture_count: int) -> str:
+        """가구 개수 정확도를 위한 프롬프트 강화"""
+        
+        if furniture_count == 1:
+            enhancement = f"""
+ULTRA-STRICT SINGLE FURNITURE RULE:
+- This room contains EXACTLY ONE piece of furniture as specified
+- ZERO additional furniture items are permitted
+- ZERO decorative or functional accessories
+- Any extra items will make this image completely WRONG
+- Sparse, minimalist room with only the specified single furniture piece
+
+ORIGINAL REQUEST:
+{original_prompt}
+
+MANDATORY VERIFICATION:
+- Count furniture in final image: MUST equal 1
+- Empty walls and floor around the single furniture item
+- No bedroom sets, no living room sets, no furniture collections
+- One furniture piece ONLY as specifically described above
+"""
+        else:
+            enhancement = f"""
+STRICT FURNITURE COUNT RULE:
+- This room contains EXACTLY {furniture_count} furniture items as specified
+- NO additional furniture beyond what is listed
+- NO decorative accessories or functional add-ons
+- Precise count enforcement: {furniture_count} items only
+
+ORIGINAL REQUEST:
+{original_prompt}
+
+MANDATORY VERIFICATION:
+- Total furniture count in image: MUST equal {furniture_count}
+- Only the furniture items explicitly mentioned above
+"""
+        
+        return enhancement
 
 
 # 테스트 함수

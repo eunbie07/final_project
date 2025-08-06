@@ -47,6 +47,39 @@ class MongoDBRoomProcessor:
         )
         
         self.processor = RoomBoxDataProcessor(self.dify_rag)
+    
+    async def connect(self):
+        """비동기 MongoDB 연결"""
+        self._connect_mongodb()
+        
+    async def disconnect(self):
+        """MongoDB 연결 종료"""
+        if self.client:
+            self.client.close()
+            
+    async def get_room_data(self, room_id: str) -> Optional[Dict[str, Any]]:
+        """특정 방 데이터 조회"""
+        if self.collection is None:
+            print("WARNING: MongoDB 연결이 없습니다")
+            return None
+            
+        try:
+            from bson import ObjectId
+            # MongoDB에서 ID로 조회
+            result = self.collection.find_one({"_id": ObjectId(room_id)})
+            
+            if result:
+                # ObjectId를 문자열로 변환
+                result["_id"] = str(result["_id"])
+                print(f"DEBUG: MongoDB에서 방 데이터 조회 성공: {room_id}")
+                return result
+            else:
+                print(f"WARNING: MongoDB에서 방 데이터를 찾을 수 없음: {room_id}")
+                return None
+                
+        except Exception as e:
+            print(f"ERROR: MongoDB 조회 실패: {e}")
+            return None
         
         # MongoDB 연결 시도
         self._connect_mongodb()

@@ -1,0 +1,96 @@
+Korean Interior Room Layout Knowledge Base
+
+=== ROOM LAYOUT SUCCESS CASES ===
+
+Case 1: Industrial Style Bedroom - Central Bed Placement
+- Room Dimensions: 391.3cm × 455.6cm × 230.0cm (17.8㎡)
+- Furniture: Single Bed
+- Position: X=196.1cm, Z=218.5cm (Perfect Center)
+- Relative Position: (0.501, 0.479) - Almost perfect center
+- Wall Clearances: Left=196.1cm, Right=195.2cm, Front=218.5cm, Back=237.1cm
+- Style: Industrial - exposed concrete walls, metal accents
+- Success Rating: 4.0/5.0
+- Key Success Factor: Bed positioned exactly at room center creates modern artistic look
+
+Case 2: Bohemian Style Bedroom - Off-Center Placement  
+- Room Dimensions: 391.3cm × 455.6cm × 230.0cm
+- Furniture: Single Bed
+- Position: X=196.1cm, Z=218.5cm 
+- Style: Bohemian - warm textiles, natural materials
+- Result: Bed appeared against wall (not desired center placement)
+- Success Rating: 2.5/5.0
+- Issue: AI model bias toward conventional bedroom layouts
+
+Case 3: Cozy Style Bedroom - Wall Placement
+- Room Dimensions: 391.3cm × 455.6cm × 230.0cm
+- Furniture: Single Bed
+- Position: Intended center, but generated against wall
+- Style: Cozy - soft lighting, warm colors
+- Success Rating: 2.0/5.0
+- Issue: Strong model bias toward typical furniture arrangement
+
+=== SPATIAL POSITIONING PATTERNS ===
+
+Successful Center Placement Indicators:
+- Relative position (0.45-0.55, 0.45-0.55) = True center zone
+- Center distance < 0.1 = Perfect center
+- Center distance < 0.2 = Near center (acceptable)
+- Center distance > 0.3 = Edge placement
+
+Room Size Categories:
+Small Room: <15㎡ - furniture should be 40-60% from walls
+Medium Room: 15-25㎡ - furniture can be exactly centered
+Large Room: >25㎡ - multiple furniture pieces, zoned layouts
+
+=== STYLE-SPECIFIC LAYOUT PRINCIPLES ===
+
+Industrial Style:
+- Prefers unconventional furniture placement
+- Center placement works well with minimalist approach
+- Raw materials complement unusual positioning
+
+Scandinavian Style:
+- Natural light important - avoid blocking windows
+- Clean lines support center placement
+- Light wood tones work with open floor space
+
+Bohemian Style:
+- Layered textures, but model tends toward wall placement
+- Requires stronger prompting for center positioning
+
+Cozy Style:
+- Model strongly biased toward wall-adjacent placement
+- Needs explicit "unconventional" positioning instructions
+
+=== PROMPT OPTIMIZATION LESSONS ===
+
+Effective Phrases for Center Placement:
+- "EXACTLY at coordinates X=Xcm, Z=Zcm"  
+- "THIS IS PERFECT CENTER placement"
+- "Modern artistic installation style"
+- "Unconventional furniture arrangement"
+- "NOT typical bedroom layout"
+
+Ineffective Approaches:
+- Vague positioning like "center of room"
+- Relying on style alone without explicit coordinates
+- Not countering model's conventional layout bias
+
+=== TECHNICAL SPECIFICATIONS ===
+
+Coordinate System:
+- Origin (0,0) at front-left corner of room
+- X-axis: left to right (width)
+- Z-axis: front to back (depth) 
+- Y-axis: floor to ceiling (height)
+
+Precision Requirements:
+- Coordinates specified to 0.1cm accuracy
+- Relative positions calculated to 0.001 precision
+- Center distance measured as Euclidean distance from (0.5, 0.5)
+
+Success Metrics:
+- Coordinate accuracy: ±10cm acceptable, ±5cm preferred
+- Furniture count accuracy: Must match exactly
+- Style consistency: Visual elements match requested style
+- Overall user satisfaction: 4.0/5.0+ for knowledge base inclusion

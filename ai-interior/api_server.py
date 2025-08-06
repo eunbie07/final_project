@@ -18,6 +18,54 @@ from roombox_integration import DifyRoomImageGenerator
 from config import load_config
 
 
+def convert_mongo_to_current_format(mongo_data: Dict[str, Any]) -> Dict[str, Any]:
+    """MongoDB 데이터를 현재 AI 생성 형식으로 변환"""
+    try:
+        scene = mongo_data.get('scene', {})
+        room_info = scene.get('room', {})
+        objects = scene.get('objects', [])
+        
+        # 새로운 형식으로 변환
+        converted_data = {
+            'dimensions': {
+                'width_cm': room_info.get('width', 400),
+                'depth_cm': room_info.get('depth', 500), 
+                'height_cm': room_info.get('height', 280)
+            },
+            'furniture_3d': [],
+            'area_sqm': (room_info.get('width', 400) * room_info.get('depth', 500)) / 10000,
+            'volume_cum': (room_info.get('width', 400) * room_info.get('depth', 500) * room_info.get('height', 280)) / 1000000,
+            'created_at': mongo_data.get('created_at', datetime.now().isoformat()),
+            'mongo_id': str(mongo_data.get('_id', ''))
+        }
+        
+        # 가구 데이터 변환 (모든 가구 타입 포함)
+        print(f"DEBUG: 변환할 가구 objects: {len(objects)}개")
+        for i, obj in enumerate(objects):
+            obj_type = obj.get('type', 'furniture')
+            obj_name = obj.get('name', 'Furniture')
+            position = obj.get('position', [0, 0, 0])
+            rotation = obj.get('rotation', [0, 0, 0])
+            
+            print(f"DEBUG: 가구 {i+1} - {obj_name} ({obj_type}) at {position}")
+            
+            furniture = {
+                'name': obj_name,
+                'type': obj_type,
+                'position': position,  # MongoDB에는 이미 cm 단위로 저장됨
+                'rotation': rotation
+            }
+            converted_data['furniture_3d'].append(furniture)
+        
+        print(f"DEBUG: MongoDB 변환 완료 - 가구 {len(converted_data['furniture_3d'])}개")
+        print(f"DEBUG: 변환된 데이터: {converted_data}")
+        return converted_data
+        
+    except Exception as e:
+        print(f"ERROR: MongoDB 데이터 변환 실패: {e}")
+        return mongo_data
+
+
 app = FastAPI(title="Dify Room Image Generator API", version="1.0.0")
 
 # CORS 설정
@@ -122,15 +170,54 @@ async def generate_interior(request: RoomDataRequest):
         print(f"TARGET: 이미지 생성 요청: {request.style} 스타일")
         print(f"   방 데이터: {request.room_data.get('dimensions', {})}")
         
-        # MongoDB ID 확인
+        # MongoDB ID 확인 및 실제 데이터 로드
         mongo_id = request.room_data.get('mongo_id')
+        final_room_data = request.room_data
+        
         if mongo_id:
             print(f"   MongoDB ID: {mongo_id}")
             print("   방 데이터가 MongoDB에 저장된 후 AI 생성 요청")
+            
+            # MongoDB에서 실제 저장된 데이터 가져오기
+            print(f"   DEBUG: MongoDB ID로 실제 데이터 조회 시작: {mongo_id}")
+            try:
+                print("   DEBUG: MongoDBRoomProcessor import 중...")
+                from mongodb_integration import MongoDBRoomProcessor
+                print("   DEBUG: MongoDBRoomProcessor 초기화 중...")
+                mongo_processor = MongoDBRoomProcessor()
+                print("   DEBUG: MongoDB 연결 중...")
+                await mongo_processor.connect()
+                print("   DEBUG: 방 데이터 조회 중...")
+                
+                mongo_data = await mongo_processor.get_room_data(mongo_id)
+                if mongo_data:
+                    print("   OK: 실제 MongoDB 데이터 조회 성공")
+                    print(f"   DEBUG: 조회된 데이터 키: {list(mongo_data.keys())}")
+                    if 'scene' in mongo_data:
+                        objects = mongo_data['scene'].get('objects', [])
+                        print(f"   DEBUG: 가구 개수: {len(objects)}")
+                        for i, obj in enumerate(objects):
+                            print(f"   DEBUG: 가구 {i+1}: {obj.get('name')} at {obj.get('position')}")
+                    
+                    # MongoDB 데이터를 현재 형식으로 변환
+                    print("   DEBUG: 데이터 형식 변환 중...")
+                    final_room_data = convert_mongo_to_current_format(mongo_data)
+                    print(f"   DEBUG: 변환된 데이터 - 가구: {len(final_room_data.get('furniture_3d', []))}")
+                else:
+                    print("   WARNING: MongoDB 데이터 조회 결과가 None")
+                    
+                print("   DEBUG: MongoDB 연결 종료 중...")
+                await mongo_processor.disconnect()
+                    
+            except Exception as e:
+                import traceback
+                print(f"   ERROR: MongoDB 접근 실패: {e}")
+                print(f"   ERROR: 상세 오류:\n{traceback.format_exc()}")
+                print("   전달받은 데이터를 사용하여 진행")
         
         # 일관성 있는 이미지 생성
         result = await generator.generate_consistent_room_image(
-            room_data=request.room_data,
+            room_data=final_room_data,
             style=request.style,
             user_id=request.user_id
         )
@@ -140,11 +227,18 @@ async def generate_interior(request: RoomDataRequest):
             
             # 로컬 파일 경로를 HTTP URL로 변환
             if 'image_path' in result and result['image_path']:
-                # 파일명만 추출 (경로 제거)
-                filename = os.path.basename(result['image_path'])
+                # 파일명만 추출 (경로 제거, Windows 백슬래시 처리)
+                filename = os.path.basename(result['image_path'].replace('\\', '/'))
                 # HTTP URL로 변환
                 result['image_url'] = f"http://localhost:8000/images/{filename}"
                 print(f"   이미지 URL: {result['image_url']}")
+                
+                # 이미지 파일 존재 확인
+                full_path = os.path.join("generated_images", filename)
+                if os.path.exists(full_path):
+                    print(f"   이미지 파일 확인됨: {full_path} ({os.path.getsize(full_path)} bytes)")
+                else:
+                    print(f"   WARNING: 이미지 파일 없음: {full_path}")
         else:
             print(f"ERROR: 이미지 생성 실패: {result.get('error')}")
         
