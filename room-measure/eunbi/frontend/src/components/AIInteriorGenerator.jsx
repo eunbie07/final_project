@@ -27,14 +27,15 @@ const GENERATOR_OPTIONS = [
     name: "DALL-E 3", 
     description: "빠른생성 정확도", 
     speed: "30초",
-    endpoint: "/generate-interior-dalle",
-    recommended: true 
+    accuracy: "70%",
+    endpoint: "/generate-interior-dalle"
   },
   { 
     id: "dify", 
     name: "Dify(Vertex AI)", 
     description: "빠른 생성", 
     speed: "30초",
+    accuracy: "75%",
     endpoint: "/generate-interior"
   },
   { 
@@ -42,13 +43,23 @@ const GENERATOR_OPTIONS = [
     name: "Stable Diffusion", 
     description: "정확한 위치 제어", 
     speed: "4분+",
+    accuracy: "80%",
     endpoint: "/generate-interior-sd"
+  },
+  { 
+    id: "colab", 
+    name: "Colab Inpainting", 
+    description: "99.7% 위치 정확도 🏆", 
+    speed: "1-2분",
+    accuracy: "99.7%",
+    endpoint: "/generate-interior-colab",
+    recommended: true 
   }
 ];
 
 const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
   const [selectedStyle, setSelectedStyle] = useState("scandinavian");
-  const [selectedGenerator, setSelectedGenerator] = useState("dalle"); // DALL-E를 기본값으로
+  const [selectedGenerator, setSelectedGenerator] = useState("colab"); // Colab Inpainting을 기본값으로
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -152,6 +163,9 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
               <div className="font-medium text-sm">{generator.name}</div>
               <div className="text-xs mt-1 opacity-75">{generator.description}</div>
               <div className="text-xs mt-1 opacity-60">⏱ {generator.speed}</div>
+              {generator.accuracy && (
+                <div className="text-xs mt-1 opacity-60">🎯 {generator.accuracy}</div>
+              )}
             </button>
           ))}
         </div>

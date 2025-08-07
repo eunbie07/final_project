@@ -361,10 +361,11 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
     const endpoints = {
       'dify': '/generate-interior',
       'stable_diffusion': '/generate-interior-sd', 
-      'dalle': '/generate-interior-dalle'
+      'dalle': '/generate-interior-dalle',
+      'colab': '/generate-interior-colab'
     };
     
-    const endpoint = endpoints[generator] || endpoints['dalle'];
+    const endpoint = endpoints[generator] || endpoints['colab'];
     console.log(`Step 2: ${generator} 생성기로 AI 인테리어 이미지 생성 중... (엔드포인트: ${endpoint})`);
 
     // 2. MongoDB 저장 성공 후 AI 인테리어 생성

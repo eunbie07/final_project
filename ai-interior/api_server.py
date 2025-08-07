@@ -38,7 +38,7 @@ def convert_mongo_to_current_format(mongo_data: Dict[str, Any]) -> Dict[str, Any
             'furniture_3d': [],
             'area_sqm': (room_info.get('width', 400) * room_info.get('depth', 500)) / 10000,
             'volume_cum': (room_info.get('width', 400) * room_info.get('depth', 500) * room_info.get('height', 280)) / 1000000,
-            'created_at': mongo_data.get('created_at', datetime.now().isoformat()),
+            'created_at': str(mongo_data.get('created_at', datetime.now())),
             'mongo_id': str(mongo_data.get('_id', ''))
         }
         
