@@ -18,8 +18,8 @@ class LayoutMaskGenerator:
     """레이아웃 마스크 생성기"""
     
     def __init__(self, 
-                 image_width: int = 1024,
-                 image_height: int = 1024,
+                 image_width: int = 512,  # AMD CPU 최적화: 작은 해상도
+                 image_height: int = 512, # AMD CPU 최적화: 작은 해상도
                  mask_color: Tuple[int, int, int] = (255, 255, 255),  # 흰색: 가구 위치
                  background_color: Tuple[int, int, int] = (0, 0, 0)):  # 검은색: 빈 공간
         

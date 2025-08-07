@@ -58,13 +58,22 @@ class StableDiffusionGenerator:
         else:
             self.mock_mode = False
         
-        # 디바이스 자동 감지
+        # 디바이스 자동 감지 (AMD GPU 최적화)
         if device is None:
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            if torch.cuda.is_available():
+                self.device = "cuda"
+            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                self.device = "mps"  # Apple Silicon
+            else:
+                self.device = "cpu"
         else:
             self.device = device
             
-        logger.info(f"[DEVICE] 사용 디바이스: {self.device}")
+        # AMD GPU 환경에서 CPU로 강제 설정 (안정성을 위해)
+        if self.device == "cpu":
+            logger.info(f"[DEVICE] AMD 시스템에서 CPU 모드 사용 (RAM: 16GB)")
+        else:
+            logger.info(f"[DEVICE] 사용 디바이스: {self.device}")
         
         # 모델 정보
         self.model_id = model_id
@@ -79,13 +88,13 @@ class StableDiffusionGenerator:
         # 마스크 생성기
         self.mask_generator = LayoutMaskGenerator()
         
-        # 생성 설정
+        # 생성 설정 (AMD CPU 최적화)
         self.default_settings = {
-            'num_inference_steps': 20,
+            'num_inference_steps': 10,  # CPU에서 더 빠른 생성을 위해 단축
             'guidance_scale': 7.5,
             'controlnet_conditioning_scale': 1.0,
-            'width': 1024,
-            'height': 1024,
+            'width': 512,   # CPU에서는 작은 해상도로 시작
+            'height': 512,  # 필요시 확대 가능
         }
         
         logger.info(f"[INIT] Stable Diffusion 생성기 초기화 (ControlNet: {self.use_controlnet})")
@@ -132,10 +141,25 @@ class StableDiffusionGenerator:
                 self.pipe.scheduler.config
             )
             
-            # 메모리 최적화
-            if self.enable_cpu_offload and self.device == "cuda":
+            # 메모리 최적화 (AMD CPU 환경)
+            if self.device == "cpu":
+                # CPU 환경에서 메모리 효율성 최적화
+                try:
+                    self.pipe.enable_sequential_cpu_offload()
+                    logger.info("[OPTIMIZE] CPU 순차 오프로드 활성화")
+                except:
+                    logger.info("[OPTIMIZE] CPU 최적화 적용")
+                
+                # 메모리 효율적인 어텐션 사용
+                try:
+                    self.pipe.enable_attention_slicing()
+                    logger.info("[OPTIMIZE] 어텐션 슬라이싱 활성화")
+                except:
+                    pass
+                    
+            elif self.enable_cpu_offload and self.device == "cuda":
                 self.pipe.enable_model_cpu_offload()
-                logger.info("[OPTIMIZE] CPU 오프로드 활성화")
+                logger.info("[OPTIMIZE] GPU CPU 오프로드 활성화")
             
             logger.info("[SUCCESS] 파이프라인 초기화 완료!")
             
@@ -163,11 +187,11 @@ class StableDiffusionGenerator:
         """
         # 스타일별 기본 프롬프트
         style_prompts = {
-            "scandinavian": "Scandinavian interior design, light wood floors, white walls, natural lighting, cozy minimalist atmosphere",
-            "modern": "Modern interior design, sleek lines, contemporary furniture, clean aesthetic, neutral colors", 
-            "industrial": "Industrial interior design, exposed brick walls, metal fixtures, concrete floors, urban loft style",
-            "bohemian": "Bohemian interior design, warm earth tones, textured fabrics, eclectic decorative elements, cozy atmosphere",
-            "cozy": "Cozy interior design, soft textures, warm lighting, comfortable furniture, homely atmosphere"
+            "scandinavian": "Korean-style Scandinavian interior design, ondol floor heating, light wood floors, white walls, natural lighting, cozy minimalist atmosphere, Korean furniture proportions",
+            "modern": "Korean modern interior design, sleek lines, contemporary Korean furniture, clean aesthetic, neutral colors, Korean apartment style, ondol heating system", 
+            "industrial": "Korean industrial interior design, exposed elements, metal fixtures, modern Korean loft style, Korean urban living space, ondol floor system",
+            "bohemian": "Korean bohemian interior design, warm earth tones, Korean textile elements, eclectic Korean decorative elements, cozy Korean home atmosphere",
+            "cozy": "Korean cozy interior design, soft textures, warm ondol heating, comfortable Korean furniture, homely Korean atmosphere"
         }
         
         base_style = style_prompts.get(style, style_prompts["scandinavian"])
@@ -183,22 +207,12 @@ class StableDiffusionGenerator:
         
         furniture_text = ", ".join(furniture_details)
         
-        # 강화된 위치 제어 프롬프트
+        # 단축된 위치 제어 프롬프트 (77 토큰 제한 고려)
         enhanced_prompt = f"""{base_style}
 
-CRITICAL FURNITURE PLACEMENT INSTRUCTIONS:
-{furniture_text}
+Furniture: {furniture_text}
 
-MANDATORY REQUIREMENTS:
-- Place each furniture item at the EXACT coordinates specified above
-- Do not follow conventional placement rules (e.g., beds against walls)
-- Maintain realistic scale and proportions
-- Ensure all furniture is clearly visible and positioned precisely
-- Create photorealistic lighting and shadows
-
-{additional_prompt}
-
-High quality, masterpiece, photorealistic interior photography, professional lighting, 8k resolution""".strip()
+Photorealistic Korean interior, professional lighting, high quality""".strip()
         
         return enhanced_prompt
     

@@ -319,7 +319,7 @@ export const calculateDepthDistance = async (point1, point2) => {
 const AI_INTERIOR_API_BASE = import.meta.env.VITE_AI_INTERIOR_API_BASE || 'http://localhost:8000';
 
 // MongoDB에 방 데이터 저장 후 AI 인테리어 생성
-export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian') => {
+export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian', generator = 'dalle') => {
   try {
     let layout_id;
     
@@ -357,9 +357,18 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
       console.log('Step 1 완료: MongoDB 저장 성공', saveResult);
     }
 
+    // 생성기별 엔드포인트 매핑
+    const endpoints = {
+      'dify': '/generate-interior',
+      'stable_diffusion': '/generate-interior-sd', 
+      'dalle': '/generate-interior-dalle'
+    };
+    
+    const endpoint = endpoints[generator] || endpoints['dalle'];
+    console.log(`Step 2: ${generator} 생성기로 AI 인테리어 이미지 생성 중... (엔드포인트: ${endpoint})`);
+
     // 2. MongoDB 저장 성공 후 AI 인테리어 생성
-    console.log('Step 2: AI 인테리어 이미지 생성 중...');
-    const response = await fetch(`${AI_INTERIOR_API_BASE}/generate-interior`, {
+    const response = await fetch(`${AI_INTERIOR_API_BASE}${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -386,7 +395,9 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
       success: true,
       mongo_save: { layout_id: layout_id },
       ai_generation: aiResult,
-      image_path: aiResult.image_path
+      image_path: aiResult.image_path,
+      image_url: aiResult.image_url,  // 각 생성기별 응답에서 이미지 URL 추출
+      generator: generator  // 사용된 생성기 정보 추가
     };
 
   } catch (error) {

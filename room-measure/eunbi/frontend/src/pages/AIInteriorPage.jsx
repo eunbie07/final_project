@@ -34,7 +34,7 @@ const AIInteriorPage = () => {
         {/* 헤더 */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-text-primary mb-2">
-            🎨 AI 인테리어 디자이너
+            AI 인테리어 디자이너
           </h1>
           <p className="text-text-secondary">
             측정한 방의 크기를 바탕으로 AI가 맞춤형 인테리어 디자인을 생성해드립니다.

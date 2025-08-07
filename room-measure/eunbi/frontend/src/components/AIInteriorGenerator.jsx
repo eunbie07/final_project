@@ -21,8 +21,34 @@ const INTERIOR_STYLES = [
   },
 ];
 
+const GENERATOR_OPTIONS = [
+  { 
+    id: "dalle", 
+    name: "DALL-E 3", 
+    description: "빠른생성 정확도", 
+    speed: "30초",
+    endpoint: "/generate-interior-dalle",
+    recommended: true 
+  },
+  { 
+    id: "dify", 
+    name: "Dify(Vertex AI)", 
+    description: "빠른 생성", 
+    speed: "30초",
+    endpoint: "/generate-interior"
+  },
+  { 
+    id: "stable_diffusion", 
+    name: "Stable Diffusion", 
+    description: "정확한 위치 제어", 
+    speed: "4분+",
+    endpoint: "/generate-interior-sd"
+  }
+];
+
 const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
   const [selectedStyle, setSelectedStyle] = useState("scandinavian");
+  const [selectedGenerator, setSelectedGenerator] = useState("dalle"); // DALL-E를 기본값으로
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -50,7 +76,7 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
         finalRoomData.mongo_id = mongoId;
       }
       
-      const response = await saveRoomDataAndGenerateAI(finalRoomData, selectedStyle);
+      const response = await saveRoomDataAndGenerateAI(finalRoomData, selectedStyle, selectedGenerator);
 
       if (response.success && (response.image_path || response.image_url)) {
         console.log("DEBUG - Response:", response);
@@ -101,12 +127,39 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
   return (
     <div className="mt-8 p-6 bg-surface rounded-xl border border-border shadow-lg">
       <h3 className="text-xl font-bold mb-4 text-text-primary flex items-center gap-2">
-        🎨 AI 인테리어 디자인 생성
+        AI 인테리어 디자인 생성
       </h3>
+
+      {/* AI 생성기 선택 */}
+      <div className="mb-6">
+        <h4 className="font-semibold mb-3 text-text-primary">AI 생성기 선택</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {GENERATOR_OPTIONS.map((generator) => (
+            <button
+              key={generator.id}
+              onClick={() => setSelectedGenerator(generator.id)}
+              className={`p-3 rounded-lg border transition-all text-left relative ${
+                selectedGenerator === generator.id
+                  ? "border-primary bg-primary/10 text-primary font-semibold"
+                  : "border-border bg-background text-text-secondary hover:border-primary/50 hover:bg-primary/5"
+              }`}
+            >
+              {generator.recommended && (
+                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                  추천
+                </span>
+              )}
+              <div className="font-medium text-sm">{generator.name}</div>
+              <div className="text-xs mt-1 opacity-75">{generator.description}</div>
+              <div className="text-xs mt-1 opacity-60">⏱ {generator.speed}</div>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* 스타일 선택 */}
       <div className="mb-6">
-        <h4 className="font-semibold mb-3 text-text-primary">스타일 선택</h4>
+        <h4 className="font-semibold mb-3 text-text-primary">🎨 스타일 선택</h4>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           {INTERIOR_STYLES.map((style) => (
             <button
@@ -142,9 +195,9 @@ const AIInteriorGenerator = ({ roomData, onImageGenerated }) => {
               AI 이미지 생성 중...
             </span>
           ) : (
-            `${
+            `${GENERATOR_OPTIONS.find((g) => g.id === selectedGenerator)?.name}로 ${
               INTERIOR_STYLES.find((s) => s.id === selectedStyle)?.name
-            } 스타일로 생성`
+            } 스타일 생성`
           )}
         </button>
 

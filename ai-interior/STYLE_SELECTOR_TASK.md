@@ -12,6 +12,7 @@
 ## 🎯 기능 요구사항
 
 ### 1. 스타일 갤러리 페이지
+
 - **5개 카테고리**를 탭이나 섹션으로 구분
   - Modern/Minimalist (9장)
   - Scandinavian (9장) 
@@ -20,17 +21,20 @@
   - Cozy (9장)
 
 ### 2. 이미지 표시 방식
+
 - **그리드 레이아웃** (3x3 또는 반응형)
 - **썸네일 크기**: 200x200px 정도
 - **호버 효과**: 마우스 올리면 살짝 확대
 - **클릭 가능**: 선택된 이미지 강조 표시
 
 ### 3. 선택 기능
+
 - **단일 선택**: 한 번에 하나의 스타일만 선택 가능
 - **선택 표시**: 선택된 이미지에 테두리나 체크 표시
 - **"생성하기" 버튼**: 선택 완료 후 AI 이미지 생성 요청
 
 ### 4. 반응형 디자인
+
 - **데스크탑**: 3-4열 그리드
 - **태블릿**: 2-3열 그리드  
 - **모바일**: 1-2열 그리드
@@ -38,7 +42,7 @@
 ## 📁 파일 구조
 
 ```
-ai-interior/
+interior-style-frontend/
 ├── style-selector/
 │   ├── src/
 │   │   ├── components/
@@ -57,8 +61,9 @@ ai-interior/
 ## 🚀 프로젝트 설정
 
 ### 1. 리액트 프로젝트 생성
+
 ```bash
-# ai-interior 폴더에서 실행
+# interior-style-frontend 폴더에서 실행
 npx create-react-app style-selector
 cd style-selector
 
@@ -71,6 +76,7 @@ npm install lucide-react  # 아이콘용
 ```
 
 ### 2. Tailwind 설정 (tailwind.config.js)
+
 ```javascript
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -85,6 +91,7 @@ module.exports = {
 ```
 
 ### 3. CSS 설정 (src/index.css)
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -94,6 +101,7 @@ module.exports = {
 ## 🔧 React 컴포넌트 구현
 
 ### 1. 이미지 데이터 (src/utils/imageData.js)
+
 ```javascript
 export const styleImages = {
   modern: Array.from({length: 9}, (_, i) => ({
@@ -133,6 +141,7 @@ export const styleLabels = {
 ```
 
 ### 2. 메인 컴포넌트 (src/components/StyleSelector.jsx)
+
 ```jsx
 import React, { useState } from 'react';
 import { styleImages, styleLabels } from '../utils/imageData';
@@ -149,7 +158,7 @@ const StyleSelector = () => {
 
   const handleGenerate = async () => {
     if (!selectedImage) return;
-    
+
     console.log('Generating image with style:', activeStyle, selectedImage);
     // TODO: API 호출 구현
     alert(`${styleLabels[activeStyle]} 스타일로 AI 이미지 생성을 시작합니다!`);
@@ -194,7 +203,7 @@ const StyleSelector = () => {
             </p>
           </div>
         )}
-        
+
         <button
           onClick={handleGenerate}
           disabled={!selectedImage}
@@ -215,6 +224,7 @@ export default StyleSelector;
 ```
 
 ### 3. 탭 컴포넌트 (src/components/StyleTab.jsx)
+
 ```jsx
 import React from 'react';
 
@@ -242,6 +252,7 @@ export default StyleTab;
 ```
 
 ### 4. 갤러리 컴포넌트 (src/components/ImageGallery.jsx)
+
 ```jsx
 import React from 'react';
 
@@ -264,7 +275,7 @@ const ImageGallery = ({ images, selectedImage, onImageSelect }) => {
             className="w-full h-48 object-cover"
             loading="lazy"
           />
-          
+
           {/* 선택 표시 */}
           {selectedImage?.id === image.id && (
             <div className="absolute top-2 right-2 bg-blue-600 text-white rounded-full p-1">
@@ -273,7 +284,7 @@ const ImageGallery = ({ images, selectedImage, onImageSelect }) => {
               </svg>
             </div>
           )}
-          
+
           {/* 호버 오버레이 */}
           <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
             <span className="text-white font-medium opacity-0 hover:opacity-100 transition-opacity">
@@ -290,6 +301,7 @@ export default ImageGallery;
 ```
 
 ### 5. App.jsx
+
 ```jsx
 import React from 'react';
 import StyleSelector from './components/StyleSelector';
@@ -308,12 +320,14 @@ export default App;
 ## 🚀 실행 방법
 
 ### 1. 개발 서버 실행
+
 ```bash
 cd style-selector
 npm start
 ```
 
 ### 2. 빌드 (배포용)
+
 ```bash
 npm run build
 ```
@@ -325,7 +339,7 @@ npm run build
 ```jsx
 const handleGenerate = async () => {
   if (!selectedImage) return;
-  
+
   try {
     const response = await fetch('/api/generate-image', {
       method: 'POST',
@@ -336,7 +350,7 @@ const handleGenerate = async () => {
         // 방 데이터도 함께 전송 가능
       })
     });
-    
+
     const result = await response.json();
     if (result.success) {
       // 생성된 이미지 표시
@@ -383,6 +397,7 @@ const handleGenerate = async () => {
 ## 🔧 문제 해결
 
 ### 이미지 경로 문제
+
 ```javascript
 // public 폴더로 이미지 이동 후
 src: `/image/Modern,Minimalist${i+1}.png`
@@ -392,12 +407,14 @@ import modernImage1 from '../assets/image/Modern,Minimalist1.png';
 ```
 
 ### Tailwind 적용 안됨
+
 ```bash
 # Tailwind 설정 재확인
 npx tailwindcss -i ./src/index.css -o ./dist/output.css --watch
 ```
 
 ### 반응형 그리드 조정
+
 ```jsx
 // 더 세밀한 반응형 설정
 className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
@@ -406,5 +423,3 @@ className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid
 ---
 
 **🎯 목표**: 사용자가 직관적으로 원하는 스타일을 선택할 수 있는 깔끔한 웹 인터페이스 완성!
-
-**📞 질문이나 막히는 부분이 있으면 언제든 연락 주세요.**

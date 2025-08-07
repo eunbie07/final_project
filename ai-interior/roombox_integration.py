@@ -412,31 +412,31 @@ class ConsistentStyleGenerator:
     """일관성 있는 스타일 프롬프트 생성기"""
     
     def __init__(self):
-        # 스타일별 일관된 키워드 정의
+        # 스타일별 일관된 키워드 정의 (한국식 인테리어 강조)
         self.style_definitions = {
             "modern": {
                 "color_palette": ["white", "grey", "black", "beige"],
-                "materials": ["glass", "steel", "marble", "wood"],
-                "lighting": "bright natural lighting, large windows",
-                "furniture_style": "minimalist, clean lines, geometric shapes",
-                "atmosphere": "spacious, uncluttered, sophisticated",
-                "keywords": ["contemporary", "sleek", "minimal", "geometric", "neutral tones"]
+                "materials": ["glass", "steel", "marble", "wood", "ondol flooring"],
+                "lighting": "bright natural lighting, large windows, Korean apartment lighting",
+                "furniture_style": "minimalist, clean lines, geometric shapes, Korean furniture proportions",
+                "atmosphere": "spacious, uncluttered, sophisticated, Korean modern living",
+                "keywords": ["Korean contemporary", "sleek", "minimal", "geometric", "neutral tones", "Korean apartment style", "ondol heating"]
             },
             "scandinavian": {
                 "color_palette": ["white", "light grey", "natural wood", "soft pastels"],
-                "materials": ["light wood", "wool", "cotton", "ceramics"],
-                "lighting": "soft natural lighting, cozy ambient lights",
-                "furniture_style": "functional, simple, organic shapes",
-                "atmosphere": "cozy, warm, hygge feeling",
-                "keywords": ["nordic", "hygge", "cozy", "functional", "natural materials"]
+                "materials": ["light wood", "wool", "cotton", "ceramics", "Korean ondol flooring"],
+                "lighting": "soft natural lighting, cozy ambient lights, Korean home atmosphere",
+                "furniture_style": "functional, simple, organic shapes, Korean furniture design",
+                "atmosphere": "cozy, warm, hygge feeling, Korean comfort living",
+                "keywords": ["Korean nordic", "hygge", "cozy", "functional", "natural materials", "Korean-style comfort", "ondol warmth"]
             },
             "industrial": {
                 "color_palette": ["dark grey", "black", "rust", "raw metal"],
-                "materials": ["exposed brick", "steel", "concrete", "leather"],
-                "lighting": "dramatic industrial lighting, exposed bulbs",
-                "furniture_style": "raw materials, metal frames, vintage",
-                "atmosphere": "urban, edgy, raw character",
-                "keywords": ["loft", "exposed", "metal", "vintage", "urban"]
+                "materials": ["exposed brick", "steel", "concrete", "leather", "Korean industrial elements"],
+                "lighting": "dramatic industrial lighting, exposed bulbs, Korean urban style",
+                "furniture_style": "raw materials, metal frames, vintage, Korean industrial furniture",
+                "atmosphere": "urban, edgy, raw character, Korean loft living",
+                "keywords": ["Korean loft", "exposed", "metal", "vintage", "Korean urban", "industrial Korean style"]
             }
         }
     
