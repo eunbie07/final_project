@@ -110,3 +110,9 @@ claude_*
 
 # Git templates
 .gitmessage
+
+# Google Cloud credentials
+**/key.json
+**/key.json.example
+**/service-account*.json
+**/google-credentials*.json
