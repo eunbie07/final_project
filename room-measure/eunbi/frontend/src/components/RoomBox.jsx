@@ -77,8 +77,8 @@ import { createRoomLayoutData } from "../utils/dataConversion";
 import { saveRoomLayoutToMongoDB, detectWindowsInImage } from "../utils/api";
 
 // GLB 추출 스크립트 임포트 (임시)
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 
 // 스냅 그리드 컴포넌트
 const SnapGrid = React.memo(function SnapGrid({
@@ -142,7 +142,7 @@ const Wall = React.memo(function Wall({
         map={texture}
         roughness={isWindow ? 0.1 : roughness}
         metalness={isWindow ? 0.02 : metalness}
-        clearcoat={isWindow ? 0.8 : (metalness > 0.1 ? 0.6 : 0.1)}
+        clearcoat={isWindow ? 0.8 : metalness > 0.1 ? 0.6 : 0.1}
         clearcoatRoughness={isWindow ? 0.1 : roughness}
         opacity={isWindow ? 0.3 : 1}
         transparent={isWindow}
@@ -176,7 +176,7 @@ export default function RoomBox({
   // Toast 알림 시스템
   const { toasts, removeToast, showSuccess, showError, showWarning, showInfo } =
     useToast();
-  
+
   const {
     furniture,
     setFurniture,
@@ -219,74 +219,75 @@ export default function RoomBox({
   // AI 인테리어 생성 핸들러
   const handleAIInteriorGenerate = useCallback(async () => {
     try {
-      showInfo('방 데이터를 저장하고 있습니다...');
-      
+      showInfo("방 데이터를 저장하고 있습니다...");
+
       // 현재 방 데이터 준비
       const roomData = {
         dimensions: {
           width_cm: w,
           height_cm: h,
-          depth_cm: d
+          depth_cm: d,
         },
         area_sqm: (w * d) / 10000,
         volume_cum: (w * h * d) / 1000000,
-        furniture_3d: furniture.map(f => ({
+        furniture_3d: furniture.map((f) => ({
           name: f.name || f.type,
           type: f.type,
           position: f.position,
           scale: f.scale,
-          rotation: f.rotation
+          rotation: f.rotation,
         })),
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
 
       // MongoDB에 방 데이터 저장
       const saveData = {
         scene: {
-          description: `AI 인테리어 생성을 위한 ${w/10}cm × ${d/10}cm 방 공간`,
+          description: `AI 인테리어 생성을 위한 ${w / 10}cm × ${
+            d / 10
+          }cm 방 공간`,
           room: {
             width: w,
             depth: d,
-            height: h
+            height: h,
           },
-          objects: furniture.map(f => ({
+          objects: furniture.map((f) => ({
             name: f.name || f.type,
             type: f.type,
             position: f.position,
             scale: f.scale,
-            rotation: f.rotation
-          }))
+            rotation: f.rotation,
+          })),
         },
         area_sqm: (w * d) / 10000,
         volume_cum: (w * h * d) / 1000000,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
 
       // MongoDB 저장
-      const { saveRoomLayoutToMongoDB } = await import('../utils/api');
+      const { saveRoomLayoutToMongoDB } = await import("../utils/api");
       const saveResult = await saveRoomLayoutToMongoDB(saveData);
-      
-      console.log('MongoDB 저장 성공:', saveResult);
-      
+
+      console.log("MongoDB 저장 성공:", saveResult);
+
       // localStorage에도 저장 (백업용)
-      localStorage.setItem('currentRoomData', JSON.stringify(roomData));
-      localStorage.setItem('mongoRoomId', saveResult.layout_id);
-      
-      showSuccess('방 데이터 저장 완료!');
-      
+      localStorage.setItem("currentRoomData", JSON.stringify(roomData));
+      localStorage.setItem("mongoRoomId", saveResult.layout_id);
+
+      showSuccess("방 데이터 저장 완료!");
+
       // AI 인테리어 페이지로 네비게이션 (MongoDB ID 포함)
-      navigate('/ai-interior', { 
-        state: { 
+      navigate("/ai-interior", {
+        state: {
           roomData,
-          mongoId: saveResult.layout_id 
-        }
+          mongoId: saveResult.layout_id,
+        },
       });
-      
-      showInfo('AI 인테리어 디자이너로 이동합니다...');
-      
+
+      showInfo("AI 인테리어 디자이너로 이동합니다...");
     } catch (error) {
-      console.error('방 데이터 저장 실패:', error);
-      showError('방 데이터 저장에 실패했습니다. 다시 시도해주세요.');
+      console.error("방 데이터 저장 실패:", error);
+      showError("방 데이터 저장에 실패했습니다. 다시 시도해주세요.");
     }
   }, [w, h, d, furniture, navigate, showInfo, showSuccess, showError]);
 
@@ -298,36 +299,37 @@ export default function RoomBox({
   const downloadCapturedImage = (dataURL, screenshotData) => {
     try {
       // 파일명 생성 (타임스탬프 + 선택된 가구 정보)
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const selectedFurnitureName = screenshotData.selectedFurniture?.name || 'no-selection';
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const selectedFurnitureName =
+        screenshotData.selectedFurniture?.name || "no-selection";
       const filename = `3d-capture-${selectedFurnitureName}-${timestamp}.png`;
 
       // Blob 생성
-      const byteCharacters = atob(dataURL.split(',')[1]);
+      const byteCharacters = atob(dataURL.split(",")[1]);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
       const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/png' });
+      const blob = new Blob([byteArray], { type: "image/png" });
 
       // 다운로드 링크 생성
-      const downloadLink = document.createElement('a');
+      const downloadLink = document.createElement("a");
       downloadLink.href = URL.createObjectURL(blob);
       downloadLink.download = filename;
-      
+
       // 자동 다운로드 실행
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
-      
+
       // URL 정리
       URL.revokeObjectURL(downloadLink.href);
-      
+
       console.log(`📸 3D 캡처 이미지 저장 완료: ${filename}`);
       return true;
     } catch (error) {
-      console.error('이미지 저장 실패:', error);
+      console.error("이미지 저장 실패:", error);
       return false;
     }
   };
@@ -336,60 +338,125 @@ export default function RoomBox({
   const handle3DCapture = useCallback(() => {
     try {
       // Canvas 요소 찾기 (React Three Fiber의 Canvas)
-      const canvasElement = document.querySelector('canvas');
-      
+      const canvasElement = document.querySelector("canvas");
+
       if (!canvasElement) {
-        showError('3D 캔버스를 찾을 수 없습니다');
+        showError("3D 캔버스를 찾을 수 없습니다");
         return;
       }
 
-      showInfo('3D 화면을 캡처하고 있습니다...');
+      showInfo("3D 화면을 캡처하고 있습니다...");
 
-      // Canvas에서 이미지 데이터 추출
-      const dataURL = canvasElement.toDataURL('image/png', 0.9);
-      
-      // 캡처된 스크린샷 데이터 생성
-      const screenshotData = {
-        imageData: dataURL,
-        timestamp: new Date().toISOString(),
-        furniture: furniture.map(f => ({
-          id: f.id,
-          type: f.type,
-          name: f.name,
-          position: f.position,
-          size: f.size,
-          selected: f.id === selectedFurniture
-        })),
-        selectedFurniture: selectedFurniture ? furniture.find(f => f.id === selectedFurniture) : null,
-        roomSize: [w, h, d],
-        canvasSize: {
-          width: canvasElement.width,
-          height: canvasElement.height
+      // 렌더링이 완료될 때까지 잠시 대기
+      setTimeout(() => {
+        try {
+          // Canvas에서 이미지 데이터 추출 (고품질)
+          const dataURL = canvasElement.toDataURL("image/png", 1.0);
+
+          // 이미지가 검은색인지 확인
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            );
+            const data = imageData.data;
+
+            // 검은색 픽셀 비율 확인
+            let blackPixels = 0;
+            for (let i = 0; i < data.length; i += 4) {
+              if (data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) {
+                blackPixels++;
+              }
+            }
+
+            const blackRatio = blackPixels / (data.length / 4);
+
+            if (blackRatio > 0.8) {
+              showWarning("캡처된 이미지가 검은색입니다. 다시 시도해주세요.");
+              return;
+            }
+
+            // 캡처된 스크린샷 데이터 생성
+            const screenshotData = {
+              imageData: dataURL,
+              timestamp: new Date().toISOString(),
+              furniture: furniture.map((f) => ({
+                id: f.id,
+                type: f.type,
+                name: f.name,
+                position: f.position,
+                size: f.size,
+                selected: f.id === selectedFurniture,
+              })),
+              selectedFurniture: selectedFurniture
+                ? furniture.find((f) => f.id === selectedFurniture)
+                : null,
+              roomSize: [w, h, d],
+              canvasSize: {
+                width: canvasElement.width,
+                height: canvasElement.height,
+              },
+            };
+
+            setCapturedScreenshot(screenshotData);
+
+            // 로컬 스토리지에 캡처 데이터 저장
+            localStorage.setItem(
+              "capturedScreenshot",
+              JSON.stringify(screenshotData)
+            );
+
+            // 캡처된 이미지를 파일로 자동 저장
+            const success = downloadCapturedImage(dataURL, screenshotData);
+
+            showSuccess(
+              `3D 화면 캡처 완료! ${furniture.length}개 가구 감지됨${
+                success ? " (이미지 저장됨)" : ""
+              }`
+            );
+
+            // 스타일 변경 패널로 데이터 전달
+            if (selectedFurniture) {
+              showInfo(
+                `선택된 가구: ${
+                  screenshotData.selectedFurniture?.name || "없음"
+                } - AI 인테리어 페이지에서 스타일을 변경할 수 있습니다`
+              );
+            } else {
+              showWarning("가구를 먼저 선택한 후 스타일을 변경할 수 있습니다");
+            }
+          };
+
+          img.src = dataURL;
+        } catch (error) {
+          console.error("캡처 처리 실패:", error);
+          showError("3D 화면 캡처에 실패했습니다");
         }
-      };
-
-      setCapturedScreenshot(screenshotData);
-      
-      // 로컬 스토리지에 캡처 데이터 저장
-      localStorage.setItem('capturedScreenshot', JSON.stringify(screenshotData));
-      
-      // 캡처된 이미지를 파일로 자동 저장
-      const success = downloadCapturedImage(dataURL, screenshotData);
-      
-      showSuccess(`3D 화면 캡처 완료! ${furniture.length}개 가구 감지됨${success ? ' (이미지 저장됨)' : ''}`);
-      
-      // 스타일 변경 패널로 데이터 전달
-      if (selectedFurniture) {
-        showInfo(`선택된 가구: ${screenshotData.selectedFurniture?.name || '없음'} - AI 인테리어 페이지에서 스타일을 변경할 수 있습니다`);
-      } else {
-        showWarning('가구를 먼저 선택한 후 스타일을 변경할 수 있습니다');
-      }
-
+      }, 200); // 200ms 대기로 렌더링 완료 보장
     } catch (error) {
-      console.error('3D 캡처 실패:', error);
-      showError('3D 화면 캡처에 실패했습니다');
+      console.error("3D 캡처 실패:", error);
+      showError("3D 화면 캡처에 실패했습니다");
     }
-  }, [furniture, selectedFurniture, w, h, d, showInfo, showSuccess, showError, showWarning]);
+  }, [
+    furniture,
+    selectedFurniture,
+    w,
+    h,
+    d,
+    showInfo,
+    showSuccess,
+    showError,
+    showWarning,
+  ]);
 
   // 3D 모델 사용 상태
   const [use3DModels, setUse3DModels] = useState(false);
@@ -399,77 +466,152 @@ export default function RoomBox({
     color: "#f8f6f0",
     roughness: 0.9,
     metalness: 0.02,
-    textureType: "none" // "none", "brick", "wood", "concrete", "wallpaper"
+    textureType: "none", // "none", "brick", "wood", "concrete", "wallpaper"
   });
 
   // 바닥 스타일 상태
   const [floorSettings, setFloorSettings] = useState({
     color: "#e8dcc0",
     roughness: 0.85,
-    metalness: 0.05
+    metalness: 0.05,
   });
 
   // 벽 텍스처 프리셋
   const wallPresets = {
-    white: { color: "#f8f6f0", roughness: 0.9, metalness: 0.02, name: "화이트" },
-    beige: { color: "#f5f5dc", roughness: 0.85, metalness: 0.01, name: "베이지" },
+    white: {
+      color: "#f8f6f0",
+      roughness: 0.9,
+      metalness: 0.02,
+      name: "화이트",
+    },
+    beige: {
+      color: "#f5f5dc",
+      roughness: 0.85,
+      metalness: 0.01,
+      name: "베이지",
+    },
     gray: { color: "#d3d3d3", roughness: 0.8, metalness: 0.05, name: "회색" },
     blue: { color: "#e6f3ff", roughness: 0.9, metalness: 0.02, name: "파란색" },
-    green: { color: "#f0fff0", roughness: 0.9, metalness: 0.02, name: "연두색" },
+    green: {
+      color: "#f0fff0",
+      roughness: 0.9,
+      metalness: 0.02,
+      name: "연두색",
+    },
     pink: { color: "#ffeef5", roughness: 0.85, metalness: 0.01, name: "핑크" },
-    yellow: { color: "#fffacd", roughness: 0.9, metalness: 0.02, name: "노란색" },
+    yellow: {
+      color: "#fffacd",
+      roughness: 0.9,
+      metalness: 0.02,
+      name: "노란색",
+    },
     brick: { color: "#cd853f", roughness: 0.95, metalness: 0.0, name: "벽돌" },
     wood: { color: "#deb887", roughness: 0.8, metalness: 0.0, name: "나무" },
-    concrete: { color: "#a9a9a9", roughness: 0.95, metalness: 0.1, name: "콘크리트" }
+    concrete: {
+      color: "#a9a9a9",
+      roughness: 0.95,
+      metalness: 0.1,
+      name: "콘크리트",
+    },
   };
 
   // 바닥 텍스처 프리셋 (극단적 차이로 수정)
   const floorPresets = {
-    wood_light: { color: "#e8dcc0", roughness: 0.9, metalness: 0.0, name: "밝은 목재" },
-    wood_dark: { color: "#8b4513", roughness: 0.85, metalness: 0.0, name: "진한 목재" },
-    tile_white: { color: "#f8f8ff", roughness: 0.05, metalness: 0.8, name: "화이트 타일" },
-    tile_gray: { color: "#d3d3d3", roughness: 0.1, metalness: 0.7, name: "그레이 타일" },
-    marble: { color: "#f0f0f0", roughness: 0.02, metalness: 0.9, name: "대리석" },
-    concrete: { color: "#a9a9a9", roughness: 0.98, metalness: 0.0, name: "콘크리트" },
-    carpet_beige: { color: "#f5deb3", roughness: 0.99, metalness: 0.0, name: "베이지 카펫" },
-    carpet_gray: { color: "#808080", roughness: 0.99, metalness: 0.0, name: "그레이 카펫" },
-    linoleum: { color: "#dda0dd", roughness: 0.2, metalness: 0.4, name: "리놀륨" },
-    mirror: { color: "#c0c0c0", roughness: 0.0, metalness: 1.0, name: "거울" }
+    wood_light: {
+      color: "#e8dcc0",
+      roughness: 0.9,
+      metalness: 0.0,
+      name: "밝은 목재",
+    },
+    wood_dark: {
+      color: "#8b4513",
+      roughness: 0.85,
+      metalness: 0.0,
+      name: "진한 목재",
+    },
+    tile_white: {
+      color: "#f8f8ff",
+      roughness: 0.05,
+      metalness: 0.8,
+      name: "화이트 타일",
+    },
+    tile_gray: {
+      color: "#d3d3d3",
+      roughness: 0.1,
+      metalness: 0.7,
+      name: "그레이 타일",
+    },
+    marble: {
+      color: "#f0f0f0",
+      roughness: 0.02,
+      metalness: 0.9,
+      name: "대리석",
+    },
+    concrete: {
+      color: "#a9a9a9",
+      roughness: 0.98,
+      metalness: 0.0,
+      name: "콘크리트",
+    },
+    carpet_beige: {
+      color: "#f5deb3",
+      roughness: 0.99,
+      metalness: 0.0,
+      name: "베이지 카펫",
+    },
+    carpet_gray: {
+      color: "#808080",
+      roughness: 0.99,
+      metalness: 0.0,
+      name: "그레이 카펫",
+    },
+    linoleum: {
+      color: "#dda0dd",
+      roughness: 0.2,
+      metalness: 0.4,
+      name: "리놀륨",
+    },
+    mirror: { color: "#c0c0c0", roughness: 0.0, metalness: 1.0, name: "거울" },
   };
 
   // GLB 메시 추출 함수 (임시)
   const extractMeshesToSeparateFiles = async () => {
     const loader = new GLTFLoader();
     const exporter = new GLTFExporter();
-    
+
     try {
-      console.log('GLB 파일 로딩 중...');
+      console.log("GLB 파일 로딩 중...");
       const gltf = await new Promise((resolve, reject) => {
-        loader.load('/low_poly_furnitures_full_bundle.glb', resolve, undefined, reject);
+        loader.load(
+          "/low_poly_furnitures_full_bundle.glb",
+          resolve,
+          undefined,
+          reject
+        );
       });
-      
-      console.log('=== 메시 추출 시작 ===');
+
+      console.log("=== 메시 추출 시작 ===");
       const meshes = [];
-      
+
       gltf.scene.traverse((child) => {
         if (child.isMesh) {
           meshes.push({
             name: child.name,
-            mesh: child.clone()
+            mesh: child.clone(),
           });
         }
       });
-      
+
       console.log(`총 ${meshes.length}개의 메시를 찾았습니다.`);
-      
+
       for (let i = 0; i < meshes.length; i++) {
         const { name, mesh } = meshes[i];
-        
+
         try {
           const scene = new THREE.Scene();
           mesh.position.set(0, 0, 0);
           scene.add(mesh);
-          
+
           const result = await new Promise((resolve, reject) => {
             exporter.parse(
               scene,
@@ -478,39 +620,37 @@ export default function RoomBox({
               (error) => reject(error)
             );
           });
-          
-          const blob = new Blob([result], { type: 'application/octet-stream' });
+
+          const blob = new Blob([result], { type: "application/octet-stream" });
           const url = URL.createObjectURL(blob);
-          
-          const link = document.createElement('a');
+
+          const link = document.createElement("a");
           link.href = url;
           link.download = `${name}.glb`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          
+
           URL.revokeObjectURL(url);
           console.log(`✅ ${name}.glb 파일 다운로드 완료`);
-          
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+
+          await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (error) {
           console.error(`❌ ${name} 메시 내보내기 실패:`, error);
         }
       }
-      
-      console.log('=== 모든 메시 추출 완료 ===');
-      
+
+      console.log("=== 모든 메시 추출 완료 ===");
     } catch (error) {
-      console.error('GLB 파일 처리 실패:', error);
+      console.error("GLB 파일 처리 실패:", error);
     }
   };
 
   // 브라우저 콘솔에서 사용할 수 있도록 등록
   useEffect(() => {
     window.extractMeshes = extractMeshesToSeparateFiles;
-    console.log('🚀 GLB 추출 도구 준비 완료!');
-    console.log('콘솔에서 extractMeshes() 를 실행하세요.');
+    console.log("🚀 GLB 추출 도구 준비 완료!");
+    console.log("콘솔에서 extractMeshes() 를 실행하세요.");
   }, []);
 
   // 방 계산 최적화
@@ -912,7 +1052,6 @@ export default function RoomBox({
         event.preventDefault();
         setEnableSnap(!enableSnap);
       }
-
     };
 
     window.addEventListener("keydown", handleKeyPress);
@@ -1183,21 +1322,25 @@ export default function RoomBox({
           <div className="space-y-3">
             {/* 색상 프리셋 선택 */}
             <div>
-              <p className="text-xs text-text-secondary mb-2 font-medium">벽 색상</p>
+              <p className="text-xs text-text-secondary mb-2 font-medium">
+                벽 색상
+              </p>
               <div className="grid grid-cols-5 gap-1">
                 {Object.entries(wallPresets).map(([key, preset]) => (
                   <button
                     key={key}
-                    onClick={() => setWallSettings({
-                      ...wallSettings,
-                      color: preset.color,
-                      roughness: preset.roughness,
-                      metalness: preset.metalness
-                    })}
+                    onClick={() =>
+                      setWallSettings({
+                        ...wallSettings,
+                        color: preset.color,
+                        roughness: preset.roughness,
+                        metalness: preset.metalness,
+                      })
+                    }
                     className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 hover:scale-110 ${
-                      wallSettings.color === preset.color 
-                        ? 'border-primary shadow-lg' 
-                        : 'border-white/30 hover:border-white/60'
+                      wallSettings.color === preset.color
+                        ? "border-primary shadow-lg"
+                        : "border-white/30 hover:border-white/60"
                     }`}
                     style={{ backgroundColor: preset.color }}
                     title={preset.name}
@@ -1205,31 +1348,44 @@ export default function RoomBox({
                 ))}
               </div>
             </div>
-            
+
             {/* 커스텀 색상 선택 */}
             <div>
-              <p className="text-xs text-text-secondary mb-2 font-medium">커스텀 색상</p>
+              <p className="text-xs text-text-secondary mb-2 font-medium">
+                커스텀 색상
+              </p>
               <input
                 type="color"
                 value={wallSettings.color}
-                onChange={(e) => setWallSettings({...wallSettings, color: e.target.value})}
+                onChange={(e) =>
+                  setWallSettings({ ...wallSettings, color: e.target.value })
+                }
                 className="w-full h-8 rounded-lg border border-border bg-background cursor-pointer"
               />
             </div>
-            
+
             {/* 재질 조절 */}
             <div>
-              <p className="text-xs text-text-secondary mb-2 font-medium">거칠기 ({wallSettings.roughness.toFixed(1)})</p>
+              <p className="text-xs text-text-secondary mb-2 font-medium">
+                거칠기 ({wallSettings.roughness.toFixed(1)})
+              </p>
               <input
                 type="range"
                 min="0"
                 max="1"
                 step="0.05"
                 value={wallSettings.roughness}
-                onChange={(e) => setWallSettings({...wallSettings, roughness: parseFloat(e.target.value)})}
+                onChange={(e) =>
+                  setWallSettings({
+                    ...wallSettings,
+                    roughness: parseFloat(e.target.value),
+                  })
+                }
                 className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
                 style={{
-                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${wallSettings.roughness * 100}%, #e5e7eb ${wallSettings.roughness * 100}%, #e5e7eb 100%)`
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${
+                    wallSettings.roughness * 100
+                  }%, #e5e7eb ${wallSettings.roughness * 100}%, #e5e7eb 100%)`,
                 }}
               />
               <div className="flex justify-between text-xs text-text-secondary mt-1">
@@ -1237,20 +1393,29 @@ export default function RoomBox({
                 <span>거침</span>
               </div>
             </div>
-            
+
             {/* 금속성 조절 */}
             <div>
-              <p className="text-xs text-text-secondary mb-2 font-medium">금속성 ({wallSettings.metalness.toFixed(2)})</p>
+              <p className="text-xs text-text-secondary mb-2 font-medium">
+                금속성 ({wallSettings.metalness.toFixed(2)})
+              </p>
               <input
                 type="range"
                 min="0"
                 max="0.5"
                 step="0.01"
                 value={wallSettings.metalness}
-                onChange={(e) => setWallSettings({...wallSettings, metalness: parseFloat(e.target.value)})}
+                onChange={(e) =>
+                  setWallSettings({
+                    ...wallSettings,
+                    metalness: parseFloat(e.target.value),
+                  })
+                }
                 className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
                 style={{
-                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${wallSettings.metalness * 200}%, #e5e7eb ${wallSettings.metalness * 200}%, #e5e7eb 100%)`
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${
+                    wallSettings.metalness * 200
+                  }%, #e5e7eb ${wallSettings.metalness * 200}%, #e5e7eb 100%)`,
                 }}
               />
               <div className="flex justify-between text-xs text-text-secondary mt-1">
@@ -1260,7 +1425,7 @@ export default function RoomBox({
             </div>
           </div>
         </div>
-        
+
         {/* 바닥 스타일 패널 */}
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
@@ -1284,20 +1449,24 @@ export default function RoomBox({
           <div className="space-y-3">
             {/* 바닥 색상 프리셋 */}
             <div>
-              <p className="text-xs text-text-secondary mb-2 font-medium">바닥 재질</p>
+              <p className="text-xs text-text-secondary mb-2 font-medium">
+                바닥 재질
+              </p>
               <div className="grid grid-cols-5 gap-1">
                 {Object.entries(floorPresets).map(([key, preset]) => (
                   <button
                     key={key}
-                    onClick={() => setFloorSettings({
-                      color: preset.color,
-                      roughness: preset.roughness,
-                      metalness: preset.metalness
-                    })}
+                    onClick={() =>
+                      setFloorSettings({
+                        color: preset.color,
+                        roughness: preset.roughness,
+                        metalness: preset.metalness,
+                      })
+                    }
                     className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 hover:scale-110 ${
-                      floorSettings.color === preset.color 
-                        ? 'border-primary shadow-lg' 
-                        : 'border-white/30 hover:border-white/60'
+                      floorSettings.color === preset.color
+                        ? "border-primary shadow-lg"
+                        : "border-white/30 hover:border-white/60"
                     }`}
                     style={{ backgroundColor: preset.color }}
                     title={preset.name}
@@ -1305,31 +1474,44 @@ export default function RoomBox({
                 ))}
               </div>
             </div>
-            
+
             {/* 커스텀 바닥 색상 */}
             <div>
-              <p className="text-xs text-text-secondary mb-2 font-medium">커스텀 색상</p>
+              <p className="text-xs text-text-secondary mb-2 font-medium">
+                커스텀 색상
+              </p>
               <input
                 type="color"
                 value={floorSettings.color}
-                onChange={(e) => setFloorSettings({...floorSettings, color: e.target.value})}
+                onChange={(e) =>
+                  setFloorSettings({ ...floorSettings, color: e.target.value })
+                }
                 className="w-full h-8 rounded-lg border border-border bg-background cursor-pointer"
               />
             </div>
-            
+
             {/* 바닥 거칠기 */}
             <div>
-              <p className="text-xs text-text-secondary mb-2 font-medium">바닥 거칠기 ({floorSettings.roughness.toFixed(1)})</p>
+              <p className="text-xs text-text-secondary mb-2 font-medium">
+                바닥 거칠기 ({floorSettings.roughness.toFixed(1)})
+              </p>
               <input
                 type="range"
                 min="0"
                 max="1"
                 step="0.05"
                 value={floorSettings.roughness}
-                onChange={(e) => setFloorSettings({...floorSettings, roughness: parseFloat(e.target.value)})}
+                onChange={(e) =>
+                  setFloorSettings({
+                    ...floorSettings,
+                    roughness: parseFloat(e.target.value),
+                  })
+                }
                 className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
                 style={{
-                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${floorSettings.roughness * 100}%, #e5e7eb ${floorSettings.roughness * 100}%, #e5e7eb 100%)`
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${
+                    floorSettings.roughness * 100
+                  }%, #e5e7eb ${floorSettings.roughness * 100}%, #e5e7eb 100%)`,
                 }}
               />
               <div className="flex justify-between text-xs text-text-secondary mt-1">
@@ -1339,7 +1521,7 @@ export default function RoomBox({
             </div>
           </div>
         </div>
-        
+
         {/* 시각 옵션 패널 */}
         <div className="backdrop-blur-lg p-4 rounded-xl shadow-lg bg-surface/85 border border-border/50 hover:bg-surface/90 transition-all duration-200">
           <div className="flex items-center gap-2 mb-3">
@@ -1784,7 +1966,6 @@ export default function RoomBox({
         {/* 뷰 컨트롤 */}
         <ViewPresets onViewChange={handleViewChange} roomSize={roomSize} />
 
-
         {/* 공간 분석 */}
         <SpaceUtilization
           furniture={furniture}
@@ -1806,20 +1987,20 @@ export default function RoomBox({
           gl={{
             antialias: true,
             alpha: true,
-            preserveDrawingBuffer: false,
+            preserveDrawingBuffer: true,
             powerPreference: "high-performance",
             failIfMajorPerformanceCaveat: false,
             toneMapping: THREE.ACESFilmicToneMapping,
             toneMappingExposure: 1.2,
             outputColorSpace: THREE.SRGBColorSpace,
             shadowMapType: THREE.PCFSoftShadowMap,
-            physicallyCorrectLights: true
+            physicallyCorrectLights: true,
           }}
         >
           <Suspense fallback={null}>
             <EnhancedLighting roomSize={roomSize} />
-            <Environment 
-              preset="studio" 
+            <Environment
+              preset="studio"
               background={false}
               environmentIntensity={0.8}
               environmentRotation={[0, Math.PI / 4, 0]}
@@ -1868,7 +2049,6 @@ export default function RoomBox({
               roughness={wallSettings.roughness}
               metalness={wallSettings.metalness}
             />
-
 
             <SnapGrid roomSize={roomSize} visible={showSnapGrid} />
             <FloorGrid roomSize={roomSize} visible={showFloorGrid} />
@@ -2224,14 +2404,16 @@ export default function RoomBox({
         {/* 캡처된 이미지 미리보기 */}
         {capturedScreenshot && (
           <div className="bg-white rounded-xl shadow-lg p-3 max-w-[200px]">
-            <div className="text-xs font-medium text-gray-600 mb-2">📸 캡처된 이미지</div>
+            <div className="text-xs font-medium text-gray-600 mb-2">
+              📸 캡처된 이미지
+            </div>
             <img
               src={capturedScreenshot.imageData}
               alt="캡처된 3D 화면"
               className="w-full h-auto rounded-lg border border-gray-200"
             />
             <div className="text-xs text-gray-500 mt-2">
-              {capturedScreenshot.selectedFurniture?.name || '가구 미선택'}
+              {capturedScreenshot.selectedFurniture?.name || "가구 미선택"}
               <br />
               <span className="text-green-600">저장됨 ✓</span>
             </div>
@@ -2260,7 +2442,9 @@ export default function RoomBox({
           </div>
           <div className="text-left">
             <div className="font-bold text-lg">AI 인테리어 생성</div>
-            <div className="text-xs text-white/80">방 크기 기반 맞춤 디자인</div>
+            <div className="text-xs text-white/80">
+              방 크기 기반 맞춤 디자인
+            </div>
           </div>
           <svg
             className="w-5 h-5 group-hover:translate-x-1 transition-transform"

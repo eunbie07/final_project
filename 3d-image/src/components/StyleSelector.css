@@ -1,0 +1,203 @@
+.style-selector {
+  text-align: center;
+}
+
+.style-selector h2 {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: white;
+}
+
+.style-description {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.style-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.style-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.style-card:hover::before {
+  left: 100%;
+}
+
+.style-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.style-card.selected {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.2);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+.style-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.style-name {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+}
+
+.style-card .style-description {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.style-info {
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.style-info h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.style-info ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: none;
+}
+
+.style-info li {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  opacity: 0.9;
+  position: relative;
+}
+
+.style-info li::before {
+  content: "✨";
+  position: absolute;
+  left: -1.5rem;
+  top: 0;
+}
+
+/* 스타일별 색상 테마 */
+.style-card[data-style="modern"]:hover {
+  border-color: #2196f3;
+  box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+}
+
+.style-card[data-style="scandinavian"]:hover {
+  border-color: #4caf50;
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+}
+
+.style-card[data-style="industrial"]:hover {
+  border-color: #ff9800;
+  box-shadow: 0 8px 25px rgba(255, 152, 0, 0.3);
+}
+
+.style-card[data-style="luxury"]:hover {
+  border-color: #9c27b0;
+  box-shadow: 0 8px 25px rgba(156, 39, 176, 0.3);
+}
+
+.style-card[data-style="minimalist"]:hover {
+  border-color: #607d8b;
+  box-shadow: 0 8px 25px rgba(96, 125, 139, 0.3);
+}
+
+.style-card[data-style="bohemian"]:hover {
+  border-color: #e91e63;
+  box-shadow: 0 8px 25px rgba(233, 30, 99, 0.3);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .style-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .style-card {
+    padding: 1rem;
+  }
+
+  .style-icon {
+    font-size: 2.5rem;
+  }
+
+  .style-name {
+    font-size: 1.1rem;
+  }
+
+  .style-info {
+    padding: 1rem;
+  }
+
+  .style-info h3 {
+    font-size: 1.1rem;
+  }
+
+  .style-info li {
+    font-size: 0.9rem;
+  }
+}
+
+/* 애니메이션 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.style-card.selected {
+  animation: pulse 2s infinite;
+}
+

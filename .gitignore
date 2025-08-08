@@ -98,3 +98,15 @@ service-account-*.json
 .env.local
 .env.production
 
+service-account-key.json
+
+# Claude settings
+.claude/
+.claude/**
+**/.claude/
+**/.claude/**
+*.claude
+claude_*
+
+# Git templates
+.gitmessage

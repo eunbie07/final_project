@@ -1,0 +1,119 @@
+.image-uploader {
+  text-align: center;
+}
+
+.image-uploader h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: white;
+}
+
+.upload-area {
+  border: 3px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 3rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-area:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.upload-placeholder {
+  text-align: center;
+}
+
+.upload-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.upload-placeholder p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.upload-hint {
+  font-size: 0.9rem !important;
+  opacity: 0.7 !important;
+}
+
+.selected-image {
+  text-align: center;
+}
+
+.selected-image img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.selected-image img:hover {
+  transform: scale(1.05);
+}
+
+.image-name {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  word-break: break-all;
+}
+
+.change-image-btn {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.change-image-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 드래그 앤 드롭 효과 */
+.upload-area.dragover {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+  transform: scale(1.02);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .upload-area {
+    padding: 2rem 1rem;
+    min-height: 150px;
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+  }
+
+  .upload-placeholder p {
+    font-size: 1rem;
+  }
+
+  .selected-image img {
+    max-height: 200px;
+  }
+}
+

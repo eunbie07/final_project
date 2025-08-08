@@ -1,0 +1,14 @@
+{
+  "name": "interior-app-extended",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "axios": "^1.6.2"
+  },
+  "scripts": {
+    "start": "PORT=7001 react-scripts start",
+    "build": "react-scripts build"
+  }
+}

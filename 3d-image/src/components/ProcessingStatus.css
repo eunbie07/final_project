@@ -1,0 +1,247 @@
+.processing-status {
+  text-align: center;
+}
+
+.processing-status h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: white;
+}
+
+.error-message {
+  background: rgba(244, 67, 54, 0.2);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: #ffcdd2;
+}
+
+.error-message p {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+}
+
+.error-message button {
+  padding: 0.5rem 1rem;
+  background: rgba(244, 67, 54, 0.3);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-message button:hover {
+  background: rgba(244, 67, 54, 0.5);
+}
+
+.processing-controls {
+  margin-bottom: 2rem;
+}
+
+.process-btn {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background: linear-gradient(45deg, #4caf50, #45a049);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  font-weight: 600;
+}
+
+.process-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.process-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.processing-info {
+  margin-top: 1rem;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.processing-progress {
+  margin-bottom: 2rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #45a049);
+  border-radius: 4px;
+  animation: progressAnimation 2s ease-in-out infinite;
+  width: 60%;
+}
+
+@keyframes progressAnimation {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 60%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.current-step {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #4caf50;
+}
+
+.processing-steps {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+}
+
+.step {
+  padding: 0.8rem 1.2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: rgba(76, 175, 80, 0.3);
+  opacity: 1;
+  color: white;
+  box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+}
+
+.vertex-info {
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vertex-info h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.vertex-info ol {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: none;
+  counter-reset: step-counter;
+}
+
+.vertex-info li {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  position: relative;
+  counter-increment: step-counter;
+}
+
+.vertex-info li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: -2rem;
+  top: 0;
+  background: #4caf50;
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* 로딩 애니메이션 */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.processing-progress::before {
+  content: "⚙️";
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .process-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .processing-steps {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .step {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .vertex-info {
+    padding: 1rem;
+  }
+
+  .vertex-info h3 {
+    font-size: 1.1rem;
+  }
+
+  .vertex-info li {
+    font-size: 0.9rem;
+  }
+}
+
+/* 성공 애니메이션 */
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.processing-complete {
+  animation: successPulse 0.5s ease-in-out;
+}
+

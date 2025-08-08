@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D to Real Image Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #4a90e2, #5c6bc0);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 40px 30px;
+        }
+        
+        .upload-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 50px 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #4a90e2;
+            background-color: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #4a90e2;
+            background-color: #e3f2fd;
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #4a90e2, #5c6bc0);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .style-section {
+            margin-bottom: 40px;
+        }
+        
+        .style-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .style-option {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .style-option:hover {
+            border-color: #4a90e2;
+            transform: translateY(-2px);
+        }
+        
+        .style-option.selected {
+            border-color: #4a90e2;
+            background-color: #e3f2fd;
+        }
+        
+        .style-option h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .style-option p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .process-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .process-steps {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .step {
+            flex: 1;
+            min-width: 250px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+        }
+        
+        .step-number {
+            background: #4a90e2;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+        }
+        
+        .step h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .step p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .process-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px 10px;
+        }
+        
+        .process-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+        
+        .process-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .results-section {
+            display: none;
+            margin-top: 40px;
+        }
+        
+        .result-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .result-item h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .result-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #6f42c1, #9c27b0);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4a90e2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 3D to Real Image</h1>
+            <p>3D 스크린샷을 2단계 AI 변환으로 실사 인테리어로 변환하세요</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- 이미지 업로드 섹션 -->
+            <div class="upload-section">
+                <h2>1. 3D 스크린샷 업로드</h2>
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">3D 레이아웃 스크린샷을 드래그하거나 클릭하여 업로드하세요</div>
+                    <button class="upload-btn" type="button">파일 선택</button>
+                </div>
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+            </div>
+            
+            <!-- 스타일 선택 섹션 -->
+            <div class="style-section">
+                <h2>2. 인테리어 스타일 선택</h2>
+                <div class="style-selector">
+                    <div class="style-option" data-style="modern">
+                        <h3>모던</h3>
+                        <p>깔끔하고 미니멀한 현대적 스타일</p>
+                    </div>
+                    <div class="style-option" data-style="scandinavian">
+                        <h3>스칸디나비안</h3>
+                        <p>따뜻하고 아늑한 북유럽 스타일</p>
+                    </div>
+                    <div class="style-option" data-style="industrial">
+                        <h3>인더스트리얼</h3>
+                        <p>거친 매력의 산업적 스타일</p>
+                    </div>
+                    <div class="style-option" data-style="cozy">
+                        <h3>코지</h3>
+                        <p>편안하고 따뜻한 분위기</p>
+                    </div>
+                    <div class="style-option selected" data-style="luxury">
+                        <h3>럭셔리</h3>
+                        <p>고급스럽고 세련된 스타일</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 처리 과정 설명 -->
+            <div class="process-section">
+                <h2>3. 변환 과정</h2>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h4>스타일 변경</h4>
+                        <p>가구 배치는 그대로 유지하면서 선택한 스타일로 변경</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h4>실사화</h4>
+                        <p>3D 렌더링을 실제 사진같은 품질로 변환</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h4>결과 확인</h4>
+                        <p>각 단계별 결과를 확인하고 다운로드</p>
+                    </div>
+                </div>
+                
+                <button class="process-btn" id="processStage1" onclick="processStage1()" disabled>
+                    1단계 실행 (스타일 변경)
+                </button>
+                <button class="process-btn" id="processStage2" onclick="processStage2()" disabled>
+                    2단계 실행 (실사화)
+                </button>
+                <button class="process-btn" id="processAll" onclick="processAll()" disabled>
+                    전체 변환 실행
+                </button>
+            </div>
+            
+            <!-- 상태 메시지 -->
+            <div id="status" class="status"></div>
+            
+            <!-- 로딩 -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>AI가 이미지를 처리하고 있습니다... 잠시만 기다려주세요</p>
+            </div>
+            
+            <!-- 결과 섹션 -->
+            <div id="results" class="results-section">
+                <h2>변환 결과</h2>
+                <div class="result-images" id="resultImages">
+                    <!-- 결과 이미지들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFileId = null;
+        let selectedStyle = 'luxury';
+        
+        // 파일 업로드 처리
+        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+        
+        // 드래그 앤 드롭 처리
+        const uploadArea = document.querySelector('.upload-area');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload({target: {files: files}});
+            }
+        });
+        
+        // 스타일 선택 처리
+        document.querySelectorAll('.style-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.style-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedStyle = option.dataset.style;
+            });
+        });
+        
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showStatus('info', '이미지 업로드 중...');
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentFileId = result.file_id;
+                    showStatus('success', '이미지 업로드 완료! 변환을 실행하세요.');
+                    
+                    // 버튼 활성화
+                    document.getElementById('processStage1').disabled = false;
+                    document.getElementById('processAll').disabled = false;
+                } else {
+                    showStatus('error', result.error);
+                }
+            } catch (error) {
+                showStatus('error', '업로드 실패: ' + error.message);
+            }
+        }
+        
+        async function processStage1() {
+            if (!currentFileId) {
+                showStatus('error', '먼저 이미지를 업로드하세요.');
+                return;
+            }
+            
+            showLoading();
+            showStatus('info', '1단계: 스타일 변경 중...');
+            
+            try {
+                const response = await fetch('/process/stage1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        file_id: currentFileId,
+                        style: selectedStyle
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('success', '1단계 완료! 2단계를 실행하거나 결과를 확인하세요.');
+                    showResult('stage1', result.stage1_output);
+                    
+                    // 2단계 버튼 활성화
+                    document.getElementById('processStage2').disabled = false;
+                } else {
+                    showStatus('error', result.error);
+                }
+            } catch (error) {
+                showStatus('error', '1단계 처리 실패: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function processStage2() {
+            if (!currentFileId) {
+                showStatus('error', '먼저 1단계를 완료하세요.');
+                return;
+            }
+            
+            showLoading();
+            showStatus('info', '2단계: 실사화 중...');
+            
+            try {
+                const response = await fetch('/process/stage2', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        file_id: currentFileId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('success', '2단계 완료! 모든 변환이 완료되었습니다.');
+                    showResult('stage2', result.stage2_output);
+                } else {
+                    showStatus('error', result.error);
+                }
+            } catch (error) {
+                showStatus('error', '2단계 처리 실패: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function processAll() {
+            if (!currentFileId) {
+                showStatus('error', '먼저 이미지를 업로드하세요.');
+                return;
+            }
+            
+            showLoading();
+            showStatus('info', '전체 변환 중... (1단계 + 2단계)');
+            
+            try {
+                const response = await fetch('/process/full', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        file_id: currentFileId,
+                        style: selectedStyle
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('success', '전체 변환 완료!');
+                    showResult('stage1', result.stage1_output);
+                    showResult('stage2', result.stage2_output);
+                } else {
+                    showStatus('error', result.error);
+                }
+            } catch (error) {
+                showStatus('error', '전체 변환 실패: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function showResult(stage, imagePath) {
+            const resultsSection = document.getElementById('results');
+            const resultImages = document.getElementById('resultImages');
+            
+            const stageNames = {
+                'stage1': '1단계: 스타일 변경',
+                'stage2': '2단계: 실사화'
+            };
+            
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            resultItem.innerHTML = `
+                <h3>${stageNames[stage]}</h3>
+                <img src="/${imagePath}" alt="${stageNames[stage]} 결과" class="result-image">
+                <a href="/download/${imagePath}" class="download-btn">다운로드</a>
+            `;
+            
+            resultImages.appendChild(resultItem);
+            resultsSection.style.display = 'block';
+        }
+        
+        function showStatus(type, message) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.textContent = message;
+            status.style.display = 'block';
+            
+            // 3초 후 자동으로 숨기기 (에러가 아닌 경우)
+            if (type !== 'error') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
