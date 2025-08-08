@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-07T14:08:31.157485",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 203.6683390625,
+      "center_z": 238.002659375,
+      "id": "Bed"
+    }
+  ],
+  "room_dimensions": {
+    "width": 3.872,
+    "height": 4.649
+  },
+  "style": "scandinavian",
+  "prompt": "Korean-style Scandinavian minimalist bedroom with ondol floor heating system, light wood floors, white walls, natural lighting, Korean furniture proportions\n\nCRITICAL FURNITURE PLACEMENT INSTRUCTIONS:\nRoom dimensions: 3.872m x 4.649m\n\nEXACT FURNITURE POSITIONS (MUST FOLLOW PRECISELY):\n• bed positioned at far left wall area and very front of room, exactly 0.2m from left wall and 0.2m from front wall\n\nCRITICAL PLACEMENT REQUIREMENTS FOR KOREAN INTERIOR:\n- This is a KOREAN HOME with MILLIMETER-PRECISE furniture positioning\n- Furniture MUST be placed at the EXACT distances from walls as specified above\n- MEASURE the distances carefully - 3.872m room width, 4.649m room depth\n- Do NOT place furniture against walls - Korean homes value open floor space\n- Show traditional Korean ONDOL flooring with precise room measurements\n- Include Korean architectural elements: built-in storage, clean lines\n- Furniture should be FLOATING in open space, clearly separated from all walls\n- Think \"Korean architectural precision\" with measured spatial relationships\n\nVISUAL REQUIREMENTS FOR KOREAN INTERIOR:\n- Show exactly 1 piece(s) of furniture\n- Room must be EXACTLY 3.872m x 4.649m proportions  \n- Korean home interior photography with SPATIAL ACCURACY\n- Warm ONDOL floor heating visible with room measurement grid\n- Korean apartment lighting showing precise furniture distances\n- Clean, minimal Korean aesthetic with measured spatial relationships\n- No extra furniture beyond specified - Korean precision minimalism\n- Show Korean lifestyle with architectural measuring precision\n\nADDITIONAL: position accuracy test - center placement verification",
+  "generator": "dalle-3",
+  "mock_mode": false
+}

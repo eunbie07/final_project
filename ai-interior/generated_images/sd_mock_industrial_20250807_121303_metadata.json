@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-07T12:13:03.337533",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 2000,
+      "center_z": 2500,
+      "id": "queen_bed"
+    },
+    {
+      "type": "desk",
+      "center_x": 3500,
+      "center_z": 1000,
+      "id": "work_desk"
+    }
+  ],
+  "room_dimensions": {
+    "width": 4.0,
+    "height": 5.0
+  },
+  "style": "industrial",
+  "prompt": "Industrial interior design, exposed brick walls, metal fixtures, concrete floors, urban loft style\n\nCRITICAL FURNITURE PLACEMENT INSTRUCTIONS:\nbed positioned at coordinates X=2.00m, Z=2.50m, desk positioned at coordinates X=3.50m, Z=1.00m\n\nMANDATORY REQUIREMENTS:\n- Place each furniture item at the EXACT coordinates specified above\n- Do not follow conventional placement rules (e.g., beds against walls)\n- Maintain realistic scale and proportions\n- Ensure all furniture is clearly visible and positioned precisely\n- Create photorealistic lighting and shadows\n\nRoomBox integration test - industrial style\n\nHigh quality, masterpiece, photorealistic interior photography, professional lighting, 8k resolution",
+  "settings": {
+    "num_inference_steps": 5,
+    "guidance_scale": 7.5,
+    "controlnet_conditioning_scale": 1.0,
+    "width": 1024,
+    "height": 1024
+  },
+  "model_id": "runwayml/stable-diffusion-v1-5",
+  "controlnet_model": "lllyasviel/sd-controlnet-canny",
+  "device": "cpu",
+  "use_controlnet": true,
+  "use_mask": true,
+  "mock_mode": true
+}

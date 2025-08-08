@@ -14,6 +14,7 @@ export const useRoomState = (initialRoomSize) => {
   const [enableSnap, setEnableSnap] = useState(true);
   const [showCollisions, setShowCollisions] = useState(true);
   const [showWindows, setShowWindows] = useState(false);
+  const [showHuman, setShowHuman] = useState(true);
   
   // Mode state
   const [activeView, setActiveView] = useState("조감도");
@@ -57,6 +58,8 @@ export const useRoomState = (initialRoomSize) => {
     setShowCollisions,
     showWindows,
     setShowWindows,
+    showHuman,
+    setShowHuman,
     
     // Mode state
     activeView,

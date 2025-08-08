@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-07T12:51:55.985346",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 198.87109375,
+      "center_z": 248.2,
+      "id": "Bed"
+    }
+  ],
+  "room_dimensions": {
+    "width": 4.026,
+    "height": 4.75
+  },
+  "style": "modern",
+  "prompt": "Modern contemporary bedroom with sleek lines, neutral colors, clean aesthetic\n\nCRITICAL FURNITURE PLACEMENT INSTRUCTIONS:\nRoom dimensions: 4.026m x 4.75m\n\nEXACT FURNITURE POSITIONS (MUST FOLLOW PRECISELY):\n• bed positioned at far left side and front area of the room\n\nUNUSUAL PLACEMENT REQUIREMENTS:\n- This is NOT a conventional bedroom layout\n- Furniture is intentionally placed in UNUSUAL positions\n- Do NOT place furniture against walls unless specifically indicated\n- Show OPEN FLOOR SPACE around centrally positioned furniture\n- Think \"modern art installation\" or \"minimalist exhibition space\"\n\nVISUAL REQUIREMENTS:\n- Show exactly 1 piece(s) of furniture\n- Room must be 4.026m x 4.75m proportions\n- High quality, photorealistic interior photography\n- Professional lighting, 8K resolution\n- No extra furniture or decorations beyond what's specified\n\nADDITIONAL: position accuracy test - center placement verification",
+  "generator": "dalle-3",
+  "mock_mode": false
+}

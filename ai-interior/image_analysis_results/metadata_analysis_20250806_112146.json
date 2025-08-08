@@ -1,0 +1,4743 @@
+{
+  "analysis_info": {
+    "total_images": 45,
+    "successful": 45,
+    "failed": 0,
+    "analyzed_at": "2025-08-06T11:21:46.776417",
+    "method": "metadata_based",
+    "concepts": {
+      "Bohemian,Natural": 9,
+      "Cozy": 9,
+      "Industrial": 9,
+      "Modern,Minimalist": 9,
+      "Scandinavian": 9
+    }
+  },
+  "results": [
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural2.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 2,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "서재",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "라탄 소파",
+          "position": "중앙",
+          "material": "라탄",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2200.0,
+            "width": 1800,
+            "depth": 750,
+            "height": 780
+          },
+          "estimated_size": "1.8m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2200mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "식물 스탠드",
+          "position": "코너",
+          "material": "우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 675.0,
+            "center_y": 600.0,
+            "width": 400,
+            "depth": 400,
+            "height": 1200
+          },
+          "estimated_size": "0.4m x 0.4m x 1.2m",
+          "precise_coordinates": "(675mm, 600mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:41.944417",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural2.png",
+      "file_size": 6569278,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural3.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 3,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "브라운",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1440.0,
+            "width": 900,
+            "depth": 600,
+            "height": 420
+          },
+          "estimated_size": "0.9m x 0.6m x 0.4m",
+          "precise_coordinates": "(1750mm, 1440mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "식물 스탠드",
+          "position": "코너",
+          "material": "우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 525.0,
+            "center_y": 675.0,
+            "width": 400,
+            "depth": 400,
+            "height": 1200
+          },
+          "estimated_size": "0.4m x 0.4m x 1.2m",
+          "precise_coordinates": "(525mm, 675mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.056132",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural3.png",
+      "file_size": 6033805,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural4.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 4,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.0m",
+        "room_type": "침실",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "라탄 소파",
+          "position": "중앙",
+          "material": "라탄",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2200.0,
+            "width": 1800,
+            "depth": 750,
+            "height": 780
+          },
+          "estimated_size": "1.8m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2200mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        },
+        {
+          "name": "우드 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "브라운",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1280.0,
+            "width": 900,
+            "depth": 600,
+            "height": 420
+          },
+          "estimated_size": "0.9m x 0.6m x 0.4m",
+          "precise_coordinates": "(2000mm, 1280mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.165407",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural4.png",
+      "file_size": 6105457,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural5.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 5,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.5m",
+        "room_type": "서재",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "라탄 소파",
+          "position": "중앙",
+          "material": "라탄",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2475.0,
+            "width": 1800,
+            "depth": 750,
+            "height": 780
+          },
+          "estimated_size": "1.8m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2475mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        },
+        {
+          "name": "식물 스탠드",
+          "position": "코너",
+          "material": "우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 675.0,
+            "center_y": 675.0,
+            "width": 400,
+            "depth": 400,
+            "height": 1200
+          },
+          "estimated_size": "0.4m x 0.4m x 1.2m",
+          "precise_coordinates": "(675mm, 675mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.275813",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural5.png",
+      "file_size": 6791852,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural6.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 6,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.0m",
+        "room_type": "거실",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "브라운",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1280.0,
+            "width": 900,
+            "depth": 600,
+            "height": 420
+          },
+          "estimated_size": "0.9m x 0.6m x 0.4m",
+          "precise_coordinates": "(1750mm, 1280mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        },
+        {
+          "name": "식물 스탠드",
+          "position": "코너",
+          "material": "우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 525.0,
+            "center_y": 600.0,
+            "width": 400,
+            "depth": 400,
+            "height": 1200
+          },
+          "estimated_size": "0.4m x 0.4m x 1.2m",
+          "precise_coordinates": "(525mm, 600mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.386885",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural6.png",
+      "file_size": 6500922,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural7.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 7,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "침실",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "라탄 소파",
+          "position": "중앙",
+          "material": "라탄",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2475.0,
+            "width": 1800,
+            "depth": 750,
+            "height": 780
+          },
+          "estimated_size": "1.8m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2475mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "우드 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "브라운",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1440.0,
+            "width": 900,
+            "depth": 600,
+            "height": 420
+          },
+          "estimated_size": "0.9m x 0.6m x 0.4m",
+          "precise_coordinates": "(2000mm, 1440mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.497248",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural7.png",
+      "file_size": 5882013,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural8.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 8,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "서재",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "라탄 소파",
+          "position": "중앙",
+          "material": "라탄",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2200.0,
+            "width": 1800,
+            "depth": 750,
+            "height": 780
+          },
+          "estimated_size": "1.8m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2200mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "식물 스탠드",
+          "position": "코너",
+          "material": "우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 675.0,
+            "center_y": 600.0,
+            "width": 400,
+            "depth": 400,
+            "height": 1200
+          },
+          "estimated_size": "0.4m x 0.4m x 1.2m",
+          "precise_coordinates": "(675mm, 600mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.607706",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural8.png",
+      "file_size": 7153271,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemain,Natural9.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 9,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "브라운",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1440.0,
+            "width": 900,
+            "depth": 600,
+            "height": 420
+          },
+          "estimated_size": "0.9m x 0.6m x 0.4m",
+          "precise_coordinates": "(1750mm, 1440mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "식물 스탠드",
+          "position": "코너",
+          "material": "우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 525.0,
+            "center_y": 675.0,
+            "width": 400,
+            "depth": 400,
+            "height": 1200
+          },
+          "estimated_size": "0.4m x 0.4m x 1.2m",
+          "precise_coordinates": "(525mm, 675mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.717842",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemain,Natural9.png",
+      "file_size": 7035535,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Bohemian,Natural",
+      "image_id": "Bohemian,Natural1.png",
+      "style": "보헤미안/내추럴",
+      "image_number": 1,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "침실",
+        "layout_description": "보헤미안/내추럴 스타일의 자유로운 배치 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "라탄 소파",
+          "position": "중앙",
+          "material": "라탄",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2475.0,
+            "width": 1800,
+            "depth": 750,
+            "height": 780
+          },
+          "estimated_size": "1.8m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2475mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "우드 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "브라운",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1440.0,
+            "width": 900,
+            "depth": 600,
+            "height": 420
+          },
+          "estimated_size": "0.9m x 0.6m x 0.4m",
+          "precise_coordinates": "(2000mm, 1440mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "어스 톤",
+        "테라코타",
+        "올리브",
+        "크림"
+      ],
+      "materials": [
+        "라탄",
+        "우드",
+        "리넨",
+        "울"
+      ],
+      "mood": "자유롭고 편안한, 자연친화적",
+      "lighting": "따뜻한 조명, 자연광",
+      "style_elements": [
+        "따뜻한 색감",
+        "패턴/텍스처",
+        "식물",
+        "천연 소재"
+      ],
+      "spatial_relationships": "자유로운 배치을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.826609",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Bohemian,Natural1.png",
+      "file_size": 5982730,
+      "concept_keywords": {
+        "style_description": "보헤미안/내추럴",
+        "key_elements": [
+          "따뜻한 색감",
+          "패턴/텍스처",
+          "식물",
+          "천연 소재"
+        ],
+        "materials": [
+          "라탄",
+          "우드",
+          "리넨",
+          "울"
+        ],
+        "colors": [
+          "어스 톤",
+          "테라코타",
+          "올리브",
+          "크림"
+        ],
+        "mood": "자유롭고 편안한, 자연친화적",
+        "furniture_style": "자연스럽고 편안한, 핸드메이드 느낌",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "따뜻한 조명, 자연광",
+        "layout_principles": [
+          "자유로운 배치",
+          "자연스러움",
+          "개성 표현"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy1.png",
+      "style": "코지/심플",
+      "image_number": 1,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "침실",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "패브릭 소파",
+          "position": "중앙",
+          "material": "소프트 패브릭",
+          "color": "베이지",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2610.0,
+            "width": 1900,
+            "depth": 820,
+            "height": 820
+          },
+          "estimated_size": "1.9m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2610mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "원목 사이드테이블",
+          "position": "소파 옆",
+          "material": "우드",
+          "color": "웜 브라운",
+          "coordinates": {
+            "center_x": 3000.0,
+            "center_y": 2925.0,
+            "width": 500,
+            "depth": 400,
+            "height": 550
+          },
+          "estimated_size": "0.5m x 0.4m x 0.6m",
+          "precise_coordinates": "(3000mm, 2925mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:42.935653",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy1.png",
+      "file_size": 6083802,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy2.png",
+      "style": "코지/심플",
+      "image_number": 2,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "독서 공간",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "패브릭 소파",
+          "position": "중앙",
+          "material": "소프트 패브릭",
+          "color": "베이지",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2320.0,
+            "width": 1900,
+            "depth": 820,
+            "height": 820
+          },
+          "estimated_size": "1.9m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2320mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "북셸프",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 3825.0,
+            "center_y": 1000.0,
+            "width": 700,
+            "depth": 280,
+            "height": 1500
+          },
+          "estimated_size": "0.7m x 0.3m x 1.5m",
+          "precise_coordinates": "(3825mm, 1000mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.045344",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy2.png",
+      "file_size": 6089578,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy3.png",
+      "style": "코지/심플",
+      "image_number": 3,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "원목 사이드테이블",
+          "position": "소파 옆",
+          "material": "우드",
+          "color": "웜 브라운",
+          "coordinates": {
+            "center_x": 2625.0,
+            "center_y": 2925.0,
+            "width": 500,
+            "depth": 400,
+            "height": 550
+          },
+          "estimated_size": "0.5m x 0.4m x 0.6m",
+          "precise_coordinates": "(2625mm, 2925mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "북셸프",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 2975.0,
+            "center_y": 1125.0,
+            "width": 700,
+            "depth": 280,
+            "height": 1500
+          },
+          "estimated_size": "0.7m x 0.3m x 1.5m",
+          "precise_coordinates": "(2975mm, 1125mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.154697",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy3.png",
+      "file_size": 5747525,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy4.png",
+      "style": "코지/심플",
+      "image_number": 4,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.0m",
+        "room_type": "침실",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "패브릭 소파",
+          "position": "중앙",
+          "material": "소프트 패브릭",
+          "color": "베이지",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2320.0,
+            "width": 1900,
+            "depth": 820,
+            "height": 820
+          },
+          "estimated_size": "1.9m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2320mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        },
+        {
+          "name": "원목 사이드테이블",
+          "position": "소파 옆",
+          "material": "우드",
+          "color": "웜 브라운",
+          "coordinates": {
+            "center_x": 3000.0,
+            "center_y": 2600.0,
+            "width": 500,
+            "depth": 400,
+            "height": 550
+          },
+          "estimated_size": "0.5m x 0.4m x 0.6m",
+          "precise_coordinates": "(3000mm, 2600mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.262497",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy4.png",
+      "file_size": 5578277,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy5.png",
+      "style": "코지/심플",
+      "image_number": 5,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.5m",
+        "room_type": "독서 공간",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "패브릭 소파",
+          "position": "중앙",
+          "material": "소프트 패브릭",
+          "color": "베이지",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2610.0,
+            "width": 1900,
+            "depth": 820,
+            "height": 820
+          },
+          "estimated_size": "1.9m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2610mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        },
+        {
+          "name": "북셸프",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 3825.0,
+            "center_y": 1125.0,
+            "width": 700,
+            "depth": 280,
+            "height": 1500
+          },
+          "estimated_size": "0.7m x 0.3m x 1.5m",
+          "precise_coordinates": "(3825mm, 1125mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.371146",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy5.png",
+      "file_size": 5787478,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy6.png",
+      "style": "코지/심플",
+      "image_number": 6,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.0m",
+        "room_type": "거실",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "원목 사이드테이블",
+          "position": "소파 옆",
+          "material": "우드",
+          "color": "웜 브라운",
+          "coordinates": {
+            "center_x": 2625.0,
+            "center_y": 2600.0,
+            "width": 500,
+            "depth": 400,
+            "height": 550
+          },
+          "estimated_size": "0.5m x 0.4m x 0.6m",
+          "precise_coordinates": "(2625mm, 2600mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        },
+        {
+          "name": "북셸프",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 2975.0,
+            "center_y": 1000.0,
+            "width": 700,
+            "depth": 280,
+            "height": 1500
+          },
+          "estimated_size": "0.7m x 0.3m x 1.5m",
+          "precise_coordinates": "(2975mm, 1000mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.485569",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy6.png",
+      "file_size": 5493875,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy7.png",
+      "style": "코지/심플",
+      "image_number": 7,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "침실",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "패브릭 소파",
+          "position": "중앙",
+          "material": "소프트 패브릭",
+          "color": "베이지",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2610.0,
+            "width": 1900,
+            "depth": 820,
+            "height": 820
+          },
+          "estimated_size": "1.9m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2610mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "원목 사이드테이블",
+          "position": "소파 옆",
+          "material": "우드",
+          "color": "웜 브라운",
+          "coordinates": {
+            "center_x": 3000.0,
+            "center_y": 2925.0,
+            "width": 500,
+            "depth": 400,
+            "height": 550
+          },
+          "estimated_size": "0.5m x 0.4m x 0.6m",
+          "precise_coordinates": "(3000mm, 2925mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.586955",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy7.png",
+      "file_size": 6282779,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy8.png",
+      "style": "코지/심플",
+      "image_number": 8,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "독서 공간",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "패브릭 소파",
+          "position": "중앙",
+          "material": "소프트 패브릭",
+          "color": "베이지",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2320.0,
+            "width": 1900,
+            "depth": 820,
+            "height": 820
+          },
+          "estimated_size": "1.9m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2320mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "북셸프",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 3825.0,
+            "center_y": 1000.0,
+            "width": 700,
+            "depth": 280,
+            "height": 1500
+          },
+          "estimated_size": "0.7m x 0.3m x 1.5m",
+          "precise_coordinates": "(3825mm, 1000mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.688289",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy8.png",
+      "file_size": 5675096,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Cozy",
+      "image_id": "Cozy9.png",
+      "style": "코지/심플",
+      "image_number": 9,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "코지/심플 스타일의 편안함 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "원목 사이드테이블",
+          "position": "소파 옆",
+          "material": "우드",
+          "color": "웜 브라운",
+          "coordinates": {
+            "center_x": 2625.0,
+            "center_y": 2925.0,
+            "width": 500,
+            "depth": 400,
+            "height": 550
+          },
+          "estimated_size": "0.5m x 0.4m x 0.6m",
+          "precise_coordinates": "(2625mm, 2925mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "북셸프",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 2975.0,
+            "center_y": 1125.0,
+            "width": 700,
+            "depth": 280,
+            "height": 1500
+          },
+          "estimated_size": "0.7m x 0.3m x 1.5m",
+          "precise_coordinates": "(2975mm, 1125mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "웜 화이트",
+        "베이지",
+        "소프트 그레이",
+        "파스텔"
+      ],
+      "materials": [
+        "소프트 패브릭",
+        "니트",
+        "우드",
+        "세라믹"
+      ],
+      "mood": "포근하고 편안한, 홈리한",
+      "lighting": "따뜻한 조명, 테이블 램프",
+      "style_elements": [
+        "포근함",
+        "소프트 패브릭",
+        "따뜻한 조명",
+        "생활감"
+      ],
+      "spatial_relationships": "편안함을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.798727",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Cozy9.png",
+      "file_size": 5297081,
+      "concept_keywords": {
+        "style_description": "코지/심플",
+        "key_elements": [
+          "포근함",
+          "소프트 패브릭",
+          "따뜻한 조명",
+          "생활감"
+        ],
+        "materials": [
+          "소프트 패브릭",
+          "니트",
+          "우드",
+          "세라믹"
+        ],
+        "colors": [
+          "웜 화이트",
+          "베이지",
+          "소프트 그레이",
+          "파스텔"
+        ],
+        "mood": "포근하고 편안한, 홈리한",
+        "furniture_style": "편안하고 실용적, 소프트한 라인",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "독서 공간"
+        ],
+        "lighting": "따뜻한 조명, 테이블 램프",
+        "layout_principles": [
+          "편안함",
+          "실용성",
+          "따뜻함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial1.png",
+      "style": "인더스트리얼",
+      "image_number": 1,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "서재",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "가죽 소파",
+          "position": "중앙",
+          "material": "가죽",
+          "color": "다크 브라운",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2700.0,
+            "width": 2100,
+            "depth": 850,
+            "height": 800
+          },
+          "estimated_size": "2.1m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2700mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "메탈 커피테이블",
+          "position": "소파 앞",
+          "material": "스틸",
+          "color": "블랙",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1575.0,
+            "width": 1300,
+            "depth": 700,
+            "height": 400
+          },
+          "estimated_size": "1.3m x 0.7m x 0.4m",
+          "precise_coordinates": "(2000mm, 1575mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:43.909487",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial1.png",
+      "file_size": 5928656,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial2.png",
+      "style": "인더스트리얼",
+      "image_number": 2,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "다이닝",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "가죽 소파",
+          "position": "중앙",
+          "material": "가죽",
+          "color": "다크 브라운",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2400.0,
+            "width": 2100,
+            "depth": 850,
+            "height": 800
+          },
+          "estimated_size": "2.1m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2400mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "인더스트리얼 선반",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "러스트",
+          "coordinates": {
+            "center_x": 3825.0,
+            "center_y": 2800.0,
+            "width": 600,
+            "depth": 250,
+            "height": 1600
+          },
+          "estimated_size": "0.6m x 0.2m x 1.6m",
+          "precise_coordinates": "(3825mm, 2800mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.016273",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial2.png",
+      "file_size": 6299473,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial3.png",
+      "style": "인더스트리얼",
+      "image_number": 3,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "메탈 커피테이블",
+          "position": "소파 앞",
+          "material": "스틸",
+          "color": "블랙",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1575.0,
+            "width": 1300,
+            "depth": 700,
+            "height": 400
+          },
+          "estimated_size": "1.3m x 0.7m x 0.4m",
+          "precise_coordinates": "(1750mm, 1575mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "인더스트리얼 선반",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "러스트",
+          "coordinates": {
+            "center_x": 2975.0,
+            "center_y": 3150.0,
+            "width": 600,
+            "depth": 250,
+            "height": 1600
+          },
+          "estimated_size": "0.6m x 0.2m x 1.6m",
+          "precise_coordinates": "(2975mm, 3150mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.117785",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial3.png",
+      "file_size": 5717646,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial4.png",
+      "style": "인더스트리얼",
+      "image_number": 4,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.0m",
+        "room_type": "서재",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "가죽 소파",
+          "position": "중앙",
+          "material": "가죽",
+          "color": "다크 브라운",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2400.0,
+            "width": 2100,
+            "depth": 850,
+            "height": 800
+          },
+          "estimated_size": "2.1m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2400mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        },
+        {
+          "name": "메탈 커피테이블",
+          "position": "소파 앞",
+          "material": "스틸",
+          "color": "블랙",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1400.0,
+            "width": 1300,
+            "depth": 700,
+            "height": 400
+          },
+          "estimated_size": "1.3m x 0.7m x 0.4m",
+          "precise_coordinates": "(2000mm, 1400mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.223706",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial4.png",
+      "file_size": 6586065,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial5.png",
+      "style": "인더스트리얼",
+      "image_number": 5,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.5m",
+        "room_type": "다이닝",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "가죽 소파",
+          "position": "중앙",
+          "material": "가죽",
+          "color": "다크 브라운",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2700.0,
+            "width": 2100,
+            "depth": 850,
+            "height": 800
+          },
+          "estimated_size": "2.1m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2700mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        },
+        {
+          "name": "인더스트리얼 선반",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "러스트",
+          "coordinates": {
+            "center_x": 3825.0,
+            "center_y": 3150.0,
+            "width": 600,
+            "depth": 250,
+            "height": 1600
+          },
+          "estimated_size": "0.6m x 0.2m x 1.6m",
+          "precise_coordinates": "(3825mm, 3150mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.325371",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial5.png",
+      "file_size": 5834956,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial6.png",
+      "style": "인더스트리얼",
+      "image_number": 6,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.0m",
+        "room_type": "거실",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "메탈 커피테이블",
+          "position": "소파 앞",
+          "material": "스틸",
+          "color": "블랙",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1400.0,
+            "width": 1300,
+            "depth": 700,
+            "height": 400
+          },
+          "estimated_size": "1.3m x 0.7m x 0.4m",
+          "precise_coordinates": "(1750mm, 1400mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        },
+        {
+          "name": "인더스트리얼 선반",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "러스트",
+          "coordinates": {
+            "center_x": 2975.0,
+            "center_y": 2800.0,
+            "width": 600,
+            "depth": 250,
+            "height": 1600
+          },
+          "estimated_size": "0.6m x 0.2m x 1.6m",
+          "precise_coordinates": "(2975mm, 2800mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.437059",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial6.png",
+      "file_size": 5919663,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial7.png",
+      "style": "인더스트리얼",
+      "image_number": 7,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "서재",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "가죽 소파",
+          "position": "중앙",
+          "material": "가죽",
+          "color": "다크 브라운",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2700.0,
+            "width": 2100,
+            "depth": 850,
+            "height": 800
+          },
+          "estimated_size": "2.1m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2700mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "메탈 커피테이블",
+          "position": "소파 앞",
+          "material": "스틸",
+          "color": "블랙",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1575.0,
+            "width": 1300,
+            "depth": 700,
+            "height": 400
+          },
+          "estimated_size": "1.3m x 0.7m x 0.4m",
+          "precise_coordinates": "(2000mm, 1575mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.538925",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial7.png",
+      "file_size": 5324204,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial8.png",
+      "style": "인더스트리얼",
+      "image_number": 8,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "다이닝",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "가죽 소파",
+          "position": "중앙",
+          "material": "가죽",
+          "color": "다크 브라운",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2400.0,
+            "width": 2100,
+            "depth": 850,
+            "height": 800
+          },
+          "estimated_size": "2.1m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2400mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "인더스트리얼 선반",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "러스트",
+          "coordinates": {
+            "center_x": 3825.0,
+            "center_y": 2800.0,
+            "width": 600,
+            "depth": 250,
+            "height": 1600
+          },
+          "estimated_size": "0.6m x 0.2m x 1.6m",
+          "precise_coordinates": "(3825mm, 2800mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.655694",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial8.png",
+      "file_size": 6492525,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Industrial",
+      "image_id": "Industrial9.png",
+      "style": "인더스트리얼",
+      "image_number": 9,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "인더스트리얼 스타일의 개방감 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "메탈 커피테이블",
+          "position": "소파 앞",
+          "material": "스틸",
+          "color": "블랙",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1575.0,
+            "width": 1300,
+            "depth": 700,
+            "height": 400
+          },
+          "estimated_size": "1.3m x 0.7m x 0.4m",
+          "precise_coordinates": "(1750mm, 1575mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "인더스트리얼 선반",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "러스트",
+          "coordinates": {
+            "center_x": 2975.0,
+            "center_y": 3150.0,
+            "width": 600,
+            "depth": 250,
+            "height": 1600
+          },
+          "estimated_size": "0.6m x 0.2m x 1.6m",
+          "precise_coordinates": "(2975mm, 3150mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "다크 그레이",
+        "블랙",
+        "러스트",
+        "로우 메탈"
+      ],
+      "materials": [
+        "노출 벽돌",
+        "스틸",
+        "콘크리트",
+        "가죽"
+      ],
+      "mood": "도시적이고 날카로운, 로우 캐릭터",
+      "lighting": "펜던트 조명, 에디슨 전구",
+      "style_elements": [
+        "노출 벽돌/파이프",
+        "메탈 소재",
+        "다크 톤",
+        "빈티지 조명"
+      ],
+      "spatial_relationships": "개방감을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.762321",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Industrial9.png",
+      "file_size": 6257379,
+      "concept_keywords": {
+        "style_description": "인더스트리얼",
+        "key_elements": [
+          "노출 벽돌/파이프",
+          "메탈 소재",
+          "다크 톤",
+          "빈티지 조명"
+        ],
+        "materials": [
+          "노출 벽돌",
+          "스틸",
+          "콘크리트",
+          "가죽"
+        ],
+        "colors": [
+          "다크 그레이",
+          "블랙",
+          "러스트",
+          "로우 메탈"
+        ],
+        "mood": "도시적이고 날카로운, 로우 캐릭터",
+        "furniture_style": "로우 머티리얼, 메탈 프레임, 빈티지",
+        "typical_rooms": [
+          "거실",
+          "서재",
+          "다이닝"
+        ],
+        "lighting": "펜던트 조명, 에디슨 전구",
+        "layout_principles": [
+          "개방감",
+          "기능성",
+          "원시적 미학"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist1.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 1,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "침실",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "모던 소파",
+          "position": "중앙",
+          "material": "패브릭",
+          "color": "라이트 그레이",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2700.0,
+            "width": 2000,
+            "depth": 800,
+            "height": 800
+          },
+          "estimated_size": "2.0m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2700mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "글래스 커피테이블",
+          "position": "소파 앞",
+          "material": "유리",
+          "color": "투명",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1575.0,
+            "width": 1200,
+            "depth": 600,
+            "height": 400
+          },
+          "estimated_size": "1.2m x 0.6m x 0.4m",
+          "precise_coordinates": "(2000mm, 1575mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.863647",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist1.png",
+      "file_size": 5485879,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist2.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 2,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "서재",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "모던 소파",
+          "position": "중앙",
+          "material": "패브릭",
+          "color": "라이트 그레이",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2400.0,
+            "width": 2000,
+            "depth": 800,
+            "height": 800
+          },
+          "estimated_size": "2.0m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2400mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "미니멀 TV 스탠드",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 200,
+            "width": 1500,
+            "depth": 400,
+            "height": 500
+          },
+          "estimated_size": "1.5m x 0.4m x 0.5m",
+          "precise_coordinates": "(2250mm, 200mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:44.965203",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist2.png",
+      "file_size": 6659764,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist3.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 3,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "글래스 커피테이블",
+          "position": "소파 앞",
+          "material": "유리",
+          "color": "투명",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1575.0,
+            "width": 1200,
+            "depth": 600,
+            "height": 400
+          },
+          "estimated_size": "1.2m x 0.6m x 0.4m",
+          "precise_coordinates": "(1750mm, 1575mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "미니멀 TV 스탠드",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 200,
+            "width": 1500,
+            "depth": 400,
+            "height": 500
+          },
+          "estimated_size": "1.5m x 0.4m x 0.5m",
+          "precise_coordinates": "(1750mm, 200mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.076240",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist3.png",
+      "file_size": 5767241,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist4.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 4,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.0m",
+        "room_type": "침실",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "모던 소파",
+          "position": "중앙",
+          "material": "패브릭",
+          "color": "라이트 그레이",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2400.0,
+            "width": 2000,
+            "depth": 800,
+            "height": 800
+          },
+          "estimated_size": "2.0m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2400mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        },
+        {
+          "name": "글래스 커피테이블",
+          "position": "소파 앞",
+          "material": "유리",
+          "color": "투명",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1400.0,
+            "width": 1200,
+            "depth": 600,
+            "height": 400
+          },
+          "estimated_size": "1.2m x 0.6m x 0.4m",
+          "precise_coordinates": "(2000mm, 1400mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.182942",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist4.png",
+      "file_size": 5780062,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist5.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 5,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.5m",
+        "room_type": "서재",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "모던 소파",
+          "position": "중앙",
+          "material": "패브릭",
+          "color": "라이트 그레이",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2700.0,
+            "width": 2000,
+            "depth": 800,
+            "height": 800
+          },
+          "estimated_size": "2.0m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2700mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        },
+        {
+          "name": "미니멀 TV 스탠드",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 200,
+            "width": 1500,
+            "depth": 400,
+            "height": 500
+          },
+          "estimated_size": "1.5m x 0.4m x 0.5m",
+          "precise_coordinates": "(2250mm, 200mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.284096",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist5.png",
+      "file_size": 5106585,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist6.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 6,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.0m",
+        "room_type": "거실",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "글래스 커피테이블",
+          "position": "소파 앞",
+          "material": "유리",
+          "color": "투명",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1400.0,
+            "width": 1200,
+            "depth": 600,
+            "height": 400
+          },
+          "estimated_size": "1.2m x 0.6m x 0.4m",
+          "precise_coordinates": "(1750mm, 1400mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        },
+        {
+          "name": "미니멀 TV 스탠드",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 200,
+            "width": 1500,
+            "depth": 400,
+            "height": 500
+          },
+          "estimated_size": "1.5m x 0.4m x 0.5m",
+          "precise_coordinates": "(1750mm, 200mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.386367",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist6.png",
+      "file_size": 5491804,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist7.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 7,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "침실",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "모던 소파",
+          "position": "중앙",
+          "material": "패브릭",
+          "color": "라이트 그레이",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2700.0,
+            "width": 2000,
+            "depth": 800,
+            "height": 800
+          },
+          "estimated_size": "2.0m x 0.8m x 0.8m",
+          "precise_coordinates": "(2000mm, 2700mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "글래스 커피테이블",
+          "position": "소파 앞",
+          "material": "유리",
+          "color": "투명",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1575.0,
+            "width": 1200,
+            "depth": 600,
+            "height": 400
+          },
+          "estimated_size": "1.2m x 0.6m x 0.4m",
+          "precise_coordinates": "(2000mm, 1575mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.491814",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist7.png",
+      "file_size": 5790708,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist8.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 8,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "서재",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "모던 소파",
+          "position": "중앙",
+          "material": "패브릭",
+          "color": "라이트 그레이",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2400.0,
+            "width": 2000,
+            "depth": 800,
+            "height": 800
+          },
+          "estimated_size": "2.0m x 0.8m x 0.8m",
+          "precise_coordinates": "(2250mm, 2400mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "미니멀 TV 스탠드",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 200,
+            "width": 1500,
+            "depth": 400,
+            "height": 500
+          },
+          "estimated_size": "1.5m x 0.4m x 0.5m",
+          "precise_coordinates": "(2250mm, 200mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.603808",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist8.png",
+      "file_size": 5678627,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Modern,Minimalist",
+      "image_id": "Modern,Minimalist9.png",
+      "style": "모던 미니멀리스트",
+      "image_number": 9,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "모던 미니멀리스트 스타일의 대칭성 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "글래스 커피테이블",
+          "position": "소파 앞",
+          "material": "유리",
+          "color": "투명",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1575.0,
+            "width": 1200,
+            "depth": 600,
+            "height": 400
+          },
+          "estimated_size": "1.2m x 0.6m x 0.4m",
+          "precise_coordinates": "(1750mm, 1575mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "미니멀 TV 스탠드",
+          "position": "벽면",
+          "material": "메탈",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 200,
+            "width": 1500,
+            "depth": 400,
+            "height": 500
+          },
+          "estimated_size": "1.5m x 0.4m x 0.5m",
+          "precise_coordinates": "(1750mm, 200mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "블랙",
+        "베이지"
+      ],
+      "materials": [
+        "패브릭",
+        "유리",
+        "메탈",
+        "마블"
+      ],
+      "mood": "깔끔하고 정돈된, 세련된",
+      "lighting": "자연광 중심, 간접조명",
+      "style_elements": [
+        "깔끔한 라인",
+        "화이트/그레이",
+        "기하학적 형태",
+        "여백 활용"
+      ],
+      "spatial_relationships": "대칭성을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.719948",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Modern,Minimalist9.png",
+      "file_size": 4853136,
+      "concept_keywords": {
+        "style_description": "모던 미니멀리스트",
+        "key_elements": [
+          "깔끔한 라인",
+          "화이트/그레이",
+          "기하학적 형태",
+          "여백 활용"
+        ],
+        "materials": [
+          "패브릭",
+          "유리",
+          "메탈",
+          "마블"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "블랙",
+          "베이지"
+        ],
+        "mood": "깔끔하고 정돈된, 세련된",
+        "furniture_style": "미니멀리스트, 직선적, 기하학적",
+        "typical_rooms": [
+          "거실",
+          "침실",
+          "서재"
+        ],
+        "lighting": "자연광 중심, 간접조명",
+        "layout_principles": [
+          "대칭성",
+          "여백 활용",
+          "기능성 우선"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian1.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 1,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "다이닝",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 소파",
+          "position": "중앙",
+          "material": "라이트 우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2925.0,
+            "width": 2200,
+            "depth": 900,
+            "height": 850
+          },
+          "estimated_size": "2.2m x 0.9m x 0.8m",
+          "precise_coordinates": "(2000mm, 2925mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "원목 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "내추럴 우드",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1800.0,
+            "width": 1000,
+            "depth": 500,
+            "height": 450
+          },
+          "estimated_size": "1.0m x 0.5m x 0.5m",
+          "precise_coordinates": "(2000mm, 1800mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.821737",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian1.png",
+      "file_size": 5763118,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian2.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 2,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "침실",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 소파",
+          "position": "중앙",
+          "material": "라이트 우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2600.0,
+            "width": 2200,
+            "depth": 900,
+            "height": 850
+          },
+          "estimated_size": "2.2m x 0.9m x 0.8m",
+          "precise_coordinates": "(2250mm, 2600mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "북유럽 책장",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 675.0,
+            "center_y": 3200.0,
+            "width": 800,
+            "depth": 300,
+            "height": 1800
+          },
+          "estimated_size": "0.8m x 0.3m x 1.8m",
+          "precise_coordinates": "(675mm, 3200mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:45.928992",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian2.png",
+      "file_size": 6659764,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian3.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 3,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "원목 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "내추럴 우드",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1800.0,
+            "width": 1000,
+            "depth": 500,
+            "height": 450
+          },
+          "estimated_size": "1.0m x 0.5m x 0.5m",
+          "precise_coordinates": "(1750mm, 1800mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "북유럽 책장",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 525.0,
+            "center_y": 3600.0,
+            "width": 800,
+            "depth": 300,
+            "height": 1800
+          },
+          "estimated_size": "0.8m x 0.3m x 1.8m",
+          "precise_coordinates": "(525mm, 3600mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:46.030378",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian3.png",
+      "file_size": 5935005,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian4.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 4,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.0m",
+        "room_type": "다이닝",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 소파",
+          "position": "중앙",
+          "material": "라이트 우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2600.0,
+            "width": 2200,
+            "depth": 900,
+            "height": 850
+          },
+          "estimated_size": "2.2m x 0.9m x 0.8m",
+          "precise_coordinates": "(2000mm, 2600mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        },
+        {
+          "name": "원목 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "내추럴 우드",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1600.0,
+            "width": 1000,
+            "depth": 500,
+            "height": 450
+          },
+          "estimated_size": "1.0m x 0.5m x 0.5m",
+          "precise_coordinates": "(2000mm, 1600mm)",
+          "room_dimensions": "4000mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:46.132345",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian4.png",
+      "file_size": 5109335,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian5.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 5,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.5m",
+        "room_type": "침실",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 소파",
+          "position": "중앙",
+          "material": "라이트 우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2925.0,
+            "width": 2200,
+            "depth": 900,
+            "height": 850
+          },
+          "estimated_size": "2.2m x 0.9m x 0.8m",
+          "precise_coordinates": "(2250mm, 2925mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        },
+        {
+          "name": "북유럽 책장",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 675.0,
+            "center_y": 3600.0,
+            "width": 800,
+            "depth": 300,
+            "height": 1800
+          },
+          "estimated_size": "0.8m x 0.3m x 1.8m",
+          "precise_coordinates": "(675mm, 3600mm)",
+          "room_dimensions": "4500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:46.250597",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian5.png",
+      "file_size": 5788719,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian6.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 6,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.0m",
+        "room_type": "거실",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "원목 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "내추럴 우드",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1600.0,
+            "width": 1000,
+            "depth": 500,
+            "height": 450
+          },
+          "estimated_size": "1.0m x 0.5m x 0.5m",
+          "precise_coordinates": "(1750mm, 1600mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        },
+        {
+          "name": "북유럽 책장",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 525.0,
+            "center_y": 3200.0,
+            "width": 800,
+            "depth": 300,
+            "height": 1800
+          },
+          "estimated_size": "0.8m x 0.3m x 1.8m",
+          "precise_coordinates": "(525mm, 3200mm)",
+          "room_dimensions": "3500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:46.361453",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian6.png",
+      "file_size": 5168831,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian7.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 7,
+      "room_analysis": {
+        "estimated_size": "4.0m x 4.5m",
+        "room_type": "다이닝",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 소파",
+          "position": "중앙",
+          "material": "라이트 우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 2925.0,
+            "width": 2200,
+            "depth": 900,
+            "height": 850
+          },
+          "estimated_size": "2.2m x 0.9m x 0.8m",
+          "precise_coordinates": "(2000mm, 2925mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        },
+        {
+          "name": "원목 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "내추럴 우드",
+          "coordinates": {
+            "center_x": 2000.0,
+            "center_y": 1800.0,
+            "width": 1000,
+            "depth": 500,
+            "height": 450
+          },
+          "estimated_size": "1.0m x 0.5m x 0.5m",
+          "precise_coordinates": "(2000mm, 1800mm)",
+          "room_dimensions": "4000mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:46.463072",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian7.png",
+      "file_size": 5368162,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian8.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 8,
+      "room_analysis": {
+        "estimated_size": "4.5m x 4.0m",
+        "room_type": "침실",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "우드 소파",
+          "position": "중앙",
+          "material": "라이트 우드",
+          "color": "내추럴",
+          "coordinates": {
+            "center_x": 2250.0,
+            "center_y": 2600.0,
+            "width": 2200,
+            "depth": 900,
+            "height": 850
+          },
+          "estimated_size": "2.2m x 0.9m x 0.8m",
+          "precise_coordinates": "(2250mm, 2600mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        },
+        {
+          "name": "북유럽 책장",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 675.0,
+            "center_y": 3200.0,
+            "width": 800,
+            "depth": 300,
+            "height": 1800
+          },
+          "estimated_size": "0.8m x 0.3m x 1.8m",
+          "precise_coordinates": "(675mm, 3200mm)",
+          "room_dimensions": "4500mm x 4000mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:46.571266",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian8.png",
+      "file_size": 6344038,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    },
+    {
+      "success": true,
+      "concept": "Scandinavian",
+      "image_id": "Scandinavian9.png",
+      "style": "스칸디나비아/북유럽",
+      "image_number": 9,
+      "room_analysis": {
+        "estimated_size": "3.5m x 4.5m",
+        "room_type": "거실",
+        "layout_description": "스칸디나비아/북유럽 스타일의 자연스러움 중심 배치"
+      },
+      "furniture": [
+        {
+          "name": "원목 커피테이블",
+          "position": "소파 앞",
+          "material": "우드",
+          "color": "내추럴 우드",
+          "coordinates": {
+            "center_x": 1750.0,
+            "center_y": 1800.0,
+            "width": 1000,
+            "depth": 500,
+            "height": 450
+          },
+          "estimated_size": "1.0m x 0.5m x 0.5m",
+          "precise_coordinates": "(1750mm, 1800mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        },
+        {
+          "name": "북유럽 책장",
+          "position": "벽면",
+          "material": "우드",
+          "color": "화이트",
+          "coordinates": {
+            "center_x": 525.0,
+            "center_y": 3600.0,
+            "width": 800,
+            "depth": 300,
+            "height": 1800
+          },
+          "estimated_size": "0.8m x 0.3m x 1.8m",
+          "precise_coordinates": "(525mm, 3600mm)",
+          "room_dimensions": "3500mm x 4500mm"
+        }
+      ],
+      "colors": [
+        "화이트",
+        "라이트 그레이",
+        "내추럴 우드",
+        "소프트 파스텔"
+      ],
+      "materials": [
+        "라이트 우드",
+        "울",
+        "코튼",
+        "세라믹"
+      ],
+      "mood": "포근하고 따뜻한, 휘게 느낌",
+      "lighting": "자연광 최대 활용, 따뜻한 조명",
+      "style_elements": [
+        "자연광",
+        "우드 소재",
+        "화이트/베이지",
+        "심플한 가구"
+      ],
+      "spatial_relationships": "자연스러움을 고려한 가구 배치로 공간의 조화를 이룸",
+      "analyzed_at": "2025-08-06T11:21:46.672483",
+      "image_path": "C:\\Users\\kibwa07\\Documents\\GitHub\\final_project\\ai-interior\\image\\Scandinavian9.png",
+      "file_size": 5256934,
+      "concept_keywords": {
+        "style_description": "스칸디나비아/북유럽",
+        "key_elements": [
+          "자연광",
+          "우드 소재",
+          "화이트/베이지",
+          "심플한 가구"
+        ],
+        "materials": [
+          "라이트 우드",
+          "울",
+          "코튼",
+          "세라믹"
+        ],
+        "colors": [
+          "화이트",
+          "라이트 그레이",
+          "내추럴 우드",
+          "소프트 파스텔"
+        ],
+        "mood": "포근하고 따뜻한, 휘게 느낌",
+        "furniture_style": "기능적, 심플, 유기적 형태",
+        "typical_rooms": [
+          "거실",
+          "다이닝",
+          "침실"
+        ],
+        "lighting": "자연광 최대 활용, 따뜻한 조명",
+        "layout_principles": [
+          "자연스러움",
+          "실용성",
+          "편안함"
+        ]
+      },
+      "analysis_method": "metadata_based"
+    }
+  ]
+}

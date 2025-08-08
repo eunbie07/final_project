@@ -192,6 +192,8 @@ export default function RoomBox({
     setShowCollisions,
     showWindows,
     setShowWindows,
+    showHuman,
+    setShowHuman,
     placementMode,
     setPlacementMode,
     activeView,
@@ -287,6 +289,107 @@ export default function RoomBox({
       showError('방 데이터 저장에 실패했습니다. 다시 시도해주세요.');
     }
   }, [w, h, d, furniture, navigate, showInfo, showSuccess, showError]);
+
+  // 3D 캡처 관련 상태
+  const [capturedScreenshot, setCapturedScreenshot] = useState(null);
+  const canvasRef = useRef();
+
+  // 캡처된 이미지를 파일로 다운로드하는 함수
+  const downloadCapturedImage = (dataURL, screenshotData) => {
+    try {
+      // 파일명 생성 (타임스탬프 + 선택된 가구 정보)
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const selectedFurnitureName = screenshotData.selectedFurniture?.name || 'no-selection';
+      const filename = `3d-capture-${selectedFurnitureName}-${timestamp}.png`;
+
+      // Blob 생성
+      const byteCharacters = atob(dataURL.split(',')[1]);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+
+      // 다운로드 링크 생성
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = filename;
+      
+      // 자동 다운로드 실행
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // URL 정리
+      URL.revokeObjectURL(downloadLink.href);
+      
+      console.log(`📸 3D 캡처 이미지 저장 완료: ${filename}`);
+      return true;
+    } catch (error) {
+      console.error('이미지 저장 실패:', error);
+      return false;
+    }
+  };
+
+  // 3D 화면 캡처 핸들러
+  const handle3DCapture = useCallback(() => {
+    try {
+      // Canvas 요소 찾기 (React Three Fiber의 Canvas)
+      const canvasElement = document.querySelector('canvas');
+      
+      if (!canvasElement) {
+        showError('3D 캔버스를 찾을 수 없습니다');
+        return;
+      }
+
+      showInfo('3D 화면을 캡처하고 있습니다...');
+
+      // Canvas에서 이미지 데이터 추출
+      const dataURL = canvasElement.toDataURL('image/png', 0.9);
+      
+      // 캡처된 스크린샷 데이터 생성
+      const screenshotData = {
+        imageData: dataURL,
+        timestamp: new Date().toISOString(),
+        furniture: furniture.map(f => ({
+          id: f.id,
+          type: f.type,
+          name: f.name,
+          position: f.position,
+          size: f.size,
+          selected: f.id === selectedFurniture
+        })),
+        selectedFurniture: selectedFurniture ? furniture.find(f => f.id === selectedFurniture) : null,
+        roomSize: [w, h, d],
+        canvasSize: {
+          width: canvasElement.width,
+          height: canvasElement.height
+        }
+      };
+
+      setCapturedScreenshot(screenshotData);
+      
+      // 로컬 스토리지에 캡처 데이터 저장
+      localStorage.setItem('capturedScreenshot', JSON.stringify(screenshotData));
+      
+      // 캡처된 이미지를 파일로 자동 저장
+      const success = downloadCapturedImage(dataURL, screenshotData);
+      
+      showSuccess(`3D 화면 캡처 완료! ${furniture.length}개 가구 감지됨${success ? ' (이미지 저장됨)' : ''}`);
+      
+      // 스타일 변경 패널로 데이터 전달
+      if (selectedFurniture) {
+        showInfo(`선택된 가구: ${screenshotData.selectedFurniture?.name || '없음'} - AI 인테리어 페이지에서 스타일을 변경할 수 있습니다`);
+      } else {
+        showWarning('가구를 먼저 선택한 후 스타일을 변경할 수 있습니다');
+      }
+
+    } catch (error) {
+      console.error('3D 캡처 실패:', error);
+      showError('3D 화면 캡처에 실패했습니다');
+    }
+  }, [furniture, selectedFurniture, w, h, d, showInfo, showSuccess, showError, showWarning]);
 
   // 3D 모델 사용 상태
   const [use3DModels, setUse3DModels] = useState(false);
@@ -1330,6 +1433,17 @@ export default function RoomBox({
                 3D 모델
               </span>
             </label>
+            <label className="flex items-center gap-2 group cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showHuman}
+                onChange={(e) => setShowHuman(e.target.checked)}
+                className="w-3 h-3 text-primary bg-background border-border rounded focus:ring-primary focus:ring-1"
+              />
+              <span className="text-text-primary group-hover:text-primary transition-colors duration-200">
+                사람 표시
+              </span>
+            </label>
           </div>
         </div>
       </div>
@@ -1793,13 +1907,15 @@ export default function RoomBox({
               <WindowsOnWalls windows={detectedWindows} roomSize={roomSize} />
             )}
 
-            <DraggableHuman
-              height={170}
-              position={humanPosition}
-              onPositionChange={setHumanPosition}
-              roomSize={roomSize}
-              onDragStateChange={setIsDragging}
-            />
+            {showHuman && (
+              <DraggableHuman
+                height={170}
+                position={humanPosition}
+                onPositionChange={setHumanPosition}
+                roomSize={roomSize}
+                onDragStateChange={setIsDragging}
+              />
+            )}
 
             <DistanceMeasurer
               point1={measurePoints[0]}
@@ -2070,8 +2186,59 @@ export default function RoomBox({
       {/* Toast 알림 */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
 
-      {/* AI 인테리어 생성 버튼 - 우측 하단 */}
-      <div className="absolute bottom-4 right-4 z-20">
+      {/* AI 인테리어 생성 및 3D 캡처 버튼들 - 우측 하단 */}
+      <div className="absolute bottom-4 right-4 z-20 space-y-3">
+        {/* 3D 화면 캡처 버튼 */}
+        <button
+          onClick={handle3DCapture}
+          disabled={furniture.length === 0}
+          className="group flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <div className="p-2 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </div>
+          <div className="text-left">
+            <div className="font-bold text-sm">3D 화면 캡처</div>
+            <div className="text-xs text-white/80">가구 스타일 변경용</div>
+          </div>
+        </button>
+
+        {/* 캡처된 이미지 미리보기 */}
+        {capturedScreenshot && (
+          <div className="bg-white rounded-xl shadow-lg p-3 max-w-[200px]">
+            <div className="text-xs font-medium text-gray-600 mb-2">📸 캡처된 이미지</div>
+            <img
+              src={capturedScreenshot.imageData}
+              alt="캡처된 3D 화면"
+              className="w-full h-auto rounded-lg border border-gray-200"
+            />
+            <div className="text-xs text-gray-500 mt-2">
+              {capturedScreenshot.selectedFurniture?.name || '가구 미선택'}
+              <br />
+              <span className="text-green-600">저장됨 ✓</span>
+            </div>
+          </div>
+        )}
+
+        {/* AI 인테리어 생성 버튼 */}
         <button
           onClick={handleAIInteriorGenerate}
           className="group flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"

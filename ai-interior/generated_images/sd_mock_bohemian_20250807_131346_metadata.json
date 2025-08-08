@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-08-07T13:13:46.334317",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 198.87109375,
+      "center_z": 248.2,
+      "id": "Bed"
+    }
+  ],
+  "room_dimensions": {
+    "width": 4.026,
+    "height": 4.75
+  },
+  "style": "bohemian",
+  "prompt": "Korean bohemian interior design, warm earth tones, Korean textile elements, eclectic Korean decorative elements, cozy Korean home atmosphere\n\nCRITICAL FURNITURE PLACEMENT INSTRUCTIONS:\nbed positioned at coordinates X=0.20m, Z=0.25m\n\nMANDATORY REQUIREMENTS:\n- Place each furniture item at the EXACT coordinates specified above\n- Do not follow conventional placement rules (e.g., beds against walls)\n- Maintain realistic scale and proportions\n- Ensure all furniture is clearly visible and positioned precisely\n- Create photorealistic lighting and shadows\n\nprecise furniture placement, photorealistic interior\n\nHigh quality, masterpiece, photorealistic interior photography, professional lighting, 8k resolution",
+  "settings": {
+    "num_inference_steps": 1,
+    "guidance_scale": 7.5,
+    "controlnet_conditioning_scale": 1.0,
+    "width": 512,
+    "height": 512
+  },
+  "model_id": "runwayml/stable-diffusion-v1-5",
+  "controlnet_model": "lllyasviel/sd-controlnet-canny",
+  "device": "cpu",
+  "use_controlnet": true,
+  "use_mask": true,
+  "mock_mode": true
+}

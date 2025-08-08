@@ -1,0 +1,33 @@
+{
+  "mask_type": "canny",
+  "timestamp": "2025-08-07T05:07:05.175563",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 2000,
+      "center_z": 2000,
+      "id": "bed_center"
+    }
+  ],
+  "room_dimensions": {
+    "width": 4.0,
+    "height": 4.0
+  },
+  "image_dimensions": {
+    "width": 1024,
+    "height": 1024
+  },
+  "mask_colors": {
+    "furniture": [
+      255,
+      255,
+      255
+    ],
+    "background": [
+      0,
+      0,
+      0
+    ]
+  },
+  "furniture_count": 1
+}

@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-08-07T16:55:58.653297",
+  "image_path": "generated_images\\vertex_modern_20250807_165558.png",
+  "original_prompt": "\nPhotoreal modern Korean apartment bedroom:\n- Exact room dimensions: 3.9m width × 4.5m depth × 2.8m height\n- ONE SINGLE Bed ONLY at precise location:\n  • EXACT coordinates: X=1.92m, Z=2.24m (from origin)\n  • Furniture size: 2.0m × 1.2m  \n  • PRECISE wall distances: 0.92m (left), 0.94m (right), 1.64m (front), 1.62m (back)\n  • MANDATORY: Place furniture at EXACTLY X=1.92m, Z=2.24m\n  • Rotation: 0°\n\n🎯 UNUSUAL FURNITURE PLACEMENT REQUIRED:\n• This is NOT a typical bedroom layout - bed is placed in UNUSUAL POSITION\n• Bed is INTENTIONALLY placed in the MIDDLE OF ROOM (not against wall)\n• EXACT position: X=1.92m from left wall, Z=2.24m from front wall\n• Create a MODERN ARTISTIC ROOM where bed floats in center with space all around\n• Think \"minimalist exhibition\" or \"modern art installation\" - NOT traditional bedroom\n• The unusual center placement is INTENTIONAL and REQUIRED\n• Show open floor space on ALL SIDES of the bed\n\nADDITIONAL RULES:\n- SHOW EXACTLY ONE FURNITURE ITEM: Bed\n- NO additional furniture, accessories, or decorations\n- EMPTY floor space all around the furniture\n            \n\n💡 SPATIAL EMBEDDING GUIDANCE:\nROOM SPATIAL ANALYSIS:\n- Room Size: 385.8cm × 445.8cm × 230.0cm\n- Room Center Point: (192.9cm, 222.9cm)\n- Total Floor Area: 17.20㎡\n\nCRITICAL FURNITURE POSITIONING:\n- BED PLACEMENT:\n  EXACT COORDINATES: X=192.3cm, Z=224.1cm\n  RELATIVE POSITION: (0.498, 0.503) where (0.5,0.5)=center\n  CENTER DISTANCE: 0.003 (0.0=perfect center, 0.5+=edge)\n  PLACEMENT TYPE: PERFECT CENTER\n  WALL CLEARANCES: Left=192.3cm, Right=193.5cm\n  POSITIONING INSTRUCTION: Place Bed EXACTLY at coordinates (192.3, 224.1) - THIS IS PERFECT CENTER\n\nCRITICAL CONSTRAINTS - MUST FOLLOW EXACTLY:\n1. FURNITURE LIMITATION: Show ONLY the furniture items specified in the layout above\n2. NO ADDITIONAL ITEMS: Do not add tables, chairs, decorations, plants, or any other objects\n3. EXACT FURNITURE COUNT: The image must contain exactly the number of furniture items specified\n4. ROOM TYPE: If bed is specified, this is a BEDROOM. If sofa is specified, this is a LIVING ROOM\n\nSTYLE REFERENCE (based on 9 successful modern examples - STYLE ONLY):\n- Color palette: 베이지, 화이트, 블랙, 라이트 그레이\n- Materials: 유리, 마블, 패브릭, 메탈\n- Lighting: 자연광 중심, 간접조명\n- Mood: 깔끔하고 정돈된, 세련된\n- NO REFERENCE TO SPECIFIC FURNITURE ITEMS FROM EXAMPLES\n\nVIOLATION WARNING: Any additional furniture beyond what is specified will be considered incorrect\n",
+  "style": "modern",
+  "verification_result": {
+    "is_accurate": true,
+    "furniture_count_correct": true,
+    "position_accuracy": 0.7,
+    "detected_furniture": [
+      {
+        "name": "Bed",
+        "confidence": 0.5
+      }
+    ],
+    "issues": [],
+    "confidence": 0.7,
+    "verification_method": "basic_analysis"
+  }
+}

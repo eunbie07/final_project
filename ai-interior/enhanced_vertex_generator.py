@@ -263,18 +263,81 @@ class EnhancedVertexGenerator:
         return await self._generate_mock_image(style, filename)
 
     async def _generate_mock_image(self, style: str, filename: str) -> Dict[str, Any]:
-        """Mock 이미지 생성 (테스트용)"""
+        """Mock 이미지 생성 (테스트용) - 실제 PNG 파일 생성"""
         await asyncio.sleep(1)  # 시뮬레이션
         
-        mock_path = os.path.join(self.output_dir, f"mock_{filename}")
-        
-        return {
-            "success": True,
-            "image_path": mock_path,
-            "method": "mock",
-            "style": style,
-            "note": "실제 AI 서비스를 사용할 수 없어 Mock 결과를 반환했습니다"
-        }
+        try:
+            # generated_images 디렉토리 생성
+            os.makedirs(self.output_dir, exist_ok=True)
+            
+            # 실제 PNG 파일 생성
+            from PIL import Image, ImageDraw, ImageFont
+            
+            # 768x512 이미지 생성 (16:9 비율)
+            img = Image.new('RGB', (768, 512), color=(240, 240, 245))
+            draw = ImageDraw.Draw(img)
+            
+            # 제목
+            title = f"Enhanced Vertex AI {style.title()}"
+            
+            # 폰트 설정
+            try:
+                font_large = ImageFont.truetype("arial.ttf", 28)
+                font_medium = ImageFont.truetype("arial.ttf", 18)
+                font_small = ImageFont.truetype("arial.ttf", 14)
+            except:
+                font_large = font_medium = font_small = ImageFont.load_default()
+            
+            # 제목
+            draw.text((384, 30), title, font=font_large, fill=(50, 50, 100), anchor="mt")
+            
+            # 방 표현
+            room_colors = {
+                'modern': (250, 250, 250),
+                'scandinavian': (248, 245, 240),
+                'industrial': (230, 230, 235),
+                'cozy': (245, 240, 235)
+            }
+            room_color = room_colors.get(style, (245, 245, 245))
+            draw.rectangle([50, 80, 718, 400], fill=room_color, outline=(100, 100, 100), width=2)
+            
+            # 가구 표현 (간단한 도형들)
+            furniture_positions = [(150, 200), (350, 220), (550, 200)]
+            for i, (x, y) in enumerate(furniture_positions):
+                draw.rectangle([x, y, x+80, y+60], fill=(150, 100, 80), outline=(120, 80, 60), width=2)
+                draw.text((x+40, y+70), f"Item{i+1}", font=font_small, fill=(80, 80, 80), anchor="mt")
+            
+            # Mock 표시
+            draw.text((384, 420), "Enhanced Vertex AI Mock", font=font_medium, fill=(100, 100, 100), anchor="mt")
+            draw.text((384, 450), f"Style: {style}", font=font_small, fill=(120, 120, 120), anchor="mt")
+            draw.text((384, 470), "실제 AI 생성이 아닙니다", font=font_small, fill=(100, 100, 100), anchor="mt")
+            
+            # 파일 저장
+            mock_filename = f"mock_enhanced_{style}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            mock_path = os.path.join(self.output_dir, mock_filename)
+            img.save(mock_path, "PNG")
+            
+            print(f"Mock 이미지 파일 생성 완료: {mock_path}")
+            
+            return {
+                "success": True,
+                "image_path": mock_path,
+                "method": "mock",
+                "style": style,
+                "note": "실제 AI 서비스를 사용할 수 없어 Mock 결과를 반환했습니다"
+            }
+            
+        except Exception as e:
+            print(f"ERROR: Mock 이미지 생성 실패: {e}")
+            # 빈 경로라도 반환
+            mock_path = os.path.join(self.output_dir, f"mock_{filename}")
+            return {
+                "success": False,
+                "error": f"Mock 이미지 생성 실패: {e}",
+                "image_path": mock_path,
+                "method": "mock",
+                "style": style
+            }
 
     def create_style_reference_images(self, style: str) -> List[Dict[str, Any]]:
         """스타일별 참조 이미지 생성"""

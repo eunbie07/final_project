@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-07T14:10:27.310879",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 1988,
+      "center_z": 2480,
+      "id": "center_bed_test"
+    }
+  ],
+  "room_dimensions": {
+    "width": 4.026,
+    "height": 4.75
+  },
+  "style": "scandinavian",
+  "prompt": "Korean-style Scandinavian minimalist bedroom with ondol floor heating system, light wood floors, white walls, natural lighting, Korean furniture proportions\n\nCRITICAL FURNITURE PLACEMENT INSTRUCTIONS:\nRoom dimensions: 4.026m x 4.75m\n\nEXACT FURNITURE POSITIONS (MUST FOLLOW PRECISELY):\n• bed floating in the exact CENTER of the room, not touching any walls\n\nCRITICAL PLACEMENT REQUIREMENTS:\n- Furniture MUST float in the middle of the room, NOT touching any walls\n- Create OPEN FLOOR SPACE around all furniture pieces\n- Furniture should appear ISOLATED in the center with clear gaps from walls\n- NO wall-mounted or wall-adjacent furniture placement\n- Show furniture clearly SEPARATED from walls on all sides\n- Think \"furniture island in open space\" concept\n\nVISUAL REQUIREMENTS:\n- Show exactly 1 piece(s) of furniture\n- Korean minimalist interior with FLOATING furniture layout\n- Clean, open space design with furniture NOT against walls\n- NO measurement lines, grids, or dimension markings\n- Professional interior photography showing spatial separation\n- Korean aesthetic with emphasis on open floor space\n- Furniture appears to \"float\" in room center surrounded by empty space\n\nADDITIONAL: precise center placement test",
+  "generator": "dalle-3",
+  "mock_mode": false
+}

@@ -1,0 +1,3893 @@
+[
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 4.0m × 4.8m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3989,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3989,
+            0
+          ],
+          "end": [
+            3989,
+            4789
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3989,
+            4789
+          ],
+          "end": [
+            0,
+            4789
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4789
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3989,
+        "depth": 4789,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "furniture",
+          "name": "소파",
+          "material": "#87CEEB",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2750,
+              "y": 1000,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 1850,
+                "y": 600
+              },
+              "top_right": {
+                "x": 3650,
+                "y": 1400
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1800,
+            "depth": 800,
+            "height": 850
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-07-28T17:52:52.978877",
+    "updated_at": "2025-07-28T17:52:52.978877"
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.8m × 4.5m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3805,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3805,
+            0
+          ],
+          "end": [
+            3805,
+            4544
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3805,
+            4544
+          ],
+          "end": [
+            0,
+            4544
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4544
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3805,
+        "depth": 4544,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "furniture",
+          "name": "소파",
+          "material": "#87CEEB",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2905,
+              "y": 2742,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2005,
+                "y": 2342
+              },
+              "top_right": {
+                "x": 3805,
+                "y": 3142
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1800,
+            "depth": 800,
+            "height": 850
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 1641,
+              "y": 1470,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 1041,
+                "y": 1170
+              },
+              "top_right": {
+                "x": 2241,
+                "y": 1770
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:23:58.880939",
+    "updated_at": "2025-07-29T13:23:58.880939",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.6m × 4.5m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3558,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3558,
+            0
+          ],
+          "end": [
+            3558,
+            4496
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3558,
+            4496
+          ],
+          "end": [
+            0,
+            4496
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4496
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3558,
+        "depth": 4496,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2040,
+            "depth": 50,
+            "height": 880
+          },
+          "position": {
+            "x": 1507,
+            "y": 0,
+            "z": 1495
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "침대",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "의자",
+          "material": "#90EE90",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2750,
+              "y": 2300,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2500,
+                "y": 2050
+              },
+              "top_right": {
+                "x": 3000,
+                "y": 2550
+              }
+            }
+          },
+          "dimensions": {
+            "width": 500,
+            "depth": 500,
+            "height": 850
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2908,
+              "y": 3000,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2308,
+                "y": 2700
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 3300
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "옷장",
+          "material": "#DDA0DD",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3108,
+              "y": 350,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2708,
+                "y": 50
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 650
+              }
+            }
+          },
+          "dimensions": {
+            "width": 800,
+            "depth": 600,
+            "height": 2000
+          },
+          "rotation_z": 2
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:53:22.561977",
+    "updated_at": "2025-07-29T13:53:22.561977",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.6m × 4.5m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3558,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3558,
+            0
+          ],
+          "end": [
+            3558,
+            4496
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3558,
+            4496
+          ],
+          "end": [
+            0,
+            4496
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4496
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3558,
+        "depth": 4496,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2000,
+            "depth": 50,
+            "height": 950
+          },
+          "position": {
+            "x": 1507,
+            "y": 0,
+            "z": 1725
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "침대",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "의자",
+          "material": "#90EE90",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2750,
+              "y": 2300,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2500,
+                "y": 2050
+              },
+              "top_right": {
+                "x": 3000,
+                "y": 2550
+              }
+            }
+          },
+          "dimensions": {
+            "width": 500,
+            "depth": 500,
+            "height": 850
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2908,
+              "y": 3000,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2308,
+                "y": 2700
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 3300
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "옷장",
+          "material": "#DDA0DD",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3108,
+              "y": 350,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2708,
+                "y": 50
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 650
+              }
+            }
+          },
+          "dimensions": {
+            "width": 800,
+            "depth": 600,
+            "height": 2000
+          },
+          "rotation_z": 2
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:54:08.351345",
+    "updated_at": "2025-07-29T13:54:08.351345",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.6m × 4.5m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3558,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3558,
+            0
+          ],
+          "end": [
+            3558,
+            4496
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3558,
+            4496
+          ],
+          "end": [
+            0,
+            4496
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4496
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3558,
+        "depth": 4496,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2080,
+            "depth": 50,
+            "height": 950
+          },
+          "position": {
+            "x": 1507,
+            "y": 0,
+            "z": 1725
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "침대",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "의자",
+          "material": "#90EE90",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2750,
+              "y": 2300,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2500,
+                "y": 2050
+              },
+              "top_right": {
+                "x": 3000,
+                "y": 2550
+              }
+            }
+          },
+          "dimensions": {
+            "width": 500,
+            "depth": 500,
+            "height": 850
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2908,
+              "y": 3000,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2308,
+                "y": 2700
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 3300
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "옷장",
+          "material": "#DDA0DD",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3108,
+              "y": 350,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2708,
+                "y": 50
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 650
+              }
+            }
+          },
+          "dimensions": {
+            "width": 800,
+            "depth": 600,
+            "height": 2000
+          },
+          "rotation_z": 2
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:55:07.064614",
+    "updated_at": "2025-07-29T13:55:07.064614",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.6m × 4.5m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3558,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3558,
+            0
+          ],
+          "end": [
+            3558,
+            4496
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3558,
+            4496
+          ],
+          "end": [
+            0,
+            4496
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4496
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3558,
+        "depth": 4496,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2080,
+            "depth": 50,
+            "height": 950
+          },
+          "position": {
+            "x": 1507,
+            "y": 0,
+            "z": 1725
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "침대",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "의자",
+          "material": "#90EE90",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2750,
+              "y": 2300,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2500,
+                "y": 2050
+              },
+              "top_right": {
+                "x": 3000,
+                "y": 2550
+              }
+            }
+          },
+          "dimensions": {
+            "width": 500,
+            "depth": 500,
+            "height": 850
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2908,
+              "y": 3000,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2308,
+                "y": 2700
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 3300
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "옷장",
+          "material": "#DDA0DD",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3108,
+              "y": 350,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2708,
+                "y": 50
+              },
+              "top_right": {
+                "x": 3508,
+                "y": 650
+              }
+            }
+          },
+          "dimensions": {
+            "width": 800,
+            "depth": 600,
+            "height": 2000
+          },
+          "rotation_z": 2
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:55:16.389688",
+    "updated_at": "2025-07-29T13:55:16.389688",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.9m × 4.6m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3928,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3928,
+            0
+          ],
+          "end": [
+            3928,
+            4609
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3928,
+            4609
+          ],
+          "end": [
+            0,
+            4609
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4609
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3928,
+        "depth": 4609,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2780,
+            "depth": 50,
+            "height": 840
+          },
+          "position": {
+            "x": 1664,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:55:59.281156",
+    "updated_at": "2025-07-29T13:55:59.281156",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.9m × 4.6m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3928,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3928,
+            0
+          ],
+          "end": [
+            3928,
+            4609
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3928,
+            4609
+          ],
+          "end": [
+            0,
+            4609
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4609
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3928,
+        "depth": 4609,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2780,
+            "depth": 50,
+            "height": 840
+          },
+          "position": {
+            "x": 1664,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:56:09.424906",
+    "updated_at": "2025-07-29T13:56:09.424906",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.9m × 4.6m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3928,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3928,
+            0
+          ],
+          "end": [
+            3928,
+            4609
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3928,
+            4609
+          ],
+          "end": [
+            0,
+            4609
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4609
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3928,
+        "depth": 4609,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2780,
+            "depth": 50,
+            "height": 840
+          },
+          "position": {
+            "x": 1664,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:56:42.293137",
+    "updated_at": "2025-07-29T13:56:42.293137",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.9m × 4.6m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3928,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3928,
+            0
+          ],
+          "end": [
+            3928,
+            4609
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3928,
+            4609
+          ],
+          "end": [
+            0,
+            4609
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4609
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3928,
+        "depth": 4609,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2780,
+            "depth": 50,
+            "height": 840
+          },
+          "position": {
+            "x": 1664,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 1250,
+              "y": 3250,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 650,
+                "y": 2950
+              },
+              "top_right": {
+                "x": 1850,
+                "y": 3550
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:56:53.783335",
+    "updated_at": "2025-07-29T13:56:53.783335",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 4.1m × 5.2m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            4102,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            4102,
+            0
+          ],
+          "end": [
+            4102,
+            5161
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            4102,
+            5161
+          ],
+          "end": [
+            0,
+            5161
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            5161
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 4102,
+        "depth": 5161,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2000,
+            "depth": 50,
+            "height": 710
+          },
+          "position": {
+            "x": 1737,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "침대",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "테이블",
+          "material": "#B0E0E6",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3500,
+              "y": 300,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 3000,
+                "y": 50
+              },
+              "top_right": {
+                "x": 4000,
+                "y": 550
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1000,
+            "depth": 500,
+            "height": 450
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:58:29.176004",
+    "updated_at": "2025-07-29T13:58:29.176004",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.4m × 4.4m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3424,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3424,
+            0
+          ],
+          "end": [
+            3424,
+            4445
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3424,
+            4445
+          ],
+          "end": [
+            0,
+            4445
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4445
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3424,
+        "depth": 4445,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2000,
+            "depth": 50,
+            "height": 1600
+          },
+          "position": {
+            "x": 1450,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "소파",
+          "material": "#87CEEB",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2524,
+              "y": 2851,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 1624,
+                "y": 2451
+              },
+              "top_right": {
+                "x": 3424,
+                "y": 3251
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1800,
+            "depth": 800,
+            "height": 850
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-07-29T13:59:21.123665",
+    "updated_at": "2025-07-29T13:59:21.123665",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.9m × 4.4m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3906,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3906,
+            0
+          ],
+          "end": [
+            3906,
+            4428
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3906,
+            4428
+          ],
+          "end": [
+            0,
+            4428
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4428
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3906,
+        "depth": 4428,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2000,
+            "depth": 50,
+            "height": 1600
+          },
+          "position": {
+            "x": 1654,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "옷장",
+          "material": "#DDA0DD",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3000,
+              "y": 1750,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2600,
+                "y": 1450
+              },
+              "top_right": {
+                "x": 3400,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 800,
+            "depth": 600,
+            "height": 2000
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-07-29T14:07:39.775868",
+    "updated_at": "2025-07-29T14:07:39.775868",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.8m × 4.8m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3816,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3816,
+            0
+          ],
+          "end": [
+            3816,
+            4782
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3816,
+            4782
+          ],
+          "end": [
+            0,
+            4782
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4782
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3816,
+        "depth": 4782,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "furniture",
+          "name": "침대",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3166,
+              "y": 350,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2566,
+                "y": 50
+              },
+              "top_right": {
+                "x": 3766,
+                "y": 650
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "의자",
+          "material": "#90EE90",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3166,
+              "y": 1500,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2916,
+                "y": 1250
+              },
+              "top_right": {
+                "x": 3416,
+                "y": 1750
+              }
+            }
+          },
+          "dimensions": {
+            "width": 500,
+            "depth": 500,
+            "height": 850
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "옷장",
+          "material": "#DDA0DD",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3366,
+              "y": 3750,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2966,
+                "y": 3450
+              },
+              "top_right": {
+                "x": 3766,
+                "y": 4050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 800,
+            "depth": 600,
+            "height": 2000
+          },
+          "rotation_z": 2
+        }
+      ]
+    },
+    "created_at": "2025-07-29T14:57:32.755644",
+    "updated_at": "2025-07-29T14:57:32.755644",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.8m × 4.8m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3816,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3816,
+            0
+          ],
+          "end": [
+            3816,
+            4782
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3816,
+            4782
+          ],
+          "end": [
+            0,
+            4782
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4782
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3816,
+        "depth": 4782,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2000,
+            "depth": 50,
+            "height": 770
+          },
+          "position": {
+            "x": 1616,
+            "y": 0,
+            "z": 1610
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "침대",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "책상",
+          "material": "#98FB98",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3166,
+              "y": 350,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2566,
+                "y": 50
+              },
+              "top_right": {
+                "x": 3766,
+                "y": 650
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1200,
+            "depth": 600,
+            "height": 750
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "의자",
+          "material": "#90EE90",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3166,
+              "y": 1500,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2916,
+                "y": 1250
+              },
+              "top_right": {
+                "x": 3416,
+                "y": 1750
+              }
+            }
+          },
+          "dimensions": {
+            "width": 500,
+            "depth": 500,
+            "height": 850
+          },
+          "rotation_z": 0
+        },
+        {
+          "type": "furniture",
+          "name": "옷장",
+          "material": "#DDA0DD",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3366,
+              "y": 3750,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2966,
+                "y": 3450
+              },
+              "top_right": {
+                "x": 3766,
+                "y": 4050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 800,
+            "depth": 600,
+            "height": 2000
+          },
+          "rotation_z": 2
+        }
+      ]
+    },
+    "created_at": "2025-07-29T14:57:58.046541",
+    "updated_at": "2025-07-29T14:57:58.046541",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.9m × 4.7m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3854,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3854,
+            0
+          ],
+          "end": [
+            3854,
+            4700
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3854,
+            4700
+          ],
+          "end": [
+            0,
+            4700
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4700
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3854,
+        "depth": 4700,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2690,
+            "depth": 50,
+            "height": 920
+          },
+          "position": {
+            "x": 1927,
+            "y": 0,
+            "z": 1610
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "bed",
+          "material": "#FFB6C1",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 1050,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 50
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 2050
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-07-29T16:36:17.078851",
+    "updated_at": "2025-07-29T16:36:17.078851",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 4.0m × 4.7m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3989,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3989,
+            0
+          ],
+          "end": [
+            3989,
+            4740
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3989,
+            4740
+          ],
+          "end": [
+            0,
+            4740
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4740
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3989,
+        "depth": 4740,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "furniture",
+          "name": "sofa",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3039,
+              "y": 1000,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2139,
+                "y": 600
+              },
+              "top_right": {
+                "x": 3939,
+                "y": 1400
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1800,
+            "depth": 800,
+            "height": 850
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-08-01T11:12:04.878154",
+    "updated_at": "2025-08-01T11:12:04.878154",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 4.1m × 4.9m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            4121,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            4121,
+            0
+          ],
+          "end": [
+            4121,
+            4905
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            4121,
+            4905
+          ],
+          "end": [
+            0,
+            4905
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4905
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 4121,
+        "depth": 4905,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "window",
+          "name": "main_window_1",
+          "wall": 1,
+          "dimensions": {
+            "width": 2000,
+            "depth": 50,
+            "height": 1600
+          },
+          "position": {
+            "x": 1745,
+            "y": 0,
+            "z": 1227
+          },
+          "rotation_z": 0,
+          "details": "wall_1 벽에 위치"
+        },
+        {
+          "type": "furniture",
+          "name": "bed",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 800,
+              "y": 3855,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 50,
+                "y": 2855
+              },
+              "top_right": {
+                "x": 1550,
+                "y": 4855
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1500,
+            "depth": 2000,
+            "height": 600
+          },
+          "rotation_z": 3
+        },
+        {
+          "type": "furniture",
+          "name": "sofa",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 3671,
+              "y": 1500,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 2771,
+                "y": 1100
+              },
+              "top_right": {
+                "x": 4571,
+                "y": 1900
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1800,
+            "depth": 800,
+            "height": 850
+          },
+          "rotation_z": 5
+        }
+      ]
+    },
+    "created_at": "2025-08-01T11:16:01.154892",
+    "updated_at": "2025-08-01T11:16:01.154892",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.8m × 4.6m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3799,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3799,
+            0
+          ],
+          "end": [
+            3799,
+            4552
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3799,
+            4552
+          ],
+          "end": [
+            0,
+            4552
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4552
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3799,
+        "depth": 4552,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "furniture",
+          "name": "sofa",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2738,
+              "y": 1439,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 1838,
+                "y": 1039
+              },
+              "top_right": {
+                "x": 3638,
+                "y": 1839
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1800,
+            "depth": 800,
+            "height": 850
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-08-04T13:41:30.554189",
+    "updated_at": "2025-08-04T13:41:30.554189",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "왼쪽 아래 꼭짓점(0,0,0)을 기준으로 하는 3.8m × 4.6m 방 공간.",
+      "walls": {
+        "wall_1": {
+          "direction": "bottom",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            3799,
+            0
+          ]
+        },
+        "wall_2": {
+          "direction": "right",
+          "start": [
+            3799,
+            0
+          ],
+          "end": [
+            3799,
+            4552
+          ]
+        },
+        "wall_3": {
+          "direction": "top",
+          "start": [
+            3799,
+            4552
+          ],
+          "end": [
+            0,
+            4552
+          ]
+        },
+        "wall_4": {
+          "direction": "left",
+          "start": [
+            0,
+            4552
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      },
+      "room": {
+        "width": 3799,
+        "depth": 4552,
+        "height": 2300
+      },
+      "objects": [
+        {
+          "type": "furniture",
+          "name": "sofa",
+          "shape": "rectangle",
+          "position": {
+            "center": {
+              "x": 2738,
+              "y": 1439,
+              "z": 0
+            },
+            "corners": {
+              "bottom_left": {
+                "x": 1838,
+                "y": 1039
+              },
+              "top_right": {
+                "x": 3638,
+                "y": 1839
+              }
+            }
+          },
+          "dimensions": {
+            "width": 1800,
+            "depth": 800,
+            "height": 850
+          },
+          "rotation_z": 0
+        }
+      ]
+    },
+    "created_at": "2025-08-04T13:41:36.554539",
+    "updated_at": "2025-08-04T13:41:36.554539",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.92cm × 45.56cm 방 공간",
+      "room": {
+        "width": 379.2,
+        "depth": 455.6,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            75,
+            30,
+            103.6448
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Chair",
+          "type": "chair",
+          "position": [
+            299.34238750000003,
+            42.5,
+            296.5376
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.276352,
+      "volume_cum": 39.735609600000004,
+      "created_at": "2025-08-06T03:26:36.549Z"
+    },
+    "created_at": "2025-08-06T12:26:43.611581",
+    "updated_at": "2025-08-06T12:26:43.611581",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.8cm × 45.39cm 방 공간",
+      "room": {
+        "width": 388,
+        "depth": 453.9,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            75,
+            30,
+            100
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Sofa",
+          "type": "sofa",
+          "position": [
+            298,
+            42.5,
+            40
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.61132,
+      "volume_cum": 40.506036,
+      "created_at": "2025-08-06T03:30:11.898Z"
+    },
+    "created_at": "2025-08-06T12:30:18.076098",
+    "updated_at": "2025-08-06T12:30:18.076098",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.55cm × 43.53cm 방 공간",
+      "room": {
+        "width": 385.5,
+        "depth": 435.3,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            75,
+            30,
+            100
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T15:26:49.091487",
+    "updated_at": "2025-08-06T15:26:49.091487",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.55cm × 43.53cm 방 공간",
+      "room": {
+        "width": 385.5,
+        "depth": 435.3,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            75,
+            30,
+            100
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 16.780815,
+      "volume_cum": 38.5958745,
+      "created_at": "2025-08-06T06:26:48.018Z"
+    },
+    "created_at": "2025-08-06T15:26:52.509431",
+    "updated_at": "2025-08-06T15:26:52.509431",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.55cm × 43.53cm 방 공간",
+      "room": {
+        "width": 385.5,
+        "depth": 435.3,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            75,
+            30,
+            100
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 16.780815,
+      "volume_cum": 38.5958745,
+      "created_at": "2025-08-06T06:26:48.018Z"
+    },
+    "created_at": "2025-08-06T15:27:46.372387",
+    "updated_at": "2025-08-06T15:27:46.372387",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 36.87cm × 42.13cm 방 공간",
+      "room": {
+        "width": 368.7,
+        "depth": 421.3,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            219.55230673235064,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T15:28:15.308944",
+    "updated_at": "2025-08-06T15:28:15.308944",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 36.87cm × 42.13cm 방 공간",
+      "room": {
+        "width": 368.7,
+        "depth": 421.3,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            219.55230673235064,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 15.533331,
+      "volume_cum": 35.7266613,
+      "created_at": "2025-08-06T06:28:14.833Z"
+    },
+    "created_at": "2025-08-06T15:28:17.382857",
+    "updated_at": "2025-08-06T15:28:17.382857",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 36.87cm × 42.13cm 방 공간",
+      "room": {
+        "width": 368.7,
+        "depth": 421.3,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            219.55230673235064,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 15.533331,
+      "volume_cum": 35.7266613,
+      "created_at": "2025-08-06T06:28:14.833Z"
+    },
+    "created_at": "2025-08-06T15:29:35.148634",
+    "updated_at": "2025-08-06T15:29:35.148634",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 39.46cm × 47.44cm 방 공간",
+      "room": {
+        "width": 394.6,
+        "depth": 474.4,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            246.36350516848682,
+            30,
+            137.04634701533428
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T15:30:56.296072",
+    "updated_at": "2025-08-06T15:30:56.296072",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 39.46cm × 47.44cm 방 공간",
+      "room": {
+        "width": 394.6,
+        "depth": 474.4,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            246.36350516848682,
+            30,
+            137.04634701533428
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 18.719824,
+      "volume_cum": 43.0555952,
+      "created_at": "2025-08-06T06:30:55.824Z"
+    },
+    "created_at": "2025-08-06T15:30:59.629979",
+    "updated_at": "2025-08-06T15:30:59.629979",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 39.46cm × 47.44cm 방 공간",
+      "room": {
+        "width": 394.6,
+        "depth": 474.4,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            246.36350516848682,
+            30,
+            137.04634701533428
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 18.719824,
+      "volume_cum": 43.0555952,
+      "created_at": "2025-08-06T06:30:55.824Z"
+    },
+    "created_at": "2025-08-06T15:34:26.468594",
+    "updated_at": "2025-08-06T15:34:26.468594",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.410000000000004cm × 46.39cm 방 공간",
+      "room": {
+        "width": 384.1,
+        "depth": 463.9,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            295.35249999999996,
+            30,
+            192.78
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T15:36:19.603033",
+    "updated_at": "2025-08-06T15:36:19.603033",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.410000000000004cm × 46.39cm 방 공간",
+      "room": {
+        "width": 384.1,
+        "depth": 463.9,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            295.35249999999996,
+            30,
+            192.78
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.818399,
+      "volume_cum": 40.982317699999996,
+      "created_at": "2025-08-06T06:36:19.143Z"
+    },
+    "created_at": "2025-08-06T15:36:21.793433",
+    "updated_at": "2025-08-06T15:36:21.793433",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.47cm × 46.36cm 방 공간",
+      "room": {
+        "width": 374.7,
+        "depth": 463.6,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            217.5667816787199,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T15:38:49.166110",
+    "updated_at": "2025-08-06T15:38:49.166110",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.47cm × 46.36cm 방 공간",
+      "room": {
+        "width": 374.7,
+        "depth": 463.6,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            217.5667816787199,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.371092,
+      "volume_cum": 39.9535116,
+      "created_at": "2025-08-06T06:38:48.696Z"
+    },
+    "created_at": "2025-08-06T15:38:54.285289",
+    "updated_at": "2025-08-06T15:38:54.285289",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.47cm × 46.36cm 방 공간",
+      "room": {
+        "width": 374.7,
+        "depth": 463.6,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            217.5667816787199,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.371092,
+      "volume_cum": 39.9535116,
+      "created_at": "2025-08-06T06:38:48.696Z"
+    },
+    "created_at": "2025-08-06T15:41:38.953601",
+    "updated_at": "2025-08-06T15:41:38.953601",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.480000000000004cm × 45.07cm 방 공간",
+      "room": {
+        "width": 384.8,
+        "depth": 450.7,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            304.8,
+            30,
+            225
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T15:42:24.566087",
+    "updated_at": "2025-08-06T15:42:24.566087",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.480000000000004cm × 45.07cm 방 공간",
+      "room": {
+        "width": 384.8,
+        "depth": 450.7,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            304.8,
+            30,
+            225
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.342936,
+      "volume_cum": 39.8887528,
+      "created_at": "2025-08-06T06:42:24.402Z"
+    },
+    "created_at": "2025-08-06T15:42:27.628511",
+    "updated_at": "2025-08-06T15:42:27.628511",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.480000000000004cm × 45.07cm 방 공간",
+      "room": {
+        "width": 384.8,
+        "depth": 450.7,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            304.8,
+            30,
+            225
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.342936,
+      "volume_cum": 39.8887528,
+      "created_at": "2025-08-06T06:42:24.402Z"
+    },
+    "created_at": "2025-08-06T15:43:20.266489",
+    "updated_at": "2025-08-06T15:43:20.266489",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.480000000000004cm × 45.07cm 방 공간",
+      "room": {
+        "width": 384.8,
+        "depth": 450.7,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            304.8,
+            30,
+            225
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 17.342936,
+      "volume_cum": 39.8887528,
+      "created_at": "2025-08-06T06:42:24.402Z"
+    },
+    "created_at": "2025-08-06T15:44:39.534940",
+    "updated_at": "2025-08-06T15:44:39.534940",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.45cm × 45.05cm 방 공간",
+      "room": {
+        "width": 374.5,
+        "depth": 450.5,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            200.28651244488225,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T15:48:11.482827",
+    "updated_at": "2025-08-06T15:48:11.482827",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.45cm × 45.05cm 방 공간",
+      "room": {
+        "width": 374.5,
+        "depth": 450.5,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            200.28651244488225,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 16.871225,
+      "volume_cum": 38.8038175,
+      "created_at": "2025-08-06T06:48:11.016Z"
+    },
+    "created_at": "2025-08-06T15:48:16.171529",
+    "updated_at": "2025-08-06T15:48:16.171529",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.089999999999996cm × 44.81cm 방 공간",
+      "room": {
+        "width": 370.9,
+        "depth": 448.1,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            205.8335447619262,
+            30,
+            266.2759697567507
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T16:24:16.840966",
+    "updated_at": "2025-08-06T16:24:16.840966",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.089999999999996cm × 44.81cm 방 공간",
+      "room": {
+        "width": 370.9,
+        "depth": 448.1,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            205.8335447619262,
+            30,
+            266.2759697567507
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "ai_generation_request": true,
+      "area_sqm": 16.620029000000002,
+      "volume_cum": 38.226066700000004,
+      "created_at": "2025-08-06T07:24:16.368Z"
+    },
+    "created_at": "2025-08-06T16:24:19.956803",
+    "updated_at": "2025-08-06T16:24:19.956803",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 41.36cm × 47.480000000000004cm 방 공간",
+      "room": {
+        "width": 413.6,
+        "depth": 474.8,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            275.43307479413454,
+            30,
+            159.45540177463113
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T16:29:55.936826",
+    "updated_at": "2025-08-06T16:29:55.936826",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.45cm × 49.06cm 방 공간",
+      "room": {
+        "width": 384.5,
+        "depth": 490.6,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            187.28607500000004,
+            30,
+            212.83800000000002
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T18:42:56.340327",
+    "updated_at": "2025-08-06T18:42:56.340327",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 34.95cm × 43.56cm 방 공간",
+      "room": {
+        "width": 349.5,
+        "depth": 435.6,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Sofa",
+          "type": "sofa",
+          "position": [
+            254.5,
+            42.5,
+            96.46236169775801
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T18:49:25.393162",
+    "updated_at": "2025-08-06T18:49:25.393162",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 35.89cm × 44.019999999999996cm 방 공간",
+      "room": {
+        "width": 358.9,
+        "depth": 440.2,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            174.35967560758382,
+            30,
+            227.03833348617235
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-06T19:07:37.142717",
+    "updated_at": "2025-08-06T19:07:37.142717",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 39.13cm × 45.56cm 방 공간",
+      "room": {
+        "width": 391.3,
+        "depth": 455.6,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            196.08993750000002,
+            30,
+            218.45600000000002
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T02:48:42.373993",
+    "updated_at": "2025-08-07T02:48:42.373993",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 39.8cm × 47.33cm 방 공간",
+      "room": {
+        "width": 398,
+        "depth": 473.3,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            181.69956875000003,
+            30,
+            224.00459999999998
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T05:17:16.013059",
+    "updated_at": "2025-08-07T05:17:16.013059",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.06cm × 47.07cm 방 공간",
+      "room": {
+        "width": 380.6,
+        "depth": 470.7,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            213.67998749999998,
+            30,
+            252.5068
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T12:07:37.986923",
+    "updated_at": "2025-08-07T12:07:37.986923",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 41.37cm × 49.12cm 방 공간",
+      "room": {
+        "width": 413.7,
+        "depth": 491.2,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            226.351,
+            30,
+            219.8528
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T12:14:41.722742",
+    "updated_at": "2025-08-07T12:14:41.722742",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 40.260000000000005cm × 47.5cm 방 공간",
+      "room": {
+        "width": 402.6,
+        "depth": 475,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            198.87109375,
+            30,
+            248.2
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T12:30:02.920738",
+    "updated_at": "2025-08-07T12:30:02.920738",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.72cm × 46.489999999999995cm 방 공간",
+      "room": {
+        "width": 387.2,
+        "depth": 464.9,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            203.6683390625,
+            30,
+            238.002659375
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T14:08:23.157273",
+    "updated_at": "2025-08-07T14:08:23.157273",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 38.58cm × 44.58cm 방 공간",
+      "room": {
+        "width": 385.8,
+        "depth": 445.8,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            192.30460781250002,
+            30,
+            224.08564375
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T16:54:09.599325",
+    "updated_at": "2025-08-07T16:54:09.599325",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.3cm × 46.79cm 방 공간",
+      "room": {
+        "width": 373,
+        "depth": 467.9,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            80,
+            30,
+            325
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Sofa",
+          "type": "sofa",
+          "position": [
+            278,
+            42.5,
+            90.8343384428797
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Desk",
+          "type": "desk",
+          "position": [
+            308,
+            37.5,
+            225
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-07T20:42:55.039170",
+    "updated_at": "2025-08-07T20:42:55.039170",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 36.739999999999995cm × 46.410000000000004cm 방 공간",
+      "room": {
+        "width": 367.4,
+        "depth": 464.1,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            75,
+            30,
+            100
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-08T14:59:37.100263",
+    "updated_at": "2025-08-08T14:59:37.100263",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 37.260000000000005cm × 44.019999999999996cm 방 공간",
+      "room": {
+        "width": 372.6,
+        "depth": 440.2,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            80,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Desk",
+          "type": "desk",
+          "position": [
+            312.6,
+            37.5,
+            30
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-08T15:19:53.110258",
+    "updated_at": "2025-08-08T15:19:53.110258",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 39.12cm × 47.739999999999995cm 방 공간",
+      "room": {
+        "width": 391.2,
+        "depth": 477.4,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            80,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "Desk",
+          "type": "desk",
+          "position": [
+            331.2,
+            37.5,
+            30
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-08T15:23:32.760406",
+    "updated_at": "2025-08-08T15:23:32.760406",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 39.3cm × 45.239999999999995cm 방 공간",
+      "room": {
+        "width": 393,
+        "depth": 452.4,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            75,
+            30,
+            100
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-08T15:34:40.180297",
+    "updated_at": "2025-08-08T15:34:40.180297",
+    "user_id": null
+  },
+  {
+    "scene": {
+      "description": "AI 인테리어 생성을 위한 41.760000000000005cm × 48.980000000000004cm 방 공간",
+      "room": {
+        "width": 417.6,
+        "depth": 489.8,
+        "height": 230
+      },
+      "objects": [
+        {
+          "name": "Bed",
+          "type": "bed",
+          "position": [
+            80,
+            30,
+            105
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "created_at": "2025-08-08T15:46:24.218875",
+    "updated_at": "2025-08-08T15:46:24.218875",
+    "user_id": null
+  }
+]

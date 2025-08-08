@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-08-08T15:25:44.347970",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 800,
+      "center_z": 105,
+      "id": "Bed"
+    },
+    {
+      "type": "desk",
+      "center_x": 331.2,
+      "center_z": 300,
+      "id": "Desk"
+    }
+  ],
+  "room_dimensions": {
+    "width": 3.912,
+    "height": 4.774
+  },
+  "style": "luxury_bed",
+  "prompt": "Korean-style Scandinavian minimalist bedroom with ondol floor heating system, light wood floors, white walls, natural lighting, Korean furniture proportions\n\nThe bed is FLOATING IN THE MIDDLE OF THE ROOM with empty space all around it.\nThe bed is NOT against any wall.\nThere is open floor space between the bed and every wall.\nShow the bed surrounded by empty floor space on all four sides.\n\nKorean minimalist bedroom interior, no measurements, no grid lines, professional photography.\n\nADDITIONAL: position accuracy test - center placement verification",
+  "generator": "dalle-3",
+  "mock_mode": false
+}

@@ -1,0 +1,66 @@
+{
+    "scene": {
+      "description": "A 3D scene definition for a room. All units are in millimeters. The origin (0,0,0) is the front-left-bottom corner. X-axis is width, Y-axis is depth, Z-axis is height.",
+      "view_point": {
+        "camera_position": { "x": 2000, "y": -1000, "z": 1700 },
+        "look_at": { "x": 2000, "y": 2500, "z": 1200 },
+        "style": "cozy, modern, bright, photorealistic, wide-angle lens"
+      },
+      "room": {
+        "dimensions": {
+          "width": 4000,
+          "depth": 5000,
+          "height": 2800
+        },
+        "walls": {
+          "material": "light beige painted plaster"
+        },
+        "floor": {
+          "material": "light oak wood planks"
+        }
+      },
+      "objects": [
+        {
+          "type": "door",
+          "name": "entrance_door",
+          "dimensions": { "width": 900, "depth": 50, "height": 2100 },
+          "position": { "x": 500, "y": 0, "z": 0 },
+          "rotation_z": 0,
+          "material": "white painted wood"
+        },
+        {
+          "type": "window",
+          "name": "main_window",
+          "dimensions": { "width": 50, "depth": 2500, "height": 1500 },
+          "position": { "x": 4000, "y": 1250, "z": 1000 },
+          "rotation_z": 0,
+          "details": "A window on the right wall (at x=4000), starting 1000mm from the floor. Covered with sheer white curtains, lets in soft daylight."
+        },
+        {
+          "type": "furniture",
+          "name": "double_bed",
+          "dimensions": { "width": 1600, "depth": 2100, "height": 1000 },
+          "position": { "x": 1200, "y": 5000, "z": 0 },
+          "rotation_z": 180,
+          "material": "dark wood frame with grey linen bedding, placed against the back wall."
+        },
+        {
+          "type": "furniture",
+          "name": "wardrobe",
+          "dimensions": { "width": 600, "depth": 1800, "height": 2200 },
+          "position": { "x": 0, "y": 1600, "z": 0 },
+          "rotation_z": 0,
+          "material": "white matte finish, placed against the left wall."
+        },
+        {
+          "type": "furniture",
+          "name": "desk",
+          "dimensions": { "width": 600, "depth": 1200, "height": 750 },
+          "position": { "x": 4000, "y": 1850, "z": 0 },
+          "rotation_z": 0,
+          "material": "light oak wood with black metal legs, placed against the right wall under the window."
+        }
+      ]
+    }
+  }
+  

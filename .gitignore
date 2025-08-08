@@ -89,8 +89,7 @@ test/project/mongosh-2.0.2-linux-x64/
 
 **/secret.yaml
 
-keys/
-*.json
+keys/*.json
 google-vision-key.json
 service-account-*.json
 
@@ -98,3 +97,4 @@ service-account-*.json
 .env
 .env.local
 .env.production
+

@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-08-07T03:07:02.231698",
+  "image_path": "generated_images\\vertex_industrial_20250807_030702.png",
+  "original_prompt": "\nPhotoreal industrial Korean apartment bedroom:\n- Exact room dimensions: 3.9m width × 4.6m depth × 2.8m height\n- ONE SINGLE Bed ONLY at precise location:\n  • EXACT coordinates: X=1.96m, Z=2.18m (from origin)\n  • Furniture size: 2.0m × 1.2m  \n  • PRECISE wall distances: 0.96m (left), 0.95m (right), 1.58m (front), 1.77m (back)\n  • MANDATORY: Place furniture at EXACTLY X=1.96m, Z=2.18m\n  • Rotation: 0°\n\n🎯 UNUSUAL FURNITURE PLACEMENT REQUIRED:\n• This is NOT a typical bedroom layout - bed is placed in UNUSUAL POSITION\n• Bed is INTENTIONALLY placed in the MIDDLE OF ROOM (not against wall)\n• EXACT position: X=1.96m from left wall, Z=2.18m from front wall\n• Create a MODERN ARTISTIC ROOM where bed floats in center with space all around\n• Think \"minimalist exhibition\" or \"modern art installation\" - NOT traditional bedroom\n• The unusual center placement is INTENTIONAL and REQUIRED\n• Show open floor space on ALL SIDES of the bed\n\nADDITIONAL RULES:\n- SHOW EXACTLY ONE FURNITURE ITEM: Bed\n- NO additional furniture, accessories, or decorations\n- EMPTY floor space all around the furniture\n            \n\nCRITICAL CONSTRAINTS - MUST FOLLOW EXACTLY:\n1. FURNITURE LIMITATION: Show ONLY the furniture items specified in the layout above\n2. NO ADDITIONAL ITEMS: Do not add tables, chairs, decorations, plants, or any other objects\n3. EXACT FURNITURE COUNT: The image must contain exactly the number of furniture items specified\n4. ROOM TYPE: If bed is specified, this is a BEDROOM. If sofa is specified, this is a LIVING ROOM\n\nSTYLE REFERENCE (based on 9 successful industrial examples - STYLE ONLY):\n- Color palette: 러스트, 로우 메탈, 다크 그레이, 블랙\n- Materials: 노출 벽돌, 가죽, 콘크리트, 스틸\n- Lighting: 펜던트 조명, 에디슨 전구\n- Mood: 도시적이고 날카로운, 로우 캐릭터\n- NO REFERENCE TO SPECIFIC FURNITURE ITEMS FROM EXAMPLES\n\nVIOLATION WARNING: Any additional furniture beyond what is specified will be considered incorrect\n",
+  "style": "industrial",
+  "verification_result": {
+    "is_accurate": true,
+    "furniture_count_correct": true,
+    "position_accuracy": 0.7,
+    "detected_furniture": [
+      {
+        "name": "Bed",
+        "confidence": 0.5
+      }
+    ],
+    "issues": [],
+    "confidence": 0.7,
+    "verification_method": "basic_analysis"
+  }
+}

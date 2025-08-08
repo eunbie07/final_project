@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-07T12:39:22.605672",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 1988,
+      "center_z": 2480,
+      "id": "center_bed_test"
+    }
+  ],
+  "room_dimensions": {
+    "width": 4.026,
+    "height": 4.75
+  },
+  "style": "scandinavian",
+  "prompt": "Scandinavian minimalist bedroom with light wood floors, white walls, natural lighting\n\nCRITICAL FURNITURE PLACEMENT INSTRUCTIONS:\nRoom dimensions: 4.026m x 4.75m\n\nEXACT FURNITURE POSITIONS (MUST FOLLOW PRECISELY):\n• bed positioned at exact center horizontally and exact center vertically of the room\n\nUNUSUAL PLACEMENT REQUIREMENTS:\n- This is NOT a conventional bedroom layout\n- Furniture is intentionally placed in UNUSUAL positions\n- Do NOT place furniture against walls unless specifically indicated\n- Show OPEN FLOOR SPACE around centrally positioned furniture\n- Think \"modern art installation\" or \"minimalist exhibition space\"\n\nVISUAL REQUIREMENTS:\n- Show exactly 1 piece(s) of furniture\n- Room must be 4.026m x 4.75m proportions\n- High quality, photorealistic interior photography\n- Professional lighting, 8K resolution\n- No extra furniture or decorations beyond what's specified\n\nADDITIONAL: precise center placement test",
+  "generator": "dalle-3",
+  "mock_mode": false
+}

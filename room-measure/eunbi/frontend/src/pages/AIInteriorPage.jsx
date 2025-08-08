@@ -5,6 +5,8 @@ import AIInteriorGenerator from '../components/AIInteriorGenerator';
 const AIInteriorPage = () => {
   const location = useLocation();
   const [roomData, setRoomData] = useState(null);
+  const [capturedScreenshot, setCapturedScreenshot] = useState(null);
+  const [selectedFurniture, setSelectedFurniture] = useState(null);
 
   useEffect(() => {
     // 네비게이션을 통해 전달된 방 데이터 확인
@@ -12,6 +14,22 @@ const AIInteriorPage = () => {
       setRoomData(location.state.roomData);
     }
   }, [location.state]);
+
+  // 로컬 스토리지에서 캡처 데이터 복원
+  useEffect(() => {
+    const savedScreenshot = localStorage.getItem('capturedScreenshot');
+    if (savedScreenshot) {
+      try {
+        const parsed = JSON.parse(savedScreenshot);
+        setCapturedScreenshot(parsed);
+        if (parsed.selectedFurniture) {
+          setSelectedFurniture(parsed.selectedFurniture);
+        }
+      } catch (error) {
+        console.error('캡처 데이터 파싱 실패:', error);
+      }
+    }
+  }, []);
 
   // 로컬 스토리지에서 최근 방 데이터 가져오기 (백업)
   useEffect(() => {
@@ -27,6 +45,12 @@ const AIInteriorPage = () => {
       }
     }
   }, [roomData]);
+
+  // 3D 캡처 핸들러 (RoomBox에서 호출 가능하도록)
+  const handle3DCapture = () => {
+    // 실제로는 RoomBox 컴포넌트가 아니므로 안내 메시지 표시
+    alert('3D 화면 캡처는 방 편집 화면에서만 가능합니다. 방 편집 화면으로 돌아가서 캡처 후 다시 시도해주세요.');
+  };
 
   return (
     <div className="min-h-screen bg-background pt-16">
@@ -77,10 +101,36 @@ const AIInteriorPage = () => {
         {/* AI 인테리어 생성기 */}
         <AIInteriorGenerator 
           roomData={roomData}
+          capturedScreenshot={capturedScreenshot}
+          selectedFurniture={selectedFurniture}
           onImageGenerated={(image) => {
             console.log('AI 인테리어 이미지 생성 완료:', image);
           }}
         />
+
+        {/* 3D 캡처 안내 */}
+        {!capturedScreenshot && (
+          <div className="mt-8 p-6 bg-orange-50 border border-orange-200 rounded-xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="text-2xl">📸</div>
+              <h3 className="text-lg font-semibold text-orange-900">3D 캡처 기반 가구 스타일 변경</h3>
+            </div>
+            <div className="text-orange-800 space-y-2">
+              <p>개별 가구의 스타일을 변경하려면:</p>
+              <ol className="list-decimal list-inside ml-4 space-y-1">
+                <li>방 편집 화면으로 돌아가서 가구를 선택하세요</li>
+                <li>"📸 3D 화면 캡처" 버튼을 클릭하세요</li>
+                <li>다시 이 페이지로 와서 "가구 스타일 변경"을 선택하세요</li>
+              </ol>
+              <button
+                onClick={() => window.history.back()}
+                className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                ← 방 편집 화면으로 돌아가기
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* 방 데이터가 없을 때 안내 */}
         {!roomData && (

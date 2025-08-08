@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-07T12:24:15.388426",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 200,
+      "center_z": 250,
+      "id": "amd_test_bed"
+    },
+    {
+      "type": "chair",
+      "center_x": 350,
+      "center_z": 100,
+      "id": "desk_chair"
+    }
+  ],
+  "room_dimensions": {
+    "width": 4.0,
+    "height": 5.0
+  },
+  "style": "scandinavian",
+  "prompt": "Scandinavian interior design, light wood floors, white walls, natural lighting, cozy minimalist atmosphere\n\nCRITICAL FURNITURE PLACEMENT INSTRUCTIONS:\nbed positioned at coordinates X=0.20m, Z=0.25m, chair positioned at coordinates X=0.35m, Z=0.10m\n\nMANDATORY REQUIREMENTS:\n- Place each furniture item at the EXACT coordinates specified above\n- Do not follow conventional placement rules (e.g., beds against walls)\n- Maintain realistic scale and proportions\n- Ensure all furniture is clearly visible and positioned precisely\n- Create photorealistic lighting and shadows\n\nAMD API test - precise furniture placement\n\nHigh quality, masterpiece, photorealistic interior photography, professional lighting, 8k resolution",
+  "settings": {
+    "num_inference_steps": 1,
+    "guidance_scale": 7.5,
+    "controlnet_conditioning_scale": 1.0,
+    "width": 512,
+    "height": 512
+  },
+  "model_id": "runwayml/stable-diffusion-v1-5",
+  "controlnet_model": "lllyasviel/sd-controlnet-canny",
+  "device": "cpu",
+  "use_controlnet": true,
+  "use_mask": true,
+  "mock_mode": true
+}

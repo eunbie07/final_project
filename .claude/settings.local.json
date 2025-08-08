@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(mv:*)",
+      "Bash(uv add:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)",
+      "Bash(robocopy:*)",
+      "Bash(powershell:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git reset:*)",
+      "Bash(mkdir:*)",
+      "Bash(git push:*)",
+      "Bash(git gc:*)",
+      "Bash(uv run:*)",
+      "Bash(dir)",
+      "Bash(dir:*)",
+      "Bash(python:*)",
+      "Bash(where python)",
+      "Bash(chcp:*)",
+      "Bash(cmd /c:*)",
+      "Bash(set PYTHONIOENCODING=utf-8)",
+      "Bash(npm run dev:*)",
+      "Bash(uv remove:*)",
+      "Bash(uv sync:*)",
+      "Bash(py api_server.py)",
+      "Bash(curl:*)",
+      "Bash(setx:*)",
+      "Bash(pip install:*)",
+      "Bash(set COLAB_API_URL=https://e1f46d72b17f.ngrok-free.app)"
+    ],
+    "deny": []
+  }
+}

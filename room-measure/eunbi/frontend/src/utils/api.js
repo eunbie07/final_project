@@ -323,12 +323,15 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
   try {
     let layout_id;
     
+    // 가구 스타일 변경 모드 감지
+    const isFurnitureStyleChange = roomData.mode === "furniture_style_change";
+    
     // 이미 mongo_id가 있으면 저장 건너뛰기
     if (roomData.mongo_id) {
       console.log('Step 1: 기존 MongoDB ID 사용:', roomData.mongo_id);
       layout_id = roomData.mongo_id;
-    } else {
-      // 1. 처음이면 MongoDB에 방 데이터 저장
+    } else if (!isFurnitureStyleChange) {
+      // 1. 일반 모드일 때만 MongoDB에 방 데이터 저장
       console.log('Step 1: MongoDB에 방 데이터 저장 중...');
       
       // roomData를 백엔드가 기대하는 scene 구조로 변환
@@ -355,6 +358,10 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
       localStorage.setItem('mongoRoomId', layout_id);
 
       console.log('Step 1 완료: MongoDB 저장 성공', saveResult);
+    } else {
+      // 가구 스타일 변경 모드에서는 기존 ID 사용
+      layout_id = roomData.mongo_id || localStorage.getItem('mongoRoomId');
+      console.log('Step 1: 가구 스타일 변경 모드 - 기존 MongoDB ID 사용:', layout_id);
     }
 
     // 생성기별 엔드포인트 매핑
@@ -362,26 +369,52 @@ export const saveRoomDataAndGenerateAI = async (roomData, style = 'scandinavian'
       'dify': '/generate-interior',
       'stable_diffusion': '/generate-interior-sd', 
       'dalle': '/generate-interior-dalle',
-      'colab': '/generate-interior-colab'
+      'vertex': '/generate-interior-vertex',
+      'colab': '/generate-interior-colab',
+      'furniture_style_vertex': '/generate-interior-vertex'
     };
     
     const endpoint = endpoints[generator] || endpoints['colab'];
     console.log(`Step 2: ${generator} 생성기로 AI 인테리어 이미지 생성 중... (엔드포인트: ${endpoint})`);
 
-    // 2. MongoDB 저장 성공 후 AI 인테리어 생성
-    const response = await fetch(`${AI_INTERIOR_API_BASE}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    // 2. AI 인테리어 생성 (가구 스타일 변경 모드에 따라 다른 payload)
+    let requestBody;
+    
+    if (isFurnitureStyleChange) {
+      // 가구 스타일 변경 전용 payload
+      requestBody = {
+        mode: "furniture_style_change",
+        room_data: {
+          dimensions: roomData.dimensions,
+          area_sqm: roomData.area_sqm,
+          volume_cum: roomData.volume_cum,
+          furniture_3d: roomData.furniture_3d,
+          mongo_id: layout_id
+        },
+        screenshot: roomData.screenshot,
+        selected_furniture: roomData.selected_furniture,
+        new_style: roomData.new_style,
+        style: style,
+        generate_image: true
+      };
+    } else {
+      // 일반 모드 payload
+      requestBody = {
         room_data: {
           ...roomData,
           mongo_id: layout_id // MongoDB ID 추가
         },
         style: style,
         generate_image: true
-      })
+      };
+    }
+    
+    const response = await fetch(`${AI_INTERIOR_API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {

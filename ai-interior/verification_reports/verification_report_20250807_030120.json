@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-08-07T03:01:20.891732",
+  "image_path": "generated_images\\vertex_cozy_20250807_030120.png",
+  "original_prompt": "\nPhotoreal modern Korean apartment bedroom:\n- Exact room dimensions: 3.9m width × 4.6m depth × 2.8m height\n- ONE SINGLE Bed ONLY at precise location:\n  • EXACT coordinates: X=1.96m, Z=2.18m (from origin)\n  • Furniture size: 2.0m × 1.2m  \n  • PRECISE wall distances: 0.96m (left), 0.95m (right), 1.58m (front), 1.77m (back)\n  • MANDATORY: Place furniture at EXACTLY X=1.96m, Z=2.18m\n  • Rotation: 0°\n\nCRITICAL RULES:\n- SHOW EXACTLY ONE FURNITURE ITEM: Bed\n- NO additional furniture, accessories, or decorations\n- NO tables, chairs, lamps, rugs, plants, artwork, or any other objects\n- Empty white walls and clean floor around the single Bed\n- Realistic interior photography with natural lighting\n            \n\nCRITICAL CONSTRAINTS - MUST FOLLOW EXACTLY:\n1. FURNITURE LIMITATION: Show ONLY the furniture items specified in the layout above\n2. NO ADDITIONAL ITEMS: Do not add tables, chairs, decorations, plants, or any other objects\n3. EXACT FURNITURE COUNT: The image must contain exactly the number of furniture items specified\n4. ROOM TYPE: If bed is specified, this is a BEDROOM. If sofa is specified, this is a LIVING ROOM\n\nSTYLE REFERENCE (based on 9 successful cozy examples - STYLE ONLY):\n- Color palette: 파스텔, 소프트 그레이, 베이지, 웜 화이트\n- Materials: 우드, 세라믹, 소프트 패브릭, 니트\n- Lighting: 따뜻한 조명, 테이블 램프\n- Mood: 포근하고 편안한, 홈리한\n- NO REFERENCE TO SPECIFIC FURNITURE ITEMS FROM EXAMPLES\n\nVIOLATION WARNING: Any additional furniture beyond what is specified will be considered incorrect\n",
+  "style": "cozy",
+  "verification_result": {
+    "is_accurate": true,
+    "furniture_count_correct": true,
+    "position_accuracy": 0.7,
+    "detected_furniture": [
+      {
+        "name": "Bed",
+        "confidence": 0.5
+      }
+    ],
+    "issues": [],
+    "confidence": 0.7,
+    "verification_method": "basic_analysis"
+  }
+}

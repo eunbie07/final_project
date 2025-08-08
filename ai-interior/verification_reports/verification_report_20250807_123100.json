@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-08-07T12:31:00.392271",
+  "image_path": "generated_images\\vertex_scandinavian_20250807_123100.png",
+  "original_prompt": "\nPhotoreal scandinavian Korean apartment bedroom:\n- Exact room dimensions: 4.0m width × 4.8m depth × 2.8m height\n- ONE SINGLE Bed ONLY at precise location:\n  • EXACT coordinates: X=1.99m, Z=2.48m (from origin)\n  • Furniture size: 2.0m × 1.2m  \n  • PRECISE wall distances: 0.99m (left), 1.04m (right), 1.88m (front), 1.67m (back)\n  • MANDATORY: Place furniture at EXACTLY X=1.99m, Z=2.48m\n  • Rotation: 0°\n\n🎯 UNUSUAL FURNITURE PLACEMENT REQUIRED:\n• This is NOT a typical bedroom layout - bed is placed in UNUSUAL POSITION\n• Bed is INTENTIONALLY placed in the MIDDLE OF ROOM (not against wall)\n• EXACT position: X=1.99m from left wall, Z=2.48m from front wall\n• Create a MODERN ARTISTIC ROOM where bed floats in center with space all around\n• Think \"minimalist exhibition\" or \"modern art installation\" - NOT traditional bedroom\n• The unusual center placement is INTENTIONAL and REQUIRED\n• Show open floor space on ALL SIDES of the bed\n\nADDITIONAL RULES:\n- SHOW EXACTLY ONE FURNITURE ITEM: Bed\n- NO additional furniture, accessories, or decorations\n- EMPTY floor space all around the furniture\n            \n\n💡 SPATIAL EMBEDDING GUIDANCE:\nROOM SPATIAL ANALYSIS:\n- Room Size: 402.6cm × 475.0cm × 230.0cm\n- Room Center Point: (201.3cm, 237.5cm)\n- Total Floor Area: 19.12㎡\n\nCRITICAL FURNITURE POSITIONING:\n- BED PLACEMENT:\n  EXACT COORDINATES: X=198.9cm, Z=248.2cm\n  RELATIVE POSITION: (0.494, 0.523) where (0.5,0.5)=center\n  CENTER DISTANCE: 0.023 (0.0=perfect center, 0.5+=edge)\n  PLACEMENT TYPE: PERFECT CENTER\n  WALL CLEARANCES: Left=198.9cm, Right=203.7cm\n  POSITIONING INSTRUCTION: Place Bed EXACTLY at coordinates (198.9, 248.2) - THIS IS PERFECT CENTER\n\nCRITICAL CONSTRAINTS - MUST FOLLOW EXACTLY:\n1. FURNITURE LIMITATION: Show ONLY the furniture items specified in the layout above\n2. NO ADDITIONAL ITEMS: Do not add tables, chairs, decorations, plants, or any other objects\n3. EXACT FURNITURE COUNT: The image must contain exactly the number of furniture items specified\n4. ROOM TYPE: If bed is specified, this is a BEDROOM. If sofa is specified, this is a LIVING ROOM\n\nSTYLE REFERENCE (based on 9 successful scandinavian examples - STYLE ONLY):\n- Color palette: 라이트 그레이, 내추럴 우드, 화이트, 소프트 파스텔\n- Materials: 코튼, 울, 세라믹, 라이트 우드\n- Lighting: 자연광 최대 활용, 따뜻한 조명\n- Mood: 포근하고 따뜻한, 휘게 느낌\n- NO REFERENCE TO SPECIFIC FURNITURE ITEMS FROM EXAMPLES\n\nVIOLATION WARNING: Any additional furniture beyond what is specified will be considered incorrect\n",
+  "style": "scandinavian",
+  "verification_result": {
+    "is_accurate": true,
+    "furniture_count_correct": true,
+    "position_accuracy": 0.7,
+    "detected_furniture": [
+      {
+        "name": "Bed",
+        "confidence": 0.5
+      }
+    ],
+    "issues": [],
+    "confidence": 0.7,
+    "verification_method": "basic_analysis"
+  }
+}

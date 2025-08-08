@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-08T15:00:04.745230",
+  "furniture_data": [
+    {
+      "type": "bed",
+      "center_x": 750,
+      "center_z": 100,
+      "id": "Bed"
+    }
+  ],
+  "room_dimensions": {
+    "width": 3.674,
+    "height": 4.641
+  },
+  "style": "industrial",
+  "prompt": "Korean industrial loft-style bedroom with exposed elements, modern Korean apartment features, ondol floor system, Korean urban living space design\n\nThe bed is FLOATING IN THE MIDDLE OF THE ROOM with empty space all around it.\nThe bed is NOT against any wall.\nThere is open floor space between the bed and every wall.\nShow the bed surrounded by empty floor space on all four sides.\n\nKorean minimalist bedroom interior, no measurements, no grid lines, professional photography.\n\nADDITIONAL: position accuracy test - center placement verification",
+  "generator": "dalle-3",
+  "mock_mode": false
+}

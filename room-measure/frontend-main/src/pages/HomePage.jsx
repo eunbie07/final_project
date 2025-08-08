@@ -85,8 +85,8 @@ const HomePage = () => {
                   Find Your Home
                 </h3>
                 <p className="text-text-secondary mb-8 leading-relaxed">
-                  라이프스타일과 취향에 맞는 완벽한 부동산을 찾아보세요. 고급
-                  필터링 옵션으로 엄선된 매물을 탐색하세요.
+                  라이프스타일과 취향에 맞는 완벽한 부동산을 찾아보세요. <br />
+                  고급 필터링 옵션으로 엄선된 매물을 탐색하세요.
                 </p>
                 <div className="space-y-3 mb-8 text-left">
                   <div className="flex items-center text-text-secondary">

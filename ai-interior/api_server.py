@@ -14,11 +14,43 @@ import json
 import os
 from datetime import datetime
 
-from roombox_integration import DifyRoomImageGenerator
-from config import load_config
-from stable_diffusion_generator import StableDiffusionGenerator
-from dalle_generator import DalleGenerator
-from colab_integration import ColabInpaintingGenerator
+# Optional imports - missing modules will be handled gracefully
+try:
+    from roombox_integration import DifyRoomImageGenerator
+except ImportError:
+    print("WARNING: roombox_integration module not found")
+    DifyRoomImageGenerator = None
+
+try:
+    from config import load_config
+except ImportError:
+    print("WARNING: config module not found")
+    def load_config():
+        return None
+
+try:
+    from stable_diffusion_generator import StableDiffusionGenerator
+except ImportError:
+    print("WARNING: stable_diffusion_generator module not found")
+    StableDiffusionGenerator = None
+
+try:
+    from dalle_generator import DalleGenerator
+except ImportError:
+    print("WARNING: dalle_generator module not found")
+    DalleGenerator = None
+
+try:
+    from colab_integration import ColabInpaintingGenerator
+except ImportError:
+    print("WARNING: colab_integration module not found")
+    ColabInpaintingGenerator = None
+
+try:
+    from enhanced_vertex_generator import EnhancedVertexGenerator
+except ImportError:
+    print("WARNING: enhanced_vertex_generator module not found")
+    EnhancedVertexGenerator = None
 
 
 def convert_mongo_to_current_format(mongo_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -91,6 +123,7 @@ generator = None
 sd_generator = None
 dalle_generator = None
 colab_generator = None
+vertex_generator = None
 
 
 class RoomDataRequest(BaseModel):
@@ -100,6 +133,11 @@ class RoomDataRequest(BaseModel):
     generate_image: bool = True
     user_id: Optional[str] = None
     use_real_ai: bool = True  # 실제 AI 모델 사용 (시간 소요 있음)
+    # 가구 스타일 변경 모드 필드들
+    mode: Optional[str] = None
+    screenshot: Optional[str] = None
+    selected_furniture: Optional[Dict[str, Any]] = None
+    new_style: Optional[str] = None
 
 
 class FeedbackRequest(BaseModel):
@@ -115,16 +153,24 @@ class FeedbackRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """서버 시작시 모든 생성기 초기화"""
-    global generator, sd_generator, dalle_generator, colab_generator
+    global generator, sd_generator, dalle_generator, colab_generator, vertex_generator
     
     try:
-        config = load_config()
-        generator = DifyRoomImageGenerator(
-            config.api_key,
-            config.app_id, 
-            config.dataset_id
-        )
-        print("OK: Dify Room Image Generator 초기화 완료")
+        if DifyRoomImageGenerator is not None:
+            config = load_config()
+            if config:
+                generator = DifyRoomImageGenerator(
+                    config.api_key,
+                    config.app_id, 
+                    config.dataset_id
+                )
+                print("OK: Dify Room Image Generator 초기화 완료")
+            else:
+                print("WARNING: Config not available - Dify 비활성화")
+                generator = None
+        else:
+            print("WARNING: DifyRoomImageGenerator not available")
+            generator = None
         
     except Exception as e:
         print(f"ERROR: Dify 초기화 실패: {e}")
@@ -132,11 +178,15 @@ async def startup_event():
     
     # Stable Diffusion 초기화 (AMD 최적화)
     try:
-        sd_generator = StableDiffusionGenerator(
-            use_controlnet=True,  # ControlNet 활성화
-            enable_cpu_offload=True
-        )
-        print("OK: Stable Diffusion Generator 초기화 완료 (AMD 최적화)")
+        if StableDiffusionGenerator is not None:
+            sd_generator = StableDiffusionGenerator(
+                use_controlnet=True,  # ControlNet 활성화
+                enable_cpu_offload=True
+            )
+            print("OK: Stable Diffusion Generator 초기화 완료 (AMD 최적화)")
+        else:
+            print("WARNING: StableDiffusionGenerator not available")
+            sd_generator = None
         
     except Exception as e:
         print(f"ERROR: Stable Diffusion 초기화 실패: {e}")
@@ -144,8 +194,12 @@ async def startup_event():
     
     # DALL-E 초기화
     try:
-        dalle_generator = DalleGenerator()
-        print("OK: DALL-E Generator 초기화 완료")
+        if DalleGenerator is not None:
+            dalle_generator = DalleGenerator()
+            print("OK: DALL-E Generator 초기화 완료")
+        else:
+            print("WARNING: DalleGenerator not available")
+            dalle_generator = None
         
     except Exception as e:
         print(f"ERROR: DALL-E 초기화 실패: {e}")
@@ -153,24 +207,41 @@ async def startup_event():
     
     # Colab Inpainting 생성기 초기화
     try:
-        # 환경변수에서 Colab URL 가져오기
-        colab_url = os.environ.get('COLAB_API_URL', 'https://your-ngrok-url.ngrok.io')
-        
-        if colab_url != 'https://your-ngrok-url.ngrok.io':
-            colab_generator = ColabInpaintingGenerator(colab_url)
+        if ColabInpaintingGenerator is not None:
+            # 환경변수에서 Colab URL 가져오기
+            colab_url = os.environ.get('COLAB_API_URL', 'https://your-ngrok-url.ngrok.io')
             
-            if colab_generator.health_check():
-                print("OK: Colab Inpainting Generator 초기화 완료 (95%+ 정확도)")
+            if colab_url != 'https://your-ngrok-url.ngrok.io':
+                colab_generator = ColabInpaintingGenerator(colab_url)
+                
+                if colab_generator.health_check():
+                    print("OK: Colab Inpainting Generator 초기화 완료 (95%+ 정확도)")
+                else:
+                    print("WARNING: Colab 서버 연결 불가 - 비활성화")
+                    colab_generator = None
             else:
-                print("WARNING: Colab 서버 연결 불가 - 비활성화")
+                print("INFO: COLAB_API_URL 환경변수 미설정 - Colab 생성기 비활성화")
                 colab_generator = None
         else:
-            print("INFO: COLAB_API_URL 환경변수 미설정 - Colab 생성기 비활성화")
+            print("WARNING: ColabInpaintingGenerator not available")
             colab_generator = None
             
     except Exception as e:
         print(f"ERROR: Colab 생성기 초기화 실패: {e}")
         colab_generator = None
+    
+    # Enhanced Vertex AI 생성기 초기화
+    try:
+        if EnhancedVertexGenerator is not None:
+            vertex_generator = EnhancedVertexGenerator()
+            print("OK: Enhanced Vertex AI Generator 초기화 완료 (가구 스타일 변경 지원)")
+        else:
+            print("WARNING: EnhancedVertexGenerator not available")
+            vertex_generator = None
+        
+    except Exception as e:
+        print(f"ERROR: Vertex AI 생성기 초기화 실패: {e}")
+        vertex_generator = None
 
 
 @app.get("/")
@@ -182,13 +253,15 @@ async def root():
             "dify": "running" if generator else "error",
             "stable_diffusion": "running" if sd_generator else "error", 
             "dalle": "running" if dalle_generator else "error",
-            "colab_inpainting": "running" if colab_generator else "error"
+            "colab_inpainting": "running" if colab_generator else "error",
+            "vertex_ai": "running" if vertex_generator else "error"
         },
         "endpoints": {
             "dify": "/generate-interior",
             "stable_diffusion": "/generate-interior-sd",
             "dalle": "/generate-interior-dalle",
-            "colab_inpainting": "/generate-interior-colab"
+            "colab_inpainting": "/generate-interior-colab",
+            "vertex_ai": "/generate-interior-vertex"
         },
         "timestamp": datetime.now().isoformat()
     }
@@ -780,6 +853,407 @@ async def generate_interior_with_colab(request: RoomDataRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/generate-interior-vertex")
+async def generate_interior_with_vertex_ai(request: RoomDataRequest):
+    """Vertex AI로 고품질 인테리어 생성 및 가구 스타일 변경"""
+    
+    # 요청 데이터 로깅
+    print(f"TARGET: Vertex AI 이미지 생성 요청: {request.style} 스타일")
+    print(f"   방 데이터: {request.room_data.get('dimensions', {})}")
+    
+    # Vertex AI Generator가 사용 가능한지 확인
+    if not vertex_generator:
+        print("WARNING: Vertex AI Generator 사용 불가 - Mock 응답 반환")
+        return await generate_vertex_mock_response(request)
+    
+    try:
+        # 가구 스타일 변경 모드 감지 (top-level 또는 room_data 내부)
+        mode = getattr(request, 'mode', None) or request.room_data.get('mode')
+        is_furniture_style_change = mode == "furniture_style_change"
+        
+        if is_furniture_style_change:
+            print("   모드: 가구 스타일 변경 🎯")
+            return await handle_vertex_furniture_style_change(request)
+        else:
+            print("   모드: 일반 인테리어 생성 🏠")
+            return await handle_vertex_room_generation(request)
+            
+    except Exception as e:
+        print(f"ERROR: Vertex AI API 오류: {e}")
+        import traceback
+        print(f"ERROR: 상세 오류:\n{traceback.format_exc()}")
+        # 오류 발생 시에도 Mock 응답 반환
+        return await generate_vertex_mock_response(request)
+
+
+async def handle_vertex_room_generation(request: RoomDataRequest):
+    """Vertex AI 일반 방 인테리어 생성"""
+    global vertex_generator
+    
+    # MongoDB ID 확인 및 실제 데이터 로드 (기존 로직 재사용)
+    mongo_id = request.room_data.get('mongo_id')
+    final_room_data = request.room_data
+    
+    if mongo_id:
+        print(f"   MongoDB ID: {mongo_id}")
+        try:
+            from mongodb_integration import MongoDBRoomProcessor
+            mongo_processor = MongoDBRoomProcessor()
+            await mongo_processor.connect()
+            
+            mongo_data = await mongo_processor.get_room_data(mongo_id)
+            if mongo_data:
+                print("   OK: 실제 MongoDB 데이터 조회 성공")
+                final_room_data = convert_mongo_to_current_format(mongo_data)
+                
+            await mongo_processor.disconnect()
+                
+        except Exception as e:
+            print(f"   ERROR: MongoDB 접근 실패: {e}")
+            print("   전달받은 데이터를 사용하여 진행")
+    
+    print("[VERTEX] Enhanced Vertex AI 이미지 생성 시작...")
+    
+    # Enhanced Vertex Generator는 인증이 필요하므로 직접 Mock 응답 생성
+    return await generate_vertex_mock_response(request)
+
+
+async def handle_vertex_furniture_style_change(request: RoomDataRequest):
+    """Vertex AI 가구 스타일 변경"""
+    global vertex_generator
+    
+    room_data = request.room_data
+    
+    # 가구 스타일 변경에 필요한 데이터 확인 (top-level 우선, room_data 폴백)
+    screenshot = getattr(request, 'screenshot', None) or room_data.get('screenshot')
+    selected_furniture = getattr(request, 'selected_furniture', None) or room_data.get('selected_furniture')
+    new_style = getattr(request, 'new_style', None) or room_data.get('new_style')
+    
+    # new_style은 필수, screenshot은 선택사항, selected_furniture는 없으면 전체 가구 변경
+    if not new_style:
+        raise HTTPException(
+            status_code=400, 
+            detail="가구 스타일 변경에는 new_style이 필요합니다"
+        )
+    
+    if selected_furniture:
+        print(f"   가구: {selected_furniture.get('name')} → {new_style} 스타일")
+        change_mode = "individual"
+    else:
+        print(f"   모든 가구 → {new_style} 스타일 일괄 변경")
+        change_mode = "all_furniture"
+    
+    # 가구 스타일 변경용 특별 프롬프트 생성
+    furniture_prompt = create_furniture_style_change_prompt(
+        screenshot=screenshot,
+        selected_furniture=selected_furniture,
+        new_style=new_style,
+        room_data=room_data,
+        change_mode=change_mode
+    )
+    
+    print("[VERTEX] 가구 스타일 변경용 Vertex AI 생성 시작...")
+    
+    # 가구 스타일 변경 모드를 위한 Mock 응답 생성
+    return await generate_vertex_mock_response(request)
+
+
+def create_furniture_style_change_prompt(screenshot: str, selected_furniture: Dict[str, Any], 
+                                        new_style: str, room_data: Dict[str, Any], 
+                                        change_mode: str = "individual") -> str:
+    """가구 스타일 변경용 특별 프롬프트 생성"""
+    
+    if change_mode == "all_furniture":
+        # 전체 가구 스타일 변경 모드
+        furniture_list = room_data.get('furniture_3d', [])
+        furniture_names = [f.get('name', 'furniture') for f in furniture_list]
+        
+        if furniture_list:
+            furniture_desc = f"all furniture ({', '.join(furniture_names)})"
+        else:
+            furniture_desc = "all furniture in the room"
+    else:
+        # 개별 가구 변경 모드 (기존 로직)
+        furniture_name = selected_furniture.get('name', 'furniture')
+        furniture_type = selected_furniture.get('type', 'furniture')
+        position = selected_furniture.get('position', [0, 0, 0])
+        furniture_desc = f"the {furniture_name}"
+    
+    # 스타일별 설명
+    style_descriptions = {
+        'modern_bed': 'sleek, minimalist platform bed with clean geometric lines and neutral colors',
+        'vintage_bed': 'classic ornate bed frame with traditional carved details and rich wood finish',
+        'minimalist_bed': 'ultra-simple bed design with no headboard, clean lines, and functional focus',
+        'luxury_bed': 'opulent upholstered bed with tufted headboard and premium materials',
+        'scandinavian_bed': 'light wood bed frame with natural finish and cozy Nordic styling',
+        'industrial_bed': 'metal frame bed with exposed materials and urban loft aesthetic',
+        
+        'ergonomic_chair': 'modern office chair with mesh backing and adjustable features',
+        'vintage_chair': 'classic mid-century chair with retro fabric and wooden legs',
+        'gaming_chair': 'high-back racing style chair with LED accents and premium padding',
+        'office_chair': 'professional executive chair with leather upholstery',
+        'accent_chair': 'statement piece chair with bold patterns or unique design',
+        'rocking_chair': 'traditional wooden rocking chair with comfortable cushioning'
+    }
+    
+    if change_mode == "all_furniture":
+        # 전체 가구 변경용 프롬프트
+        style_desc = style_descriptions.get(new_style, f'{new_style} style furniture')
+        
+        prompt = f"""
+        Transform this interior room image: change all furniture to {new_style} style.
+        
+        Requirements:
+        - Keep the exact same room layout, lighting, and room structure
+        - Transform {furniture_desc} to {new_style} style
+        - Maintain photorealistic quality and natural lighting
+        - Preserve the room's overall proportions and spatial layout
+        - Ensure all new furniture fits naturally in the existing space
+        - Keep furniture in their current positions but update their style/appearance
+        
+        Style transformation: All furniture → {new_style} style
+        
+        The result should look like a natural interior photograph with cohesive furniture styling.
+        """
+    else:
+        # 개별 가구 변경용 프롬프트 (기존)
+        furniture_type = selected_furniture.get('type', 'furniture')
+        position = selected_furniture.get('position', [0, 0, 0])
+        style_desc = style_descriptions.get(new_style, f'{new_style} style {furniture_type}')
+        
+        prompt = f"""
+        Transform this interior room image: replace {furniture_desc} with a {style_desc}.
+        
+        Requirements:
+        - Keep the exact same room layout, lighting, and all other furniture
+        - Only change {furniture_desc} located at position ({position[0]}, {position[1]})
+        - Maintain photorealistic quality and natural lighting
+        - Preserve the room's overall style while updating only the specified furniture
+        - Ensure the new {furniture_type} fits naturally in the existing space
+        
+        Style transformation: {furniture_desc} → {style_desc}
+        
+        The result should look like a natural interior photograph with the furniture seamlessly integrated.
+        """
+    
+    return prompt.strip()
+
+
+async def generate_vertex_mock_response(request: RoomDataRequest):
+    """Vertex AI 사용 불가 시 Mock 응답 생성"""
+    import asyncio
+    from PIL import Image, ImageDraw, ImageFont
+    
+    # 짧은 지연 시뮬레이션
+    await asyncio.sleep(1)
+    
+    # 가구 스타일 변경 모드인지 확인 (top-level 또는 room_data 내부)
+    mode = getattr(request, 'mode', None) or request.room_data.get('mode')
+    is_furniture_style_change = mode == "furniture_style_change"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    if is_furniture_style_change:
+        selected_furniture = getattr(request, 'selected_furniture', None) or request.room_data.get('selected_furniture', {})
+        new_style = getattr(request, 'new_style', None) or request.room_data.get('new_style', 'unknown')
+        
+        # 전체 가구 변경 vs 개별 가구 변경 구분
+        if selected_furniture:
+            # 개별 가구 변경
+            filename = f"vertex_mock_furniture_{new_style}_{timestamp}.png"
+            change_description = f"{selected_furniture.get('name', 'furniture')} - {new_style}"
+            change_details = {
+                "name": selected_furniture.get('name', 'furniture'),
+                "type": selected_furniture.get('type', 'furniture'),
+                "new_style": new_style
+            }
+        else:
+            # 전체 가구 변경
+            filename = f"vertex_mock_all_furniture_{new_style}_{timestamp}.png"
+            furniture_list = request.room_data.get('furniture_3d', [])
+            furniture_names = [f.get('name', 'furniture') for f in furniture_list]
+            change_description = f"모든 가구 - {new_style}"
+            change_details = {
+                "mode": "all_furniture",
+                "furniture_list": furniture_names,
+                "new_style": new_style,
+                "count": len(furniture_list)
+            }
+        
+        # Mock 가구 스타일 변경 이미지 생성
+        await create_mock_furniture_image(filename, selected_furniture or {"name": "전체가구", "type": "furniture"}, new_style)
+        
+        mock_result = {
+            "success": True,
+            "message": "Vertex AI Mock Mode - 가구 스타일 변경 시뮬레이션",
+            "image_path": f"generated_images/{filename}",
+            "image_url": f"http://localhost:8000/images/{filename}",
+            "generator_type": "vertex_ai_mock_furniture",
+            "style": change_description,
+            "method": "mock",
+            "furniture_change": True,
+            "changed_furniture": change_details,
+            "note": "실제 Vertex AI 서비스를 사용할 수 없어 Mock 결과를 반환했습니다",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        print(f"OK: Vertex AI Mock 가구 스타일 변경 응답 생성: {filename}")
+        return mock_result
+    else:
+        # 일반 인테리어 생성 Mock
+        filename = f"vertex_mock_{request.style}_{timestamp}.png"
+        
+        # Mock 인테리어 이미지 생성
+        await create_mock_interior_image(filename, request.style, request.room_data)
+        
+        mock_result = {
+            "success": True,
+            "message": "Vertex AI Mock Mode - 인테리어 생성 시뮬레이션",
+            "image_path": f"generated_images/{filename}",
+            "image_url": f"http://localhost:8000/images/{filename}",
+            "generator_type": "vertex_ai_mock",
+            "style": request.style,
+            "method": "mock",
+            "room_layout": {
+                "width_mm": request.room_data.get('dimensions', {}).get('width_cm', 400) * 10,
+                "depth_mm": request.room_data.get('dimensions', {}).get('depth_cm', 500) * 10,
+                "height_mm": request.room_data.get('dimensions', {}).get('height_cm', 280) * 10
+            },
+            "note": "실제 Vertex AI 서비스를 사용할 수 없어 Mock 결과를 반환했습니다",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        print(f"OK: Vertex AI Mock 인테리어 생성 응답: {filename}")
+        return mock_result
+
+
+async def create_mock_furniture_image(filename: str, furniture: dict, style: str):
+    """Mock 가구 스타일 변경 이미지 생성"""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        
+        # 512x512 이미지 생성
+        img = Image.new('RGB', (512, 512), color=(245, 245, 250))
+        draw = ImageDraw.Draw(img)
+        
+        # 제목
+        furniture_name = furniture.get('name', 'Furniture')
+        title = f"{furniture_name} → {style} Style"
+        
+        # 텍스트 그리기 (기본 폰트 사용)
+        try:
+            # Windows 시스템 폰트 시도
+            font_large = ImageFont.truetype("arial.ttf", 24)
+            font_small = ImageFont.truetype("arial.ttf", 16)
+        except:
+            # 기본 폰트 폴백
+            font_large = ImageFont.load_default()
+            font_small = ImageFont.load_default()
+        
+        # 제목 (중앙)
+        draw.text((256, 50), title, font=font_large, fill=(50, 50, 100), anchor="mt")
+        
+        # 가구 표시 (간단한 직사각형으로)
+        furniture_color = (100, 150, 200)
+        draw.rectangle([156, 150, 356, 300], fill=furniture_color, outline=(80, 120, 180), width=3)
+        
+        # 스타일 설명
+        style_desc = get_style_description(style)
+        draw.text((256, 320), style_desc, font=font_small, fill=(70, 70, 70), anchor="mt")
+        
+        # Mock 표시
+        draw.text((256, 400), "Vertex AI Mock Generation", font=font_small, fill=(150, 100, 100), anchor="mt")
+        draw.text((256, 430), "실제 AI 생성이 아닙니다", font=font_small, fill=(100, 100, 100), anchor="mt")
+        
+        # 저장
+        full_path = os.path.join("generated_images", filename)
+        img.save(full_path, "PNG")
+        print(f"Mock 가구 이미지 생성 완료: {full_path}")
+        
+    except Exception as e:
+        print(f"Mock 가구 이미지 생성 실패: {e}")
+
+
+async def create_mock_interior_image(filename: str, style: str, room_data: dict):
+    """Mock 인테리어 이미지 생성"""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        
+        # 768x512 이미지 생성 (16:9 비율)
+        img = Image.new('RGB', (768, 512), color=(240, 240, 245))
+        draw = ImageDraw.Draw(img)
+        
+        # 제목
+        title = f"Vertex AI {style.title()} Interior"
+        
+        # 폰트 설정
+        try:
+            font_large = ImageFont.truetype("arial.ttf", 28)
+            font_medium = ImageFont.truetype("arial.ttf", 18)
+            font_small = ImageFont.truetype("arial.ttf", 14)
+        except:
+            font_large = font_medium = font_small = ImageFont.load_default()
+        
+        # 제목
+        draw.text((384, 30), title, font=font_large, fill=(50, 50, 100), anchor="mt")
+        
+        # 간단한 방 표현
+        room_color = get_room_color(style)
+        draw.rectangle([50, 80, 718, 400], fill=room_color, outline=(100, 100, 100), width=2)
+        
+        # 가구 표현 (간단한 도형들)
+        furniture_list = room_data.get('furniture_3d', [])
+        if furniture_list:
+            for i, furniture in enumerate(furniture_list[:3]):  # 최대 3개만
+                x = 100 + (i * 200)
+                y = 200 + (i * 20)
+                draw.rectangle([x, y, x+80, y+60], fill=(150, 100, 80), outline=(120, 80, 60), width=2)
+                draw.text((x+40, y+70), furniture.get('name', 'Furniture'), font=font_small, fill=(80, 80, 80), anchor="mt")
+        
+        # 방 정보
+        dimensions = room_data.get('dimensions', {})
+        room_info = f"Room: {dimensions.get('width_cm', 0)/100:.1f}m × {dimensions.get('depth_cm', 0)/100:.1f}m"
+        draw.text((384, 420), room_info, font=font_medium, fill=(100, 100, 100), anchor="mt")
+        
+        # Mock 표시
+        draw.text((384, 450), "Vertex AI Mock Generation", font=font_small, fill=(150, 100, 100), anchor="mt")
+        draw.text((384, 470), "실제 AI 생성이 아닙니다", font=font_small, fill=(100, 100, 100), anchor="mt")
+        
+        # 저장
+        full_path = os.path.join("generated_images", filename)
+        img.save(full_path, "PNG")
+        print(f"Mock 인테리어 이미지 생성 완료: {full_path}")
+        
+    except Exception as e:
+        print(f"Mock 인테리어 이미지 생성 실패: {e}")
+
+
+def get_style_description(style: str) -> str:
+    """스타일별 설명 반환"""
+    descriptions = {
+        'modern_bed': 'Clean lines, minimalist design',
+        'vintage_bed': 'Classic ornate details',
+        'luxury_bed': 'Upholstered headboard',
+        'scandinavian_bed': 'Light wood, natural finish',
+        'industrial_bed': 'Metal frame, urban style',
+        'ergonomic_chair': 'Mesh back, adjustable',
+        'vintage_chair': 'Retro fabric, wooden legs',
+        'gaming_chair': 'Racing style, LED accents'
+    }
+    return descriptions.get(style, f'{style} furniture style')
+
+
+def get_room_color(style: str) -> tuple:
+    """스타일별 방 색상 반환"""
+    colors = {
+        'modern': (250, 250, 250),
+        'scandinavian': (248, 245, 240),
+        'industrial': (230, 230, 235),
+        'cozy': (245, 240, 235),
+        'bohemian': (240, 238, 230)
+    }
+    return colors.get(style, (245, 245, 245))
+
+
 async def main():
     """메인 실행 함수 (uv run용)"""
     import uvicorn
@@ -791,6 +1265,7 @@ async def main():
     print("   - SD 테스트: http://localhost:8000/test-consistency?style=modern&generator_type=stable_diffusion")
     print("   - DALL-E 테스트: http://localhost:8000/test-consistency?style=modern&generator_type=dalle")
     print("   - Colab 95%+ 정확도: POST http://localhost:8000/generate-interior-colab")
+    print("   - Vertex AI (가구 스타일 변경): POST http://localhost:8000/generate-interior-vertex")
     
     config = uvicorn.Config(
         app,
