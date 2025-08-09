@@ -16,21 +16,32 @@
       </div>
       <div class="row">
         <label>Provider</label>
-        <select id="provider">
-          <option value="stability">stability</option>
-          <option value="replicate">replicate</option>
+        <select id="provider" onchange="updateModelOptions()">
           <option value="vertex">vertex</option>
+          <option value="replicate">replicate</option>
+          <option value="stability">stability</option>
         </select>
       </div>
-      <div class="row">
-        <label>Prompt</label>
-        <textarea id="prompt" rows="4">A realistic cozy bedroom, same perspective as input image, white and light gray walls, warm wooden floor, a modern low bed with white duvet and two light-gray pillows, soft warm ceiling spotlight near the corner, subtle wall shadow, minimal decor, photo-realistic, high detail</textarea>
+      <div class="row" id="model-row" style="display: none;">
+        <label>Model</label>
+        <select id="model" onchange="updateStructureOptions()">
+          <option value="default">Default SDXL</option>
+          <option value="depth2img">ControlNet Depth2Img (레이아웃 유지)</option>
+          <option value="controlnet">ControlNet Structure (구조 보존)</option>
+          <option value="fooocus">Fooocus Inpainting (부분 수정)</option>
+          <option value="flux_ultra">FLUX Pro Ultra (고해상도)</option>
+        </select>
       </div>
-      <div class="row">
-        <label>strength</label>
-        <input type="number" id="strength" step="0.01" min="0" max="1" value="0.6" />
-        <label>guidance</label>
-        <input type="number" id="guidance" step="0.1" min="0" max="20" value="7.5" />
+      <div class="row" id="structure-row" style="display: none;">
+        <label>Structure Type</label>
+        <select id="structure">
+          <option value="depth">Depth (깊이)</option>
+          <option value="canny">Canny (외곽선)</option>
+          <option value="hed">HED (경계)</option>
+          <option value="normal">Normal (법선)</option>
+          <option value="openpose">OpenPose (포즈)</option>
+          <option value="scribble">Scribble (스케치)</option>
+        </select>
       </div>
       <button>생성</button>
     </form>
