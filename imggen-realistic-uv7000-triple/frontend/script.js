@@ -40,12 +40,14 @@ form.addEventListener('submit', async (e) => {
   const provider = document.getElementById('provider').value;
   const model = document.getElementById('model').value;
   const structure = document.getElementById('structure').value;
+  const style = document.getElementById('style').value;
   
   const fd = new FormData();
   fd.append('image', file);
   fd.append('provider', provider);
   fd.append('model', model);
   fd.append('structure', structure);
+  fd.append('style', style);
   
   try {
     const res = await fetch('http://localhost:7000/api/realistic-room', { method: 'POST', body: fd });
@@ -58,7 +60,7 @@ form.addEventListener('submit', async (e) => {
       const img = document.createElement('img');
       img.src = url;
       const info = document.createElement('p');
-      info.textContent = `${provider} - ${model} ${model === 'controlnet' ? `(${structure})` : ''}`;
+      info.textContent = `${provider} - ${model} ${model === 'controlnet' ? `(${structure})` : ''} ${model === 'pipeline_3d_capture' ? `(${style})` : ''}`;
       info.style.fontSize = '12px';
       info.style.color = '#666';
       const a = document.createElement('a');

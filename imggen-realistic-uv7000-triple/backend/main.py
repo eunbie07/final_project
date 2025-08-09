@@ -1,4 +1,4 @@
-import os, base64, subprocess, io, uuid
+import os, base64, subprocess, io, uuid, asyncio
 from typing import List
 from datetime import datetime
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
@@ -9,7 +9,8 @@ from PIL import Image
 from dotenv import load_dotenv
 from prompt_templates import (
     DEFAULT_PROMPT, STABILITY_PROMPT, REPLICATE_PROMPT, VERTEX_PROMPT, 
-    NEGATIVE_PROMPT, DEFAULT_STRENGTH, DEFAULT_GUIDANCE
+    NEGATIVE_PROMPT, DEFAULT_STRENGTH, DEFAULT_GUIDANCE,
+    CAPTURE_TO_REAL_PROMPT, STYLE_PRESETS
 )
 
 load_dotenv()
@@ -209,6 +210,7 @@ async def call_replicate_depth2img(image_bytes: bytes, prompt: str, strength: fl
                 if status != "succeeded":
                     raise HTTPException(500, f"Replicate job {status}")
                 return j["output"]
+            await asyncio.sleep(1)
 
 async def call_replicate_controlnet_structure(image_bytes: bytes, prompt: str, strength: float, guidance: float, structure: str = "depth") -> List[str]:
     """RossJillian ControlNet 모델 - 다양한 구조 보존"""
@@ -252,6 +254,7 @@ async def call_replicate_controlnet_structure(image_bytes: bytes, prompt: str, s
                 if status != "succeeded":
                     raise HTTPException(500, f"Replicate job {status}")
                 return j["output"]
+            await asyncio.sleep(1)
 
 # 기존 SDXL 모델 유지 (백업용)
 async def call_replicate_sdxl_i2i(image_bytes: bytes, prompt: str, strength: float, guidance: float) -> List[str]:
@@ -298,6 +301,7 @@ async def call_replicate_sdxl_i2i(image_bytes: bytes, prompt: str, strength: flo
                 if status != "succeeded":
                     raise HTTPException(500, f"Replicate job {status}")
                 return j["output"]
+            await asyncio.sleep(1)
 
 async def call_replicate_fooocus_inpaint(image_bytes: bytes, prompt: str, strength: float, guidance: float) -> List[str]:
     """Fooocus 인페인팅 모델 - 부분 수정 및 스타일 튜닝"""
@@ -385,6 +389,7 @@ async def call_replicate_fooocus_inpaint(image_bytes: bytes, prompt: str, streng
                 if status != "succeeded":
                     raise HTTPException(500, f"Replicate job {status}")
                 return j["output"]
+            await asyncio.sleep(1)
 
 async def call_replicate_flux_ultra(image_bytes: bytes, prompt: str, strength: float, guidance: float) -> List[str]:
     """FLUX 1.1 Pro Ultra 모델 - 고해상도 포토리얼 업스케일"""
@@ -430,6 +435,7 @@ async def call_replicate_flux_ultra(image_bytes: bytes, prompt: str, strength: f
                 if status != "succeeded":
                     raise HTTPException(500, f"Replicate job {status}")
                 return j["output"]
+            await asyncio.sleep(1)
 
 async def call_vertex_imagen3(image_bytes: bytes, prompt: str, strength: float, guidance: float) -> str:
     if not GCP_PROJECT_ID:
@@ -524,13 +530,62 @@ async def call_vertex_imagen3(image_bytes: bytes, prompt: str, strength: float, 
     # 모든 모델이 실패한 경우
     raise HTTPException(500, f"모든 Vertex AI 모델 시도 실패. 마지막 오류: {last_error}")
 
+# 3D 캡처 전용 2단계 파이프라인
+async def run_pipeline_3d_capture(
+    img_bytes: bytes, style: str, strength: float, guidance: float
+) -> str:
+    # 1단계: ControlNet Depth로 레이아웃 유지 i2i
+    style_text = STYLE_PRESETS.get(style, "")
+    depth_prompt = (
+        f"{CAPTURE_TO_REAL_PROMPT} "
+        f"{DEFAULT_PROMPT} "
+        f"If any CGI flat shading is detected, replace with realistic PBR textures. "
+        f"Style: {style_text}".strip()
+    )
+
+    # ControlNet(rossjillian) 또는 depth2img(jagilley) 중 하나 선택
+    try:
+        urls = await call_replicate_controlnet_structure(
+            img_bytes, prompt=depth_prompt, strength=strength,
+            guidance=guidance, structure="depth"
+        )
+    except Exception:
+        # 폴백: depth2img
+        urls = await call_replicate_depth2img(
+            img_bytes, prompt=depth_prompt, strength=strength, guidance=guidance
+        )
+
+    if not urls:
+        raise HTTPException(500, "Stage1 실패: ControlNet 결과가 비어 있습니다.")
+    stage1_url = urls[0]
+
+    # 2단계: FLUX Ultra로 고해상도 디테일 강화 (이미지 프롬프트 비중 약간 올림)
+    async with httpx.AsyncClient(timeout=120) as client:
+        r = await client.get(stage1_url)
+        if r.status_code != 200:
+            raise HTTPException(502, f"Stage1 이미지 다운로드 실패: {r.status_code}")
+        stage1_bytes = r.content
+
+    # 실사 유지 + 과도한 재해석 방지
+    flux_prompt = (
+        "Enhance photorealism, preserve layout and furniture identity from the image, "
+        "add subtle micro-textures on fabric and wood, clean edges, reduce CGI feel."
+    )
+    flux_urls = await call_replicate_flux_ultra(
+        stage1_bytes, prompt=flux_prompt, strength=0.25, guidance=guidance
+    )
+    if not flux_urls:
+        raise HTTPException(500, "Stage2 실패: FLUX 업스케일 실패")
+    return flux_urls[0]
+
 # Unified endpoint
 @app.post("/api/realistic-room", response_model=I2IResponse)
 async def realistic_room(
     image: UploadFile = File(...),
     provider: str = Form("stability"),  # stability | replicate | vertex 
-    model: str = Form("default"),  # default | depth2img | controlnet | fooocus | flux_ultra
+    model: str = Form("default"),  # default | depth2img | controlnet | fooocus | flux_ultra | pipeline_3d_capture
     structure: str = Form("depth"),  # depth | canny | hed | mlsd | normal | openpose | scribble | seg (controlnet용)
+    style: str = Form("scandinavian")  # scandinavian | modern | bohemian | japanese
 ):
     # 프롬프트와 파라미터를 코드에서 직접 설정
     prompt = DEFAULT_PROMPT
@@ -547,7 +602,20 @@ async def realistic_room(
     print(f"[Main] 요청 ID: {request_id}, 업로드 파일: {uploaded_path}")
     
     try:
-        if provider == "stability":
+        if provider == "replicate" and model == "pipeline_3d_capture":
+            # 전용 파이프라인 실행
+            final_url = await run_pipeline_3d_capture(img_bytes, style, strength, guidance)
+
+            # 저장
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(final_url)
+                if resp.status_code == 200:
+                    img_b64 = base64.b64encode(resp.content).decode()
+                    save_generated_image(f"data:image/png;base64,{img_b64}",
+                                         f"{provider}_{model}", request_id)
+            return {"images": [final_url]}
+        
+        elif provider == "stability":
             out = await call_stability_i2i(img_bytes, STABILITY_PROMPT, strength, guidance)
             # 생성된 이미지 저장
             if out:

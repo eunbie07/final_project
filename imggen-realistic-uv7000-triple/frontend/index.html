@@ -30,6 +30,7 @@
           <option value="controlnet">ControlNet Structure (구조 보존)</option>
           <option value="fooocus">Fooocus Inpainting (부분 수정)</option>
           <option value="flux_ultra">FLUX Pro Ultra (고해상도)</option>
+          <option value="pipeline_3d_capture">3D Capture Pipeline (2단계 파이프라인)</option>
         </select>
       </div>
       <div class="row" id="structure-row" style="display: none;">
@@ -41,6 +42,15 @@
           <option value="normal">Normal (법선)</option>
           <option value="openpose">OpenPose (포즈)</option>
           <option value="scribble">Scribble (스케치)</option>
+        </select>
+      </div>
+      <div class="row" id="style-row">
+        <label>Style</label>
+        <select id="style">
+          <option value="scandinavian">Scandinavian (스칸디나비안)</option>
+          <option value="modern">Modern (모던)</option>
+          <option value="bohemian">Bohemian (보헤미안)</option>
+          <option value="japanese">Japanese (일본식)</option>
         </select>
       </div>
       <button>생성</button>
