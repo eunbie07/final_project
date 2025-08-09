@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      - STABILITY_API_KEY=${STABILITY_API_KEY}
+      - REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GCP_LOCATION=${GCP_LOCATION}
+      - GCP_SERVICE_ACCOUNT_JSON_PATH=${GCP_SERVICE_ACCOUNT_JSON_PATH}
+    ports:
+      - "7000:7000"
+    volumes:
+      - ./backend/service-account.json:/app/service-account.json:ro
+    restart: unless-stopped

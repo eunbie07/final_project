@@ -1,0 +1,9 @@
+body { font-family: system-ui, sans-serif; background:#fafafa; color:#111; margin:0; }
+.wrap { max-width: 900px; margin: 24px auto; padding: 16px; }
+.row { display:flex; gap:8px; align-items:center; margin:8px 0; }
+label { width: 90px; }
+input, select, textarea, button { padding:8px; border:1px solid #ddd; border-radius:8px; }
+button { cursor:pointer; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:12px; margin-top:16px; }
+.card { background:#fff; border:1px solid #eee; border-radius:12px; padding:8px; }
+.card img { width:100%; display:block; border-radius:8px; }

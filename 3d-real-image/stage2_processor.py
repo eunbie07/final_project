@@ -73,8 +73,8 @@ class PhotorealisticProcessor:
             # API URL
             url = f"{self.stability_host}{self.stability_path}"
             
-            # 실사화 프롬프트
-            prompt = "photorealistic interior photograph, professional photography, realistic textures, natural lighting, high quality, architectural photography"
+            # 실사화 강화 프롬프트
+            prompt = "enhance this interior to professional architectural photography quality, perfect lighting, ultra realistic textures, high-end interior design magazine quality, detailed materials, perfect shadows and reflections"
             
             # 일반 FormData 방식으로 변경
             files = {
@@ -90,7 +90,7 @@ class PhotorealisticProcessor:
                 'sampler': 'K_DPM_2_ANCESTRAL',
                 'samples': '1',
                 'steps': '50',
-                'image_strength': '0.6'
+                'image_strength': '0.4'  # 낮춰서 원본 더 유지하되 품질만 향상
             }
             
             print("   Stability AI로 실사화 중...")

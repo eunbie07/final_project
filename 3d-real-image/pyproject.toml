@@ -10,6 +10,8 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "werkzeug>=2.3.0",
     "requests-toolbelt>=1.0.0",
+    "openai>=1.99.5",
+    "replicate>=1.0.7",
 ]
 
 [tool.hatch.build.targets.wheel]

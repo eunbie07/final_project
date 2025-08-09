@@ -116,3 +116,11 @@ claude_*
 **/key.json.example
 **/service-account*.json
 **/google-credentials*.json
+**/*key*.json
+**/*key*
+*key*
+
+# Environment files
+**/*env*.json
+**/*env*
+*env*

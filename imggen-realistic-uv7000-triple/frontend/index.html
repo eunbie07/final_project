@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Realistic Room i2i</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <h1>실사 인테리어 생성 (Stability / Replicate / Vertex)</h1>
+    <form id="form">
+      <div class="row">
+        <label>이미지</label>
+        <input type="file" id="image" accept="image/*" required />
+      </div>
+      <div class="row">
+        <label>Provider</label>
+        <select id="provider">
+          <option value="stability">stability</option>
+          <option value="replicate">replicate</option>
+          <option value="vertex">vertex</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Prompt</label>
+        <textarea id="prompt" rows="4">A realistic cozy bedroom, same perspective as input image, white and light gray walls, warm wooden floor, a modern low bed with white duvet and two light-gray pillows, soft warm ceiling spotlight near the corner, subtle wall shadow, minimal decor, photo-realistic, high detail</textarea>
+      </div>
+      <div class="row">
+        <label>strength</label>
+        <input type="number" id="strength" step="0.01" min="0" max="1" value="0.6" />
+        <label>guidance</label>
+        <input type="number" id="guidance" step="0.1" min="0" max="20" value="7.5" />
+      </div>
+      <button>생성</button>
+    </form>
+    <div id="out" class="grid"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
